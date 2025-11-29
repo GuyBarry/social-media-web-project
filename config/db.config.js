@@ -6,6 +6,13 @@ const config = {
   dbPassword: process.env.DB_PASSWORD ?? "",
 };
 
+const dbAuth =
+  config.dbUsername && config.dbPassword
+    ? `${encodeURIComponent(config.dbUsername)}:${encodeURIComponent(
+        config.dbPassword
+      )}@`
+    : "";
+
 export default {
-  connectionUrl: `mongodb://${config.dbUsername}:${config.dbPassword}@${config.dbHost}:${config.dbPort}/${config.dbName}?authSource=admin`,
+  connectionUrl: `mongodb://${dbAuth}${config.dbHost}:${config.dbPort}/${config.dbName}?authSource=admin`,
 };
