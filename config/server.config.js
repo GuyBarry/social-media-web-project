@@ -1,3 +1,3 @@
 export default {
-  PORT: process.env.SERVER_PORT ?? 8000,
+  port: process.env.SERVER_PORT ?? 8000,
 };

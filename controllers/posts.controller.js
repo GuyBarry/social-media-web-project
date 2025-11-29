@@ -1,5 +1,5 @@
 import express from "express";
-import postService from '../services/posts.service'
+import postService from '../services/posts.service.js'
 
 const router = express.Router();
 

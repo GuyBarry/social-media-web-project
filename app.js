@@ -1,18 +1,18 @@
+import express from "express";
 import bodyParser from "body-parser";
-import postsController from "./controllers/posts.controller";
-import serverConfig from "./config/server.config";
-import { errorHandler } from "./middlewares/errorHandler";
+import postsController from "./controllers/posts.controller.js";
+import serverConfig from "./config/server.config.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
 
 const main = async () => {
   const port = serverConfig.port;
   const app = express();
 
-  //middleware
+  app.use(bodyParser.urlencoded({ extended: true, limit: "1mb" }));
   app.use(bodyParser.json());
-  app.use(errorHandler);
-
-  //endpoints
+  
   app.use("/posts", postsController);
+  app.use(errorHandler);
 
   try {
     app.listen(port, () => {
