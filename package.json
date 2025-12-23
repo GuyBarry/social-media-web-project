@@ -5,10 +5,11 @@
   "license": "ISC",
   "author": "",
   "type": "module",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --env-file=.env app.js"
+    "test": "jest --detectOpenHandles --forceExit",
+    "start": "node --env-file=.env app.js",
+    "devstart": "nodemon --env-file=.env app.js"
   },
   "dependencies": {
     "body-parser": "^2.2.1",
@@ -17,5 +18,10 @@
     "mongoose": "^9.0.0",
     "uuid": "^13.0.0",
     "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.3",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
   }
 }
