@@ -1,12 +1,12 @@
 import express from "express";
 import bodyParser from "body-parser";
-import postsController from "./controllers/posts.controller.js";
+import postsController from "./posts/posts.controller.js";
 import serverConfig from "./config/server.config.js";
 import dbConfig from "./config/db.config.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import mongoose from "mongoose";
 
-const main = async () => {
+export const initApp = async () => {
   const port = serverConfig.port;
   const app = express();
 
@@ -32,6 +32,8 @@ const main = async () => {
 
     console.error(errorLog);
   }
+
+  return app;
 };
 
-main();
+initApp();
