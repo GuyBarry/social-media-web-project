@@ -32,4 +32,14 @@ describe("GET / ", () => {
     expect(response.body.length).toBeGreaterThan(0);
     expect(response.body[0]._id).toBe(examplePost._id);
   });
+
+  test("Should return empty array when no posts exist", async () => {
+    await Post.deleteMany();
+
+    const response = await request(app).get("/posts");
+
+    expect(response.statusCode).toEqual(200);
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toEqual(0);
+  });
 });
