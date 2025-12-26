@@ -10,7 +10,7 @@ beforeAll(async () => {
   await initApp().then(async (appInstance) => {
     app = appInstance;
   });
-  Post.deleteMany().exec();
+  await Post.deleteMany();
 });
 
 beforeEach(async () => {
