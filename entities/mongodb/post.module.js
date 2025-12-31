@@ -12,7 +12,7 @@ const postSchema = new Schema(
       required: true,
     },
     sender: {
-      type: Number,
+      type: String,
       required: true,
     },
   },
