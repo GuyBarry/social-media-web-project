@@ -5,7 +5,7 @@ import dbConfig from "./config/db.config.js";
 import serverConfig from "./config/server.config.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { noRouteHandler } from "./middlewares/noRouteHandler.js";
-import postsController from "./posts/posts.controller.js";
+import { postsController } from "./posts/posts.controller.js";
 
 export const initApp = async () => {
   const port = serverConfig.port;

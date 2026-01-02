@@ -24,4 +24,4 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-export default router;
+export const postsController = router;

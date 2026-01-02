@@ -59,4 +59,12 @@ describe("GET / ", () => {
       expect(response.body.message).toBe("Post does not exist");
     });
   });
+
+  describe("GET /invalid-endpoint", () => {
+    test("Should return 404 for invalid endpoint", async () => {
+      const response = await request(app).get("/invalid-endpoint");
+      expect(response.statusCode).toEqual(404);
+      expect(response.body.message).toBe("Route does not exist");
+    });
+  });
 });
