@@ -31,6 +31,7 @@ describe("GET / ", () => {
     expect(response.body.length).toBeGreaterThan(0);
     expect(response.body[0]._id).toBe(exampleComment._id);
   });
+
   test("Should return empty array when no comments exist", async () => {
     await Comment.deleteMany();
     const response = await request(app).get("/comments");
@@ -52,6 +53,7 @@ describe("GET / ", () => {
       expect(response.body[0]._id).toBe(exampleComment._id);
       expect(response.body[0].postId).toBe(exampleComment.postId);
     });
+    
     test("Should return empty array when no comments exist for postId", async () => {
       const response = await request(app).get(`/comments?postId=nonexistentid`);
 

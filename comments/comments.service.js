@@ -1,7 +1,7 @@
 import { commentsRepository } from "./comments.repository.js";
 
-const getAllComments = () => commentsRepository.getAllComments();
-const getAllCommentsByPostId = (postId) => commentsRepository.getAllCommentsByPostId(postId);
+const getAllComments = async () => await commentsRepository.getAllComments();
+const getAllCommentsByPostId = async (postId) => await commentsRepository.getAllCommentsByPostId(postId);
 
 export const commentsService = {
   getAllComments,

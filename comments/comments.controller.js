@@ -5,10 +5,10 @@ const router = express.Router();
 
 // Get all comments
 router.get("/", async (req, res) => {
-  const postID = req.query.postId;
+  const postId = req.query.postId;
 
-  const response = postID
-    ? await commentsService.getAllCommentsByPostId(postID)
+  const response = postId
+    ? await commentsService.getAllCommentsByPostId(postId)
     : await commentsService.getAllComments();
 
   res.status(200).send(response);
