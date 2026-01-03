@@ -42,29 +42,82 @@ describe("GET / ", () => {
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toEqual(0);
   });
+});
 
-  describe("GET /:id", () => {
-    test("Should return a post by id", async () => {
-      const response = await request(app).get(`/posts/${examplePost._id}`);
+describe("GET /:id", () => {
+  test("Should return a post by id", async () => {
+    const response = await request(app).get(`/posts/${examplePost._id}`);
 
-      expect(response.statusCode).toEqual(200);
-      expect(response.body._id).toBe(examplePost._id);
-    });
-
-    test("Should return 404 when post does not exist", async () => {
-      const nonExistentId = "nonexistentid";
-      const response = await request(app).get(`/posts/${nonExistentId}`);
-
-      expect(response.statusCode).toEqual(404);
-      expect(response.body.message).toBe("Post does not exist");
-    });
+    expect(response.statusCode).toEqual(200);
+    expect(response.body._id).toBe(examplePost._id);
   });
 
-  describe("GET /invalid-endpoint", () => {
-    test("Should return 404 for invalid endpoint", async () => {
-      const response = await request(app).get("/invalid-endpoint");
-      expect(response.statusCode).toEqual(404);
-      expect(response.body.message).toBe("Route does not exist");
-    });
+  test("Should return 404 when post does not exist", async () => {
+    const nonExistentId = "nonexistentid";
+    const response = await request(app).get(`/posts/${nonExistentId}`);
+
+    expect(response.statusCode).toEqual(404);
+    expect(response.body.message).toBe("Post does not exist");
+  });
+});
+
+describe("POST / ", () => {
+  test("Should create a new post", async () => {
+    const newPostData = {
+      message: "This is a new test post",
+      sender: "testuser",
+    };
+    const response = await request(app).post("/posts").send(newPostData);
+    expect(response.statusCode).toEqual(201);
+    expect(response.body.message).toBe("created new post");
+    expect(response.body.postId).toBeDefined();
+    expect(response.body.createdAt).toBeDefined();
+  });
+
+  test("Should return 400 for missing sender field", async () => {
+    const invalidPostData = {
+      message: "This post has no sender",
+    };
+    const response = await request(app).post("/posts").send(invalidPostData);
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toBe("Invalid request body");
+    expect(response.body.violations).toBeDefined();
+  });
+
+  test("Should return 400 for missing message field", async () => {
+    const invalidPostData = {
+      sender: "testuser",
+    };
+    const response = await request(app).post("/posts").send(invalidPostData);
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toBe("Invalid request body");
+    expect(response.body.violations).toBeDefined();
+  });
+
+  test("Should return 400 for empty post data", async () => {
+    const response = await request(app).post("/posts").send({});
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toBe("Invalid request body");
+    expect(response.body.violations).toBeDefined();
+  });
+
+  test("Should return 400 for non-existing fields", async () => {
+    const invalidPostData = {
+      notExistingField: "some value",
+      message: "This is a new test post",
+      sender: "testuser",
+    };
+    const response = await request(app).post("/posts").send(invalidPostData);
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toBe("Invalid request body");
+    expect(response.body.violations).toBeDefined();
+  });
+});
+
+describe("GET /invalid-endpoint", () => {
+  test("Should return 404 for invalid endpoint", async () => {
+    const response = await request(app).get("/invalid-endpoint");
+    expect(response.statusCode).toEqual(404);
+    expect(response.body.message).toBe("Route does not exist");
   });
 });
