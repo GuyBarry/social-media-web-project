@@ -1,5 +1,7 @@
 import express from "express";
 import postService from "./posts.service.js";
+import { createPostSchema } from "../entities/dto/post.dto.js";
+import { validateRequestBody } from "../middlewares/requestBodyValidator.js";
 
 const router = express.Router();
 
@@ -11,7 +13,7 @@ router.get("/", async (req, res) => {
 });
 
 // Create post
-router.post("/", async (req, res) => {
+router.post("/", validateRequestBody(createPostSchema), async (req, res) => {
   const postData = req.body;
   const { _id, createdAt } = await postService.createPost(postData);
   res.status(201).send({
