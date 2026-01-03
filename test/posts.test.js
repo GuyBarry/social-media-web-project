@@ -14,9 +14,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  if (!(await Post.exists({ _id: examplePost._id }))) {
-    await Post.create(examplePost);
-  }
+  await Post.deleteMany();
+  await Post.create(examplePost);
 });
 
 afterAll(async () => {
