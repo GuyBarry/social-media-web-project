@@ -6,6 +6,7 @@ import serverConfig from "./config/server.config.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { noRouteHandler } from "./middlewares/noRouteHandler.js";
 import { postsController } from "./posts/posts.controller.js";
+import { commentsController } from "./comments/comments.controller.js";
 
 export const initApp = async () => {
   const port = serverConfig.port;
@@ -15,6 +16,7 @@ export const initApp = async () => {
   app.use(bodyParser.json());
 
   app.use("/posts", postsController);
+  app.use("/comments", commentsController);
   app.use(noRouteHandler);
   app.use(errorHandler);
 
