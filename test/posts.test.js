@@ -42,4 +42,29 @@ describe("GET / ", () => {
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toEqual(0);
   });
+
+  describe("GET /:id", () => {
+    test("Should return a post by id", async () => {
+      const response = await request(app).get(`/posts/${examplePost._id}`);
+
+      expect(response.statusCode).toEqual(200);
+      expect(response.body._id).toBe(examplePost._id);
+    });
+
+    test("Should return 404 when post does not exist", async () => {
+      const nonExistentId = "nonexistentid";
+      const response = await request(app).get(`/posts/${nonExistentId}`);
+
+      expect(response.statusCode).toEqual(404);
+      expect(response.body.message).toBe("Post does not exist");
+    });
+  });
+
+  describe("GET /invalid-endpoint", () => {
+    test("Should return 404 for invalid endpoint", async () => {
+      const response = await request(app).get("/invalid-endpoint");
+      expect(response.statusCode).toEqual(404);
+      expect(response.body.message).toBe("Route does not exist");
+    });
+  });
 });
