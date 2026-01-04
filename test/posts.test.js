@@ -120,3 +120,34 @@ describe("GET /invalid-endpoint", () => {
     expect(response.body.message).toBe("Route does not exist");
   });
 });
+
+describe("PUT /:id", () => {
+  test("Should update an existing post", async () => {
+    const updatedPostData = {
+      message: "This is an updated test post",
+      sender: "updateduser",
+    };
+    const response = await request(app)
+      .put(`/posts/${examplePost._id}`)
+      .send(updatedPostData);
+      console.log(response);
+    expect(response.statusCode).toEqual(200);
+    expect(response.body.message).toBe("updated post");
+    expect(response.body.postId).toBe(examplePost._id);
+    expect(response.body.updatedAt).toBeDefined();
+  });
+
+  test("Should return 404 when updating a non-existent post", async () => {
+    const nonExistentId = "nonexistentid";
+    const updatedPostData = {
+      message: "This post does not exist",
+      sender: "noone",
+    };
+    const response = await request(app)
+      .put(`/posts/${nonExistentId}`)
+      .send(updatedPostData);
+    expect(response.statusCode).toEqual(404);
+    expect(response.body.message).toBe("Post does not exist");
+    expect(response.body.postId).toBe(nonExistentId);
+  });
+});

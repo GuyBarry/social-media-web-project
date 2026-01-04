@@ -13,7 +13,7 @@ const updatePost = async (id, postData) => {
     includeResultMetadata: true,
   });
 
-  return result
+  return result.value
     ? { _id: result.value._id, updatedAt: result.value.updatedAt }
     : { _id: null, updatedAt: null };
 };

@@ -44,7 +44,7 @@ router.put("/:id", validateRequestBody(postSchema), async (req, res) => {
 
   const { _id, updatedAt } = await postService.updatePost(id, postData);
 
-  if (!updatedAt) {
+  if (!_id) {
     return res.status(404).send({ message: "Post does not exist", postId: id });
   } else {
     res.status(200).send({
