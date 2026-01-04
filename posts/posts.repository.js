@@ -7,8 +7,20 @@ const createPost = async (postData) => {
   return await post.save();
 };
 
+const updatePost = async (id, postData) => {
+  const result = await Post.findByIdAndUpdate(id, postData, {
+    new: true,
+    includeResultMetadata: true,
+  });
+
+  return result
+    ? { _id: result.value._id, updatedAt: result.value.updatedAt }
+    : { _id: null, updatedAt: null };
+};
+
 export const postRepository = {
   getAllPosts,
   getPostById,
   createPost,
+  updatePost,
 };
