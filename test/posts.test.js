@@ -120,3 +120,34 @@ describe("GET /invalid-endpoint", () => {
     expect(response.body.message).toBe("Route does not exist");
   });
 });
+
+describe("GET /?sender=", () => {
+  test("Should return posts by sender", async () => {
+    const response = await request(app).get(
+      `/posts?sender=${examplePost.sender}`
+    );
+
+    expect(response.statusCode).toEqual(200);
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toBeGreaterThan(0);
+    response.body.forEach((post) => {
+      expect(post.sender).toBe(examplePost.sender);
+    });
+  });
+
+  test("Should return empty array when no posts exist for sender", async () => {
+    const response = await request(app).get(`/posts?sender=unknownuser`);
+
+    expect(response.statusCode).toEqual(200);
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toEqual(0);
+  });
+  // add test for sender equals null to return all posts
+  test("Should return all posts when sender is null", async () => {
+    const response = await request(app).get(`/posts?sender=`);
+
+    expect(response.statusCode).toEqual(200);
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toBeGreaterThan(0);
+  });
+});
