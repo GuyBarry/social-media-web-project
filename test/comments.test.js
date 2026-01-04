@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import request from "supertest";
 import { initApp } from "../app.js";
 import { Comment } from "../entities/mongodb/comment.module.js";
-import { exampleComment } from "./testUtils.js";
+import { exampleComment, examplePost } from "./testUtils.js";
 
 let app;
 
@@ -53,7 +53,7 @@ describe("GET / ", () => {
       expect(response.body[0]._id).toBe(exampleComment._id);
       expect(response.body[0].postId).toBe(exampleComment.postId);
     });
-    
+
     test("Should return empty array when no comments exist for postId", async () => {
       const response = await request(app).get(`/comments?postId=nonexistentid`);
 
@@ -61,5 +61,46 @@ describe("GET / ", () => {
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body.length).toEqual(0);
     });
+  });
+});
+
+describe("POST / ", () => {
+  test("Should create a new comment", async () => {
+    const newCommentData = {
+      sender: "Alice",
+      message: "Great post!",
+      postId: examplePost._id,
+    };
+
+    const response = await request(app)
+      .post("/comments")
+      .send(newCommentData)
+      .set("Content-Type", "application/json");
+
+    expect(response.statusCode).toEqual(201);
+    expect(response.body.message).toBe("created new comment");
+    expect(response.body).toHaveProperty("commentId");
+    expect(response.body).toHaveProperty("createdAt");
+
+    const createdComment = await Comment.findById(response.body.commentId);
+    expect(createdComment).not.toBeNull();
+    expect(createdComment.sender).toBe(newCommentData.sender);
+    expect(createdComment.message).toBe(newCommentData.message);
+    expect(createdComment.postId).toBe(newCommentData.postId);
+  });
+
+  test("Should not create a new comment if post does not exist", async () => {
+    const newCommentData = {
+      sender: "Alice",
+      message: "Great post!",
+      postId: "nonexistentid",
+    };
+
+    const response = await request(app)
+      .post("/comments")
+      .send(newCommentData)
+      .set("Content-Type", "application/json");
+
+    expect(response.statusCode).toEqual(400);
   });
 });
