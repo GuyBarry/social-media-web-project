@@ -63,3 +63,21 @@ describe("GET / ", () => {
     });
   });
 });
+
+describe('DELETE /:id', () => {
+    test('should delete a comment', async () => {
+        const response = await request(app).delete(`/comments/${exampleComment._id}`);
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe('Comment deleted successfully');
+
+        const commentInDB = await Comment.findById(exampleComment._id);
+        expect(commentInDB).toBeNull();
+    });
+
+    test('should return 500 when deleting a non-existent comment', async () => {
+        const response = await request(app).delete('/comments/nonexistentid');
+
+        expect(response.status).toBe(500);
+        expect(response.body.message).toBe('Error deleting comment');
+    });
+});
