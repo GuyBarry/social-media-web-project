@@ -19,18 +19,22 @@ router.get("/", async (req, res) => {
 // Create comment
 router.post("/", validateRequestBody(commentSchema), async (req, res) => {
   const commentData = req.body;
-  const { _id, createdAt } = await commentsService.createComment(commentData);
 
-  if (!_id) {
-    res.status(400).send({
-      message: "Post does not exist",
-    });
-  } else {
+  try {
+    const { _id, createdAt } = await commentsService.createComment(commentData);
     res.status(201).send({
       message: "created new comment",
       commentId: _id,
       createdAt,
     });
+  } catch (error) {
+    if (error.message === "Post does not exist") {
+      res.status(400).send({
+        message: "Post does not exist",
+      });
+    } else {
+      throw error;
+    }
   }
 });
 

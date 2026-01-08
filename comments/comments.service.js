@@ -6,7 +6,7 @@ const getAllCommentsByPostId = async (postId) =>
   await commentsRepository.getAllCommentsByPostId(postId);
 const createComment = async (commentData) => {
   if (!(await postService.getPostById(commentData.postId))) {
-    return { _id: null, createdAt: null };
+    throw new Error("Post does not exist");
   }
 
   return await commentsRepository.createComment(commentData);

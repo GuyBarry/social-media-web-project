@@ -72,10 +72,7 @@ describe("POST / ", () => {
       postId: examplePost._id,
     };
 
-    const response = await request(app)
-      .post("/comments")
-      .send(newCommentData)
-      .set("Content-Type", "application/json");
+    const response = await request(app).post("/comments").send(newCommentData);
 
     expect(response.statusCode).toEqual(201);
     expect(response.body.message).toBe("created new comment");
@@ -87,6 +84,41 @@ describe("POST / ", () => {
     expect(createdComment.sender).toBe(newCommentData.sender);
     expect(createdComment.message).toBe(newCommentData.message);
     expect(createdComment.postId).toBe(newCommentData.postId);
+  });
+
+  test("Should not create a new comment with invalid sender", async () => {
+    const invalidCommentData = {
+      sender: "",
+      message: "Great post!",
+      postId: examplePost._id,
+    };
+
+    const response = await request(app)
+      .post("/comments")
+      .send(invalidCommentData);
+      console.log(response);
+      console.log(response.statusCode);
+      
+
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toBe("Invalid request body");
+    expect(response.body.violations).toBeDefined();
+  });
+
+  test("Should not create a new comment with invalid message", async () => {
+    const invalidCommentData = {
+      sender: "Alice",
+      message: "",
+      postId: examplePost._id,
+    };
+
+    const response = await request(app)
+      .post("/comments")
+      .send(invalidCommentData);
+
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toBe("Invalid request body");
+    expect(response.body.violations).toBeDefined();
   });
 
   test("Should not create a new comment if post does not exist", async () => {
@@ -102,5 +134,6 @@ describe("POST / ", () => {
       .set("Content-Type", "application/json");
 
     expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toBe("Post does not exist");
   });
 });
