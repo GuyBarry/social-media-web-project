@@ -5,3 +5,7 @@ export const createPostSchema = z.strictObject({
   sender: notEmptyStringSchema("Sender"),
   message: notEmptyStringSchema("Message"),
 });
+
+export const updatePostSchema = z.strictObject({
+  message: createPostSchema.shape.message,
+});

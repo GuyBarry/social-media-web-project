@@ -1,5 +1,8 @@
 import express from "express";
-import { createPostSchema } from "../entities/dto/post.dto.js";
+import {
+  createPostSchema,
+  updatePostSchema,
+} from "../entities/dto/post.dto.js";
 import { validateRequestBody } from "../middlewares/requestBodyValidator.js";
 import { postService } from "./posts.service.js";
 
@@ -35,10 +38,28 @@ router.post("/", validateRequestBody(createPostSchema), async (req, res) => {
   const postData = req.body;
   const { _id, createdAt } = await postService.createPost(postData);
   res.status(201).send({
-    message: "created new post",
+    message: "Created new post",
     postId: _id,
     createdAt,
   });
+});
+
+// Update post
+router.put("/:id", validateRequestBody(updatePostSchema), async (req, res) => {
+  const id = req.params.id;
+  const postData = req.body;
+
+  const updated = await postService.updatePost(id, postData);
+
+  if (!updated) {
+    return res.status(404).send({ message: "Post does not exist", postId: id });
+  } else {
+    res.status(200).send({
+      message: "Updated post",
+      postId: id,
+      updatedAt: updated.updatedAt,
+    });
+  }
 });
 
 export const postsController = router;
