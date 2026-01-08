@@ -1,9 +1,13 @@
+### get all posts
 GET http://localhost:8000/posts
 
+### get post by id
 GET http://localhost:8000/posts/1234
 
+### get posts by sender
 GET http://localhost:8000/posts?sender=1234
 
+### create new post
 POST http://localhost:8000/posts
 Content-Type: application/json
 
@@ -12,6 +16,7 @@ Content-Type: application/json
     "sender": "1234"
 }
 
+### update post
 PUT http://localhost:8000/posts
 Content-Type: application/json
 
