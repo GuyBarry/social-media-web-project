@@ -64,6 +64,65 @@ describe("GET / ", () => {
   });
 });
 
+describe("PUT /:id", () => {
+  test("Should update an existing comment", async () => {
+    const newMessage = { message: "This is an updated test message" };
+
+    const response = await request(app)
+      .put(`/comments/${exampleComment._id}`)
+      .send(newMessage);
+
+    expect(response.statusCode).toEqual(200);
+    expect(response.body.message).toEqual("updated comment");
+    expect(response.body.commentId).toEqual(exampleComment._id);
+
+    const updated = await Comment.findById(exampleComment._id);
+    expect(updated.message).toEqual(newMessage.message);
+    expect(response.body.updatedAt).toBeDefined();
+  });
+
+  test("Should return 400 when update body is invalid", async () => {
+    const response = await request(app)
+      .put(`/comments/${exampleComment._id}`)
+      .send({ message: "" });
+
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toEqual("Invalid request body");
+    expect(Array.isArray(response.body.violations)).toBe(true);
+    expect(response.body.violations.length).toBeGreaterThan(0);
+  });
+
+  test("Should return 400 when update body is invalid - empty string", async () => {
+    const response = await request(app)
+      .put(`/comments/${exampleComment._id}`)
+      .send({ message: 12345 });
+
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toEqual("Invalid request body");
+    expect(Array.isArray(response.body.violations)).toBe(true);
+    expect(response.body.violations.length).toBeGreaterThan(0);
+  });
+
+  test("Should return 400 when update body is missing - wrong type", async () => {
+    const response = await request(app)
+      .put(`/comments/${exampleComment._id}`)
+      .send({});
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toEqual("Invalid request body");
+    expect(Array.isArray(response.body.violations)).toBe(true);
+    expect(response.body.violations.length).toBeGreaterThan(0);
+  });
+
+  test("Should return 404 when updating non-existing comment", async () => {
+    const response = await request(app)
+      .put(`/comments/nonexistentid`)
+      .send({ message: "nope" });
+
+    expect(response.statusCode).toEqual(404);
+    expect(response.body.message).toEqual("Comment does not exist");
+  });
+});
+
 describe("POST / ", () => {
   test("Should create a new comment", async () => {
     const newCommentData = {

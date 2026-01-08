@@ -4,6 +4,8 @@ import { commentsRepository } from "./comments.repository.js";
 const getAllComments = async () => await commentsRepository.getAllComments();
 const getAllCommentsByPostId = async (postId) =>
   await commentsRepository.getAllCommentsByPostId(postId);
+const updateComment = async (id, commentData) =>
+  await commentsRepository.updateComment(id, commentData);
 const createComment = async (commentData) => {
   if (!(await postService.getPostById(commentData.postId))) {
     throw new Error("Post does not exist");
@@ -14,5 +16,6 @@ const createComment = async (commentData) => {
 export const commentsService = {
   getAllComments,
   getAllCommentsByPostId,
+  updateComment,
   createComment,
 };
