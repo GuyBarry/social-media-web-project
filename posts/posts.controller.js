@@ -7,7 +7,11 @@ const router = express.Router();
 
 // Get all posts
 router.get("/", async (req, res) => {
-  const response = await postService.getAllPosts();
+  const senderId = req.query.sender;
+
+  const response = senderId
+    ? await postService.getPostsBySender(senderId)
+    : await postService.getAllPosts();
 
   res.status(200).send(response);
 });

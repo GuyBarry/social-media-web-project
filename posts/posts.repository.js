@@ -6,7 +6,7 @@ const createPost = async (postData) => {
   const post = new Post(postData);
   return await post.save();
 };
-
+const getPostsBySender = async (sender) => await Post.find({ sender });
 const updatePost = async (id, postData) => {
   const result = await Post.findByIdAndUpdate(id, postData, {
     new: true,
@@ -23,4 +23,5 @@ export const postRepository = {
   getPostById,
   createPost,
   updatePost,
+  getPostsBySender,
 };
