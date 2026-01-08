@@ -7,16 +7,8 @@ const createPost = async (postData) => {
   return await post.save();
 };
 const getPostsBySender = async (sender) => await Post.find({ sender });
-const updatePost = async (id, postData) => {
-  const result = await Post.findByIdAndUpdate(id, postData, {
-    new: true,
-    includeResultMetadata: true,
-  });
-
-  return result.value
-    ? { _id: result.value._id, updatedAt: result.value.updatedAt }
-    : { _id: null, updatedAt: null };
-};
+const updatePost = async (id, postData) =>
+  await Post.findByIdAndUpdate(id, postData, { new: true });
 
 export const postRepository = {
   getAllPosts,

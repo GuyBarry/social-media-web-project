@@ -96,9 +96,6 @@ describe("POST / ", () => {
     const response = await request(app)
       .post("/comments")
       .send(invalidCommentData);
-      console.log(response);
-      console.log(response.statusCode);
-      
 
     expect(response.statusCode).toEqual(400);
     expect(response.body.message).toBe("Invalid request body");
