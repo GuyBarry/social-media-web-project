@@ -59,7 +59,7 @@ router.post("/", validateRequestBody(createCommentSchema), async (req, res) => {
   try {
     const { _id, createdAt } = await commentsService.createComment(commentData);
     res.status(201).send({
-      message: "created new comment",
+      message: "Created new comment",
       commentId: _id,
       createdAt,
     });
@@ -81,7 +81,7 @@ router.delete("/:id", async (req, res) => {
   const deleted = await commentsService.deleteComment(id);
 
   if (!deleted) {
-    return res.status(500).send({ message: "Error deleting comment" });
+    return res.status(500).send({ message: "Comment does not exist" });
   }
   
   return res.status(200).send({

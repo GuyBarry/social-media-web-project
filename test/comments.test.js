@@ -155,7 +155,7 @@ describe("POST / ", () => {
     const response = await request(app).post("/comments").send(newCommentData);
 
     expect(response.statusCode).toEqual(201);
-    expect(response.body.message).toBe("created new comment");
+    expect(response.body.message).toBe("Created new comment");
     expect(response.body).toHaveProperty("commentId");
     expect(response.body).toHaveProperty("createdAt");
 
@@ -229,6 +229,6 @@ describe('DELETE /:id', () => {
         const response = await request(app).delete('/comments/nonexistentid');
 
         expect(response.status).toBe(500);
-        expect(response.body.message).toBe('Error deleting comment');
+        expect(response.body.message).toBe('Comment does not exist');
     });
 });
