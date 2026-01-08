@@ -7,6 +7,7 @@ import { errorHandler } from "./middlewares/errorHandler.js";
 import { noRouteHandler } from "./middlewares/noRouteHandler.js";
 import { postsController } from "./posts/posts.controller.js";
 import { commentsController } from "./comments/comments.controller.js";
+import { setupSwagger } from "./swagger/setupSwagger.js";
 
 export const initApp = async () => {
   const port = serverConfig.port;
@@ -17,6 +18,8 @@ export const initApp = async () => {
 
   app.use("/posts", postsController);
   app.use("/comments", commentsController);
+
+  app.use(...setupSwagger);
   app.use(noRouteHandler);
   app.use(errorHandler);
 
