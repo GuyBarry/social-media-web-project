@@ -1,10 +1,7 @@
 import { z } from "zod";
+import { notEmptyStringSchema } from "./zodUtils.js";
 
 export const createPostSchema = z.strictObject({
-  sender: z.string().refine((sender) => {
-    return sender.length > 0;
-  }, "Sender must be a non-empty string"),
-  message: z.string().refine((message) => {
-    return message.length > 0;
-  }, "Message must be a non-empty string"),
+  sender: notEmptyStringSchema("Sender"),
+  message: notEmptyStringSchema("Message"),
 });
