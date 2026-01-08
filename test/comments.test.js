@@ -78,6 +78,7 @@ describe("PUT /:id", () => {
 
     const updated = await Comment.findById(exampleComment._id);
     expect(updated.message).toEqual(newMessage.message);
+    expect(response.body.updatedAt).toBeDefined();
   });
 
   test("Should return 400 when update body is invalid", async () => {

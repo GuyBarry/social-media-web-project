@@ -34,6 +34,7 @@ router.put(
       res.status(200).send({
         message: "updated comment",
         commentId: id,
+        updatedAt: updated.updatedAt
       });
     }
   }
