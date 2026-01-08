@@ -7,14 +7,6 @@ GET http://localhost:8000/comments?postId=1234
 ###  get comment by id
 GET http://localhost:8000/comments/5678
 
-### update comment
-PUT http://localhost:8000/comments/5678
-Content-Type: application/json
-
-{
-  "message": "Updated message"
-} 
-
 ### create comment
 POST  http://localhost:8000/comments
 Content-Type: application/json
@@ -24,6 +16,14 @@ Content-Type: application/json
     "sender": "Guy123",
     "postId": "1234"
 }
+
+### update comment
+PUT http://localhost:8000/comments/5678
+Content-Type: application/json
+
+{
+  "message": "Updated message"
+} 
 
 ### delete comment
 DELETE http://localhost:8000/comments/5678

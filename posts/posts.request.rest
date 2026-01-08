@@ -5,7 +5,7 @@ GET http://localhost:8000/posts
 GET http://localhost:8000/posts/1234
 
 ### get posts by sender
-GET http://localhost:8000/posts?sender=1234
+GET http://localhost:8000/posts?sender=Mayan
 
 ### create new post
 POST http://localhost:8000/posts
@@ -21,7 +21,5 @@ PUT http://localhost:8000/posts/1234
 Content-Type: application/json
 
 {
-    "sender": "Mayan",
-    "message": "updated message content",
-    "_id": "1234"
+    "message": "updated message content"
 }
