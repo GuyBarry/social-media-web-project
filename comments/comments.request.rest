@@ -24,3 +24,7 @@ Content-Type: application/json
     "sender": "Guy123",
     "postId": "1234"
 }
+
+### delete comment
+DELETE http://localhost:8000/comments/5678
+

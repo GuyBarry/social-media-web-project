@@ -7,7 +7,7 @@ const router = express.Router();
 
 // Get all comments
 router.get("/", async (req, res) => {
-  const postId = req.query.postId;
+  const { postId } = req.query;
 
   const response = postId
     ? await commentsService.getAllCommentsByPostId(postId)
@@ -59,7 +59,7 @@ router.post("/", validateRequestBody(createCommentSchema), async (req, res) => {
   try {
     const { _id, createdAt } = await commentsService.createComment(commentData);
     res.status(201).send({
-      message: "created new comment",
+      message: "Created new comment",
       commentId: _id,
       createdAt,
     });
@@ -72,6 +72,21 @@ router.post("/", validateRequestBody(createCommentSchema), async (req, res) => {
       throw error;
     }
   }
+});
+
+// Delete a comment by Id
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const deleted = await commentsService.deleteComment(id);
+
+  if (!deleted) {
+    return res.status(404).send({ message: "Comment does not exist" });
+  }
+  
+  return res.status(200).send({
+    message: "Comment deleted successfully",
+  });
 });
 
 export const commentsController = router;

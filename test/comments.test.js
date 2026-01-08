@@ -155,7 +155,7 @@ describe("POST / ", () => {
     const response = await request(app).post("/comments").send(newCommentData);
 
     expect(response.statusCode).toEqual(201);
-    expect(response.body.message).toBe("created new comment");
+    expect(response.body.message).toBe("Created new comment");
     expect(response.body).toHaveProperty("commentId");
     expect(response.body).toHaveProperty("createdAt");
 
@@ -213,4 +213,22 @@ describe("POST / ", () => {
     expect(response.statusCode).toEqual(400);
     expect(response.body.message).toBe("Post does not exist");
   });
+});
+
+describe('DELETE /:id', () => {
+    test('should delete a comment', async () => {
+        const response = await request(app).delete(`/comments/${exampleComment._id}`);
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe('Comment deleted successfully');
+
+        const commentInDB = await Comment.findById(exampleComment._id);
+        expect(commentInDB).toBeNull();
+    });
+
+    test('should return 404 when deleting a non-existent comment', async () => {
+        const response = await request(app).delete('/comments/nonexistentid');
+
+        expect(response.status).toBe(404);
+        expect(response.body.message).toBe('Comment does not exist');
+    });
 });
