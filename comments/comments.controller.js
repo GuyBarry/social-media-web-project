@@ -16,6 +16,18 @@ router.get("/", async (req, res) => {
   res.status(200).send(response);
 });
 
+// Get comment by id
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+  const comment = await commentsService.getCommentById(id);
+
+  if (!comment) {
+    return res.status(404).send({ message: "Comment does not exist" });
+  }
+
+  res.status(200).send(comment);
+});
+
 // Update comment
 router.put(
   "/:id",

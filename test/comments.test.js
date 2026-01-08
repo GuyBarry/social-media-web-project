@@ -62,6 +62,27 @@ describe("GET / ", () => {
       expect(response.body.length).toEqual(0);
     });
   });
+
+  describe("GET /:id", () => {
+    test("Should return comment by id", async () => {
+      const response = await request(app).get(
+        `/comments/${exampleComment._id}`
+      );
+
+      expect(response.statusCode).toEqual(200);
+      expect(response.body).toBeDefined();
+      expect(response.body._id).toBe(exampleComment._id);
+      expect(response.body.postId).toBe(exampleComment.postId);
+    });
+
+    test("Should return 404 when comment does not exist", async () => {
+      const nonExistentId = "nonexistentid";
+      const response = await request(app).get(`/comments/${nonExistentId}`);
+
+      expect(response.statusCode).toEqual(404);
+      expect(response.body.message).toBe("Comment does not exist");
+    });
+  });
 });
 
 describe("PUT /:id", () => {

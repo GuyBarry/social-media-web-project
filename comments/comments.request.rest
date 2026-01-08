@@ -4,7 +4,10 @@ GET http://localhost:8000/comments
 ###  get comments by postId
 GET http://localhost:8000/comments?postId=1234
 
-### create a new comment
+###  get comment by id
+GET http://localhost:8000/comments/5678
+
+### update comment
 PUT http://localhost:8000/comments/5678
 Content-Type: application/json
 
