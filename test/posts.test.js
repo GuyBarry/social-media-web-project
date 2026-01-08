@@ -68,7 +68,7 @@ describe("POST / ", () => {
     };
     const response = await request(app).post("/posts").send(newPostData);
     expect(response.statusCode).toEqual(201);
-    expect(response.body.message).toBe("created new post");
+    expect(response.body.message).toBe("Created new post");
     expect(response.body.postId).toBeDefined();
     expect(response.body.createdAt).toBeDefined();
   });
@@ -121,6 +121,86 @@ describe("GET /invalid-endpoint", () => {
   });
 });
 
+describe("PUT /:id", () => {
+  test("Should update an existing post", async () => {
+    const updatedPostData = {
+      message: "This is an updated test post",
+    };
+    const response = await request(app)
+      .put(`/posts/${examplePost._id}`)
+      .send(updatedPostData);
+
+    expect(response.statusCode).toEqual(200);
+    expect(response.body.message).toBe("Updated post");
+    expect(response.body.postId).toBe(examplePost._id);
+    expect(response.body.updatedAt).toBeDefined();
+  });
+
+  test("Should return 404 when updating a non-existent post", async () => {
+    const nonExistentId = "nonexistentid";
+    const updatedPostData = {
+      message: "This post does not exist",
+    };
+    const response = await request(app)
+      .put(`/posts/${nonExistentId}`)
+      .send(updatedPostData);
+
+    expect(response.statusCode).toEqual(404);
+    expect(response.body.message).toBe("Post does not exist");
+    expect(response.body.postId).toBe(nonExistentId);
+  });
+
+  test("Should return 400 for invalid update data", async () => {
+    const updatedPostData = {
+      message: "",
+    };
+    const response = await request(app)
+      .put(`/posts/${examplePost._id}`)
+      .send(updatedPostData);
+
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toBe("Invalid request body");
+    expect(response.body.violations).toBeDefined();
+  });
+
+  test("Should return 400 for non-existing fields in update data", async () => {
+    const updatedPostData = {
+      notExistingField: "some value",
+      message: "This is an updated test post",
+    };
+    const response = await request(app)
+      .put(`/posts/${examplePost._id}`)
+      .send(updatedPostData);
+
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toBe("Invalid request body");
+    expect(response.body.violations).toBeDefined();
+  });
+
+  test("Should return 400 for empty update data", async () => {
+    const response = await request(app)
+      .put(`/posts/${examplePost._id}`)
+      .send({});
+
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toBe("Invalid request body");
+    expect(response.body.violations).toBeDefined();
+  });
+
+  test("should return 400 for trying to update sender", async () => {
+    const updatedPostData = {
+      sender: "newSender",
+    };
+    const response = await request(app)
+      .put(`/posts/${examplePost._id}`)
+      .send(updatedPostData);
+
+    expect(response.statusCode).toEqual(400);
+    expect(response.body.message).toBe("Invalid request body");
+    expect(response.body.violations).toBeDefined();
+  });
+});
+
 describe("GET /?sender=", () => {
   test("Should return posts by sender", async () => {
     const response = await request(app).get(
@@ -142,7 +222,7 @@ describe("GET /?sender=", () => {
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toEqual(0);
   });
-  // add test for sender equals null to return all posts
+
   test("Should return all posts when sender is null", async () => {
     const response = await request(app).get(`/posts?sender=`);
 

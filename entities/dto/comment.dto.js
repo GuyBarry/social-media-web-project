@@ -1,7 +1,12 @@
 import { z } from "zod";
+import { notEmptyStringSchema } from "./zodUtils.js";
+
+export const createCommentSchema = z.strictObject({
+  sender: notEmptyStringSchema("Sender "),
+  message: notEmptyStringSchema("Message"),
+  postId: notEmptyStringSchema("postId"),
+});
 
 export const updateCommentSchema = z.strictObject({
-  message: z
-    .string()
-    .refine((message) => message.length > 0, "Message must be a non-empty string"),
+  message: createCommentSchema.shape.message,
 });

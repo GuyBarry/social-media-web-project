@@ -11,3 +11,13 @@ Content-Type: application/json
 {
   "message": "Updated message"
 } 
+
+### create comment
+POST  http://localhost:8000/comments
+Content-Type: application/json
+
+{
+    "message": "Nice post!",
+    "sender": "Guy123",
+    "postId": "1234"
+}
