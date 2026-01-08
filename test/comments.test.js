@@ -225,10 +225,10 @@ describe('DELETE /:id', () => {
         expect(commentInDB).toBeNull();
     });
 
-    test('should return 500 when deleting a non-existent comment', async () => {
+    test('should return 404 when deleting a non-existent comment', async () => {
         const response = await request(app).delete('/comments/nonexistentid');
 
-        expect(response.status).toBe(500);
+        expect(response.status).toBe(404);
         expect(response.body.message).toBe('Comment does not exist');
     });
 });

@@ -81,7 +81,7 @@ router.delete("/:id", async (req, res) => {
   const deleted = await commentsService.deleteComment(id);
 
   if (!deleted) {
-    return res.status(500).send({ message: "Comment does not exist" });
+    return res.status(404).send({ message: "Comment does not exist" });
   }
   
   return res.status(200).send({
