@@ -28,6 +28,28 @@ router.get("/:id", async (req, res) => {
   res.status(200).send(comment);
 });
 
+// Create comment
+router.post("/", validateRequestBody(createCommentSchema), async (req, res) => {
+  const commentData = req.body;
+
+  try {
+    const { _id, createdAt } = await commentsService.createComment(commentData);
+    res.status(201).send({
+      message: "Created new comment",
+      commentId: _id,
+      createdAt,
+    });
+  } catch (error) {
+    if (error.message === "Post does not exist") {
+      res.status(400).send({
+        message: "Post does not exist",
+      });
+    } else {
+      throw error;
+    }
+  }
+});
+
 // Update comment
 router.put(
   "/:id",
@@ -52,27 +74,6 @@ router.put(
   }
 );
 
-// Create comment
-router.post("/", validateRequestBody(createCommentSchema), async (req, res) => {
-  const commentData = req.body;
-
-  try {
-    const { _id, createdAt } = await commentsService.createComment(commentData);
-    res.status(201).send({
-      message: "Created new comment",
-      commentId: _id,
-      createdAt,
-    });
-  } catch (error) {
-    if (error.message === "Post does not exist") {
-      res.status(400).send({
-        message: "Post does not exist",
-      });
-    } else {
-      throw error;
-    }
-  }
-});
 
 // Delete a comment by Id
 router.delete("/:id", async (req, res) => {

@@ -9,11 +9,16 @@ const apiSpec = swaggerJSDoc({
       version: "1.0.0",
     },
   },
-  apis: ["**/*.controller.js", "**/*.dto.js"],
+  tags: [{ name: "Posts" }, { name: "Comments" }],
+  apis: ["**/*.controller.docs.js", "**/*.dto.js"],
 });
 
 export const setupSwagger = [
   "/docs",
   swaggerUi.serve,
-  swaggerUi.setup(apiSpec),
+  swaggerUi.setup(apiSpec, {
+    swaggerOptions: {
+      operationsSorter: "method",
+    },
+  }),
 ];
