@@ -1,0 +1,5 @@
+{
+  "preset": "ts-jest",
+  "testTimeout": 5000,
+  "testMatch": ["**/*.test.ts"]
+}

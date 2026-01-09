@@ -1,21 +1,21 @@
+import { Express } from "express";
 import mongoose from "mongoose";
 import request from "supertest";
-import { initApp } from "../app.js";
-import { Post } from "../entities/mongodb/post.module.js";
-import { examplePost } from "./testUtils.js";
+import { initApp } from "../app";
+import { PostModel } from "../entities/mongodb/post.module";
+import { examplePost } from "./testUtils";
 
-let app;
+let app: Express;
 
 beforeAll(async () => {
   await initApp().then(async (appInstance) => {
     app = appInstance;
   });
-  await Post.deleteMany();
 });
 
 beforeEach(async () => {
-  await Post.deleteMany();
-  await Post.create(examplePost);
+  await PostModel.deleteMany();
+  await PostModel.create(examplePost);
 });
 
 afterAll(async () => {
@@ -33,7 +33,7 @@ describe("GET / ", () => {
   });
 
   test("Should return empty array when no posts exist", async () => {
-    await Post.deleteMany();
+    await PostModel.deleteMany();
 
     const response = await request(app).get("/posts");
 
@@ -210,7 +210,7 @@ describe("GET /?sender=", () => {
     expect(response.statusCode).toEqual(200);
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toBeGreaterThan(0);
-    response.body.forEach((post) => {
+    response.body.forEach((post: any) => {
       expect(post.sender).toBe(examplePost.sender);
     });
   });
