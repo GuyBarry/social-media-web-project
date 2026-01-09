@@ -11,7 +11,7 @@ const apiSpec = swaggerJSDoc({
     },
   },
   tags: [{ name: "Posts" }, { name: "Comments" }],
-  apis: ["**/*.controller.ts", "**/*.dto.ts"],
+  apis: ["**/*.docs.ts", "**/*.dto.ts"],
 });
 
 export const registerSwagger = (app: Express) => {
