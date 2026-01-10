@@ -55,11 +55,21 @@ describe("GET / ", () => {
     });
 
     test("Should return empty array when no comments exist for postId", async () => {
-      const response = await request(app).get(`/comments?postId=nonexistentid`);
+      await CommentModel.deleteMany();
+      const response = await request(app).get(
+        `/comments?postId=${examplePost._id}`
+      );
 
       expect(response.statusCode).toEqual(200);
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body.length).toEqual(0);
+    });
+
+    test("Should return 400 when post does not exist", async () => {
+      const response = await request(app).get(`/comments?postId=nonexistentid`);
+
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.message).toBe("Post does not exist");
     });
   });
 

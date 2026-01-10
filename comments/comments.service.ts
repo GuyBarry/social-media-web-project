@@ -12,9 +12,13 @@ export const getAllComments = async (): Promise<Comment[]> =>
 
 export const getAllCommentsByPostId = async (
   postId: Post["_id"]
-): Promise<Comment[]> =>
-  await commentsRepository.getAllCommentsByPostId(postId);
+): Promise<Comment[]> => {
+  if (!(await postService.getPostById(postId))) {
+    throw new Error("Post does not exist");
+  }
 
+  return await commentsRepository.getAllCommentsByPostId(postId);
+};
 export const getCommentById = async (
   id: Comment["_id"]
 ): Promise<Comment | null> => await commentsRepository.getCommentById(id);

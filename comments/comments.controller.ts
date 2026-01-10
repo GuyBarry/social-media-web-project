@@ -19,11 +19,18 @@ router.get(
   ) => {
     const postId = req.query.postId;
 
-    const response = postId
-      ? await commentsService.getAllCommentsByPostId(postId)
-      : await commentsService.getAllComments();
-
-    res.status(200).send(response);
+    try {
+      const response = postId
+        ? await commentsService.getAllCommentsByPostId(postId)
+        : await commentsService.getAllComments();
+      res.status(200).send(response);
+    } catch (error) {
+      if (error instanceof Error && error.message === "Post does not exist") {
+        return res.status(400).send({ message: "Post does not exist" });
+      } else {
+        throw error;
+      }
+    }
   }
 );
 
