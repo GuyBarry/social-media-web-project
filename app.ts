@@ -1,15 +1,15 @@
 import bodyParser from "body-parser";
-import express from "express";
+import express, { Express } from "express";
 import mongoose from "mongoose";
-import dbConfig from "./config/db.config.js";
-import serverConfig from "./config/server.config.js";
-import { errorHandler } from "./middlewares/errorHandler.js";
-import { noRouteHandler } from "./middlewares/noRouteHandler.js";
-import { postsController } from "./posts/posts.controller.js";
-import { commentsController } from "./comments/comments.controller.js";
-import { setupSwagger } from "./swagger/setupSwagger.js";
+import { dbConfig } from "./config/db.config";
+import { serverConfig } from "./config/server.config";
+import { errorHandler } from "./middlewares/errorHandler";
+import { noRouteHandler } from "./middlewares/noRouteHandler";
+import { postsController } from "./posts/posts.controller";
+import { commentsController } from "./comments/comments.controller";
+import { registerSwagger } from "./swagger/setupSwagger";
 
-export const initApp = async () => {
+export const initApp = async (): Promise<Express> => {
   const port = serverConfig.port;
   const app = express();
 
@@ -19,7 +19,7 @@ export const initApp = async () => {
   app.use("/posts", postsController);
   app.use("/comments", commentsController);
 
-  app.use(...setupSwagger);
+  registerSwagger(app);
   app.use(noRouteHandler);
   app.use(errorHandler);
 
@@ -31,7 +31,8 @@ export const initApp = async () => {
     app.listen(port, () => {
       console.log(`Listening on port ${port}`);
     });
-  } catch (error) {
+  } catch (err) {
+    const error = err as Error;
     const errorLog = {
       message: error.message,
       stack: error.stack,
@@ -43,4 +44,4 @@ export const initApp = async () => {
   return app;
 };
 
-initApp();
+void initApp();

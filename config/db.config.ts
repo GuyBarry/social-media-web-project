@@ -13,6 +13,6 @@ const dbAuth =
       )}@`
     : "";
 
-export default {
+export const dbConfig = {
   connectionUrl: `mongodb://${dbAuth}${config.dbHost}:${config.dbPort}/${config.dbName}?authSource=admin`,
 };
