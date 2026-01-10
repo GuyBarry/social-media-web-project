@@ -62,14 +62,25 @@ router.put(
   validateRequestBody(updateUserSchema),
   async (req: Request<{ id: User["_id"] }, {}, UpdateUser>, res: Response) => {
     const { id } = req.params;
+    try {
+      const user = await usersService.updateUser(id, req.body);
 
-    const user = await usersService.updateUser(id, req.body);
+      if (!user) {
+        return res.status(404).send({ message: "User does not exist" });
+      }
 
-    if (!user) {
-      return res.status(404).send({ message: "User does not exist" });
+      res.status(200).send(user);
+    } catch (error) {
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        error.code === 11000
+      ) {
+        return res.status(409).send({ message: "User already exists" });
+      }
+      throw error;
     }
-
-    res.status(200).send(user);
   }
 );
 

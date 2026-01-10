@@ -5,11 +5,10 @@ import { notEmptyStringSchema } from "./zodUtils";
 export const userSchema = baseModule.extend({
   username: notEmptyStringSchema("Username"),
   email: z.string().email().min(1),
-  birthDate: z.date(),
+  birthDate: z.string().date(),
   bio: z.string().optional(),
 });
 export type User = z.infer<typeof userSchema>;
-
 
 /**
  * @swagger
@@ -41,7 +40,6 @@ export const createUserSchema = z.strictObject({
   bio: userSchema.shape.bio,
 });
 export type CreateUser = z.infer<typeof createUserSchema>;
-
 
 /**
  * @swagger
