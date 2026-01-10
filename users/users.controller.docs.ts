@@ -128,6 +128,13 @@
  *                 message:
  *                   type: string
  *                   example: User already exists
+ *                 details:
+ *                   type: object
+ *                   properties:
+ *                     field: 
+ *                       type: string
+ *                     value: 
+ *                       type: string
  */
 
 /**
@@ -191,6 +198,23 @@
  *                 message:
  *                   type: string
  *                   example: User does not exist
+ *       409:
+ *         description: Conflict
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User already exists
+ *                 details:
+ *                   type: object
+ *                   properties:
+ *                     field: 
+ *                       type: string
+ *                     value: 
+ *                       type: string
  */
 
 /**

@@ -116,6 +116,23 @@
  *                 message:
  *                   type: string
  *                   example: Invalid request body
+ *       409:
+ *         description: Conflict
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Post already exists
+ *                 details:
+ *                   type: object
+ *                   properties:
+ *                     field: 
+ *                       type: string
+ *                     value: 
+ *                       type: string
  */
 
 /**

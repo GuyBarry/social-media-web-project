@@ -105,11 +105,20 @@
  *             $ref: '#/components/schemas/CreateComment'
  *     responses:
  *       201:
- *         description: Created new comment
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreateComment'
+ *         description: Returns the created comment id
+ *         content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  example: Created new comment
+ *                commentId:
+ *                  type: string
+ *                  example: 1234
+ *                createdAt:
+ *                  type: string
  *       400:
  *         description: Bad request
  *         content:
@@ -130,6 +139,23 @@
  *                 message:
  *                   type: string
  *                   example: Post does not exist
+ *       409:
+ *         description: Conflict
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Comment already exists
+ *                 details:
+ *                   type: object
+ *                   properties:
+ *                     field: 
+ *                       type: string
+ *                     value: 
+ *                       type: string
  */
 
 /**
