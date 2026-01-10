@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import { Request, Response, Router } from "express";
 import {
   CreatePost,
   createPostSchema,
@@ -9,7 +9,7 @@ import {
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { postService } from "./posts.service";
 
-const router = express.Router();
+const router = Router();
 
 // Get all posts
 router.get(
@@ -48,7 +48,9 @@ router.post(
   validateRequestBody(createPostSchema),
   async (req: Request<{}, {}, CreatePost>, res: Response) => {
     const postData = req.body;
+
     const { _id, createdAt } = await postService.createPost(postData);
+
     res.status(201).send({
       message: "Created new post",
       postId: _id,
@@ -68,9 +70,7 @@ router.put(
     const updated = await postService.updatePost(id, postData);
 
     if (!updated) {
-      return res
-        .status(404)
-        .send({ message: "Post does not exist", postId: id });
+      return res.status(404).send({ message: "Post does not exist" });
     } else {
       res.status(200).send({
         message: "Updated post",

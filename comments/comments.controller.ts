@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import { Request, Response, Router } from "express";
 import {
   Comment,
   CreateComment,
@@ -9,7 +9,7 @@ import {
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { commentsService } from "./comments.service";
 
-const router = express.Router();
+const router = Router();
 // Get all comments
 router.get(
   "/",
@@ -23,6 +23,7 @@ router.get(
       const response = postId
         ? await commentsService.getAllCommentsByPostId(postId)
         : await commentsService.getAllComments();
+
       res.status(200).send(response);
     } catch (error) {
       if (error instanceof Error && error.message === "Post does not exist") {
@@ -116,6 +117,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
 
   return res.status(200).send({
     message: "Comment deleted successfully",
+    commentId: id,
   });
 });
 

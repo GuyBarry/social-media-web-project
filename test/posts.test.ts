@@ -147,7 +147,6 @@ describe("PUT /:id", () => {
 
     expect(response.statusCode).toEqual(404);
     expect(response.body.message).toBe("Post does not exist");
-    expect(response.body.postId).toBe(nonExistentId);
   });
 
   test("Should return 400 for invalid update data", async () => {

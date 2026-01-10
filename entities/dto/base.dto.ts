@@ -1,7 +1,8 @@
 import { z } from "zod";
+import { notEmptyStringSchema } from "./zodUtils";
 
 export const baseModule = z.object({
-  _id: z.string(),
+  _id: notEmptyStringSchema("Id"),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

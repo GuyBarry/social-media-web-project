@@ -232,6 +232,7 @@ describe("DELETE /:id", () => {
     );
     expect(response.status).toBe(200);
     expect(response.body.message).toBe("Comment deleted successfully");
+    expect(response.body.commentId).toBe(exampleComment._id);
 
     const commentInDB = await CommentModel.findById(exampleComment._id);
     expect(commentInDB).toBeNull();
