@@ -53,8 +53,8 @@ export const handleDuplicateKeyException = (error: unknown): never => {
 
     throw new CustomException(
       `${model} already exists`,
+      StatusCodes.CONFLICT,
       { field, value },
-      StatusCodes.CONFLICT
     );
   }
 

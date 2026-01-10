@@ -1,8 +1,8 @@
 export class CustomException extends Error {
   constructor(
     message: string,
-    readonly details: string | object,
     readonly statusCode: number,
+    readonly details?: string | object,
     cause?: Error["stack"]
   ) {
     super(message, { cause });

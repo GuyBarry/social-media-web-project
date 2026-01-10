@@ -66,10 +66,10 @@ describe("GET / ", () => {
       expect(response.body.length).toEqual(0);
     });
 
-    test("Should return 400 when post does not exist", async () => {
+    test("Should return 404 when post does not exist", async () => {
       const response = await request(app).get(`/comments?postId=nonexistentid`);
 
-      expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
+      expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
       expect(response.body.message).toBe("Post does not exist");
     });
   });
@@ -221,7 +221,7 @@ describe("POST / ", () => {
       .send(newCommentData)
       .set("Content-Type", "application/json");
 
-    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
+    expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("Post does not exist");
   });
 

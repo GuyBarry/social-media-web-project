@@ -20,21 +20,11 @@ router.get(
   ) => {
     const postId = req.query.postId;
 
-    try {
-      const response = postId
-        ? await commentsService.getAllCommentsByPostId(postId)
-        : await commentsService.getAllComments();
+    const response = postId
+      ? await commentsService.getAllCommentsByPostId(postId)
+      : await commentsService.getAllComments();
 
-      res.status(StatusCodes.OK).send(response);
-    } catch (error) {
-      if (error instanceof Error && error.message === "Post does not exist") {
-        return res
-          .status(StatusCodes.BAD_REQUEST)
-          .send({ message: "Post does not exist" });
-      } else {
-        throw error;
-      }
-    }
+    res.status(StatusCodes.OK).send(response);
   }
 );
 
@@ -62,24 +52,13 @@ router.post(
   async (req: Request<{}, {}, CreateComment>, res: Response) => {
     const commentData = req.body;
 
-    try {
-      const { _id, createdAt } = await commentsService.createComment(
-        commentData
-      );
-      res.status(StatusCodes.CREATED).send({
-        message: "Created new comment",
-        commentId: _id,
-        createdAt,
-      });
-    } catch (error) {
-      if (error instanceof Error && error.message === "Post does not exist") {
-        res.status(StatusCodes.BAD_REQUEST).send({
-          message: "Post does not exist",
-        });
-      } else {
-        throw error;
-      }
-    }
+    const { _id, createdAt } = await commentsService.createComment(commentData);
+
+    res.status(StatusCodes.CREATED).send({
+      message: "Created new comment",
+      commentId: _id,
+      createdAt,
+    });
   }
 );
 

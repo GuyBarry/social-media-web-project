@@ -1,6 +1,5 @@
 import { CreateUser, UpdateUser, User } from "../entities/dto/user.dto";
 import { UserModel } from "../entities/mongodb/user.module";
-import { CustomException } from "../exceptions/customException";
 import { handleDuplicateKeyException } from "../exceptions/mongoException";
 
 export const getAllUsers = async (): Promise<User[]> =>
