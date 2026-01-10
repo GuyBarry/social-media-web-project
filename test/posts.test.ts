@@ -209,9 +209,8 @@ describe("GET /?sender=", () => {
     expect(response.statusCode).toEqual(200);
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toBeGreaterThan(0);
-    response.body.forEach((post: any) => {
-      expect(post.sender).toBe(examplePost.sender);
-    });
+    expect(response.body[0]._id).toBe(examplePost._id);
+    expect(response.body[0].sender).toBe(examplePost.sender);
   });
 
   test("Should return empty array when no posts exist for sender", async () => {

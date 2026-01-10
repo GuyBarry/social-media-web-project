@@ -31,7 +31,8 @@ export const initApp = async (): Promise<Express> => {
     app.listen(port, () => {
       console.log(`Listening on port ${port}`);
     });
-  } catch (error: any) {
+  } catch (err) {
+    const error = err as Error;
     const errorLog = {
       message: error.message,
       stack: error.stack,
