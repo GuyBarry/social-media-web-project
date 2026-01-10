@@ -11,12 +11,12 @@ export const examplePost: CreatePost = {
 export const exampleComment: CreateComment = {
   _id: "5678",
   postId: "1234",
-  sender: "Guy",
+  sender: "Mayan",
   message: "Nice post!",
 };
 
 export const exampleUser: CreateUser = {
-  _id: "1111",
+  _id: "Mayan",
   username: "mayanamsterdam",
   email: "mayan@example.com",
   birthDate: "2002-10-13",

@@ -14,6 +14,7 @@ const postSchema = new Schema(
     },
     sender: {
       type: String,
+      ref: "User",
       required: true,
     },
   },

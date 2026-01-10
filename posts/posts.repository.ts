@@ -1,17 +1,24 @@
 import { CreatePost, Post, UpdatePost } from "../entities/dto/post.dto";
 import { PostModel } from "../entities/mongodb/post.module";
-import { CustomException } from "../exceptions/customException";
+import { USER_POPULATE_FIELDS } from "../entities/mongodb/user.module";
 import { handleDuplicateKeyException } from "../exceptions/mongoException";
 
 export const getAllPosts = async (): Promise<Post[]> =>
-  await PostModel.find({}).exec();
+  await PostModel.find({})
+    .populate(USER_POPULATE_FIELDS.field, USER_POPULATE_FIELDS.subFields)
+    .exec();
 
 export const getPostById = async (id: Post["_id"]): Promise<Post | null> =>
-  await PostModel.findById(id).exec();
+  await PostModel.findById(id)
+    .populate(USER_POPULATE_FIELDS.field, USER_POPULATE_FIELDS.subFields)
+    .exec();
 
 export const getPostsBySender = async (
   sender: Post["sender"]
-): Promise<Post[]> => await PostModel.find({ sender }).exec();
+): Promise<Post[]> =>
+  await PostModel.find({ sender })
+    .populate(USER_POPULATE_FIELDS.field, USER_POPULATE_FIELDS.subFields)
+    .exec();
 
 export const createPost = async (postData: CreatePost): Promise<Post> => {
   const post = new PostModel(postData);

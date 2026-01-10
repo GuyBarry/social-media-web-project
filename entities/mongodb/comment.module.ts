@@ -18,6 +18,7 @@ const commentSchema = new Schema(
     },
     sender: {
       type: String,
+      ref: "User",
       required: true,
     },
   },
