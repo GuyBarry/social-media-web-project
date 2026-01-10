@@ -215,6 +215,9 @@
  *                 message:
  *                   type: string
  *                   example: Comment deleted successfully
+ *                 commentId:
+ *                   type: string
+ *                   example: 1234
  *       404:
  *         description: Bad request
  *         content:
