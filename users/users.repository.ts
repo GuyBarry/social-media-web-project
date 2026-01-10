@@ -1,22 +1,26 @@
 import { CreateUser, UpdateUser, User } from "../entities/dto/user.dto";
 import { UserModel } from "../entities/mongodb/user.module";
+import { CustomException } from "../exceptions/customException";
+import { handleDuplicateKeyException } from "../exceptions/mongoException";
 
 export const getAllUsers = async (): Promise<User[]> =>
-  await UserModel.find({}).exec();
+  await UserModel.find({});
 
 export const getUserById = async (id: User["_id"]): Promise<User | null> =>
-  await UserModel.findById(id).exec();
+  await UserModel.findById(id);
 
 export const createUser = async (userData: CreateUser): Promise<User> => {
   const user = new UserModel(userData);
-  return await user.save();
+  return await user.save().catch((err) => handleDuplicateKeyException(err));
 };
 
 export const updateUser = async (
   id: User["_id"],
   userData: UpdateUser
 ): Promise<User | null> =>
-  await UserModel.findByIdAndUpdate(id, userData, { new: true }).exec();
+  await UserModel.findByIdAndUpdate(id, userData, { new: true }).catch((err) =>
+    handleDuplicateKeyException(err)
+  );
 
 export const deleteUser = async (id: User["_id"]): Promise<boolean> =>
   (await UserModel.deleteOne({ _id: id }).exec()).deletedCount > 0;

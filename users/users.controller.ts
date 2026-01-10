@@ -1,4 +1,5 @@
 import { Request, Response, Router } from "express";
+import { StatusCodes } from "http-status-codes";
 import {
   CreateUser,
   createUserSchema,
@@ -14,7 +15,7 @@ const router = Router();
 // Get all users
 router.get("/", async (req: Request, res: Response) => {
   const users = await usersService.getAllUsers();
-  res.status(200).send(users);
+  res.status(StatusCodes.OK).send(users);
 });
 
 // Get user by id
@@ -23,10 +24,10 @@ router.get("/:id", async (req: Request<{ id: User["_id"] }>, res: Response) => {
   const user = await usersService.getUserById(id);
 
   if (!user) {
-    return res.status(404).send({ message: "User does not exist" });
+    return res.status(StatusCodes.NOT_FOUND).send({ message: "User does not exist" });
   }
 
-  res.status(200).send(user);
+  res.status(StatusCodes.OK).send(user);
 });
 
 // Create user
@@ -36,7 +37,7 @@ router.post(
   async (req: Request<{}, {}, CreateUser>, res: Response) => {
     try {
       const user = await usersService.createUser(req.body);
-      res.status(201).send({
+      res.status(StatusCodes.CREATED).send({
         message: "Created new user",
         userId: user._id,
         createdAt: user.createdAt,
@@ -49,7 +50,7 @@ router.post(
         "code" in error &&
         error.code === 11000
       ) {
-        return res.status(409).send({ message: "User already exists" });
+        return res.status(StatusCodes.CONFLICT).send({ message: "User already exists" });
       }
       throw error;
     }
@@ -66,10 +67,10 @@ router.put(
       const user = await usersService.updateUser(id, req.body);
 
       if (!user) {
-        return res.status(404).send({ message: "User does not exist" });
+        return res.status(StatusCodes.NOT_FOUND).send({ message: "User does not exist" });
       }
 
-      res.status(200).send(user);
+      res.status(StatusCodes.OK).send(user);
     } catch (error) {
       if (
         error &&
@@ -77,7 +78,7 @@ router.put(
         "code" in error &&
         error.code === 11000
       ) {
-        return res.status(409).send({ message: "User already exists" });
+        return res.status(StatusCodes.CONFLICT).send({ message: "User already exists" });
       }
       throw error;
     }
@@ -92,10 +93,10 @@ router.delete(
     const deleted = await usersService.deleteUser(id);
 
     if (!deleted) {
-      return res.status(404).send({ message: "User does not exist" });
+      return res.status(StatusCodes.NOT_FOUND).send({ message: "User does not exist" });
     }
 
-    res.status(200).send({ message: "User deleted successfully", userId: id });
+    res.status(StatusCodes.OK).send({ message: "User deleted successfully", userId: id });
   }
 );
 

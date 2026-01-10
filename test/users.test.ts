@@ -1,4 +1,5 @@
 import { Express } from "express";
+import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import request from "supertest";
 import { initApp } from "../app";
@@ -26,7 +27,7 @@ describe("GET /", () => {
   test("Should return all users", async () => {
     const response = await request(app).get("/users");
 
-    expect(response.statusCode).toEqual(200);
+    expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toBeGreaterThan(0);
     expect(response.body[0]._id).toBe(exampleUser._id);
@@ -36,7 +37,7 @@ describe("GET /", () => {
     await UserModel.deleteMany();
     const response = await request(app).get("/users");
 
-    expect(response.statusCode).toEqual(200);
+    expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toEqual(0);
   });
@@ -46,7 +47,7 @@ describe("GET /:id", () => {
   test("Should return a user by id", async () => {
     const response = await request(app).get(`/users/${exampleUser._id}`);
 
-    expect(response.statusCode).toEqual(200);
+    expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(response.body._id).toBe(exampleUser._id);
   });
 
@@ -54,7 +55,7 @@ describe("GET /:id", () => {
     const nonExistentId = "nonexistentid";
     const response = await request(app).get(`/users/${nonExistentId}`);
 
-    expect(response.statusCode).toEqual(404);
+    expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("User does not exist");
   });
 });
@@ -68,7 +69,7 @@ describe("POST /users", () => {
       birthDate: "1990-01-01",
     });
 
-    expect(response.statusCode).toEqual(201);
+    expect(response.statusCode).toEqual(StatusCodes.CREATED);
     expect(response.body.message).toBe("Created new user");
     expect(response.body).toHaveProperty("userId");
     expect(response.body).toHaveProperty("createdAt");
@@ -86,7 +87,7 @@ describe("POST /users", () => {
       birthDate: "1990-01-01",
     };
     const response = await request(app).post("/users").send(invalidUserData);
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
@@ -99,7 +100,7 @@ describe("POST /users", () => {
       birthDate: "invalid-date",
     };
     const response = await request(app).post("/users").send(invalidUserData);
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
@@ -111,7 +112,7 @@ describe("POST /users", () => {
       birthDate: "1990-01-01",
     };
     const response = await request(app).post("/users").send(invalidUserData);
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
@@ -124,7 +125,7 @@ describe("POST /users", () => {
       birthDate: "1990-01-01",
     };
     const response = await request(app).post("/users").send(invalidUserData);
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
@@ -132,8 +133,10 @@ describe("POST /users", () => {
   test("Should return 409 if user already exists", async () => {
     const response = await request(app).post("/users").send(exampleUser);
 
-    expect(response.statusCode).toEqual(409);
+    expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
     expect(response.body.message).toBe("User already exists");
+    expect(response.body.details.field).toBe("_id");
+    expect(response.body.details.value).toBe(exampleUser._id);
   });
 });
 
@@ -144,7 +147,7 @@ describe("PUT /users/:id", () => {
       bio: "This is an updated bio",
     });
 
-    expect(response.statusCode).toEqual(200);
+    expect(response.statusCode).toEqual(StatusCodes.OK);
 
     const updatedUser = await UserModel.findById(exampleUser._id);
     expect(updatedUser).not.toBeNull();
@@ -158,7 +161,7 @@ describe("PUT /users/:id", () => {
       .put(`/users/${nonExistentId}`)
       .send({ bio: "This user does not exist" });
 
-    expect(response.statusCode).toEqual(404);
+    expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("User does not exist");
   });
 
@@ -170,16 +173,17 @@ describe("PUT /users/:id", () => {
       .put(`/users/${exampleUser._id}`)
       .send(invalidUpdateData);
 
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
 
   test("Should return 409 when updating to an existing user's email", async () => {
+    const uniqueEmail = "unique@example.com";
     const anotherUser = await UserModel.create({
       _id: "2222",
       username: "anotheruser",
-      email: "another@example.com",
+      email: uniqueEmail,
       bio: "This is another user",
       birthDate: "1995-05-05",
     });
@@ -188,14 +192,17 @@ describe("PUT /users/:id", () => {
       .put(`/users/${exampleUser._id}`)
       .send({ email: anotherUser.email });
 
-    expect(response.statusCode).toEqual(409);
+    expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
     expect(response.body.message).toBe("User already exists");
+    expect(response.body.details.field).toBe("email");
+    expect(response.body.details.value).toBe(uniqueEmail);
   });
 
   test("Should return 409 when updating to an existing user's username", async () => {
+    const uniqueUsername = "uniqueusername";
     const anotherUser = await UserModel.create({
       _id: "3333",
-      username: "uniqueusername",
+      username: uniqueUsername,
       email: "unique@example.com",
       bio: "This is another user",
       birthDate: "1995-05-05",
@@ -205,8 +212,10 @@ describe("PUT /users/:id", () => {
       .put(`/users/${exampleUser._id}`)
       .send({ username: anotherUser.username });
 
-    expect(response.statusCode).toEqual(409);
+    expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
     expect(response.body.message).toBe("User already exists");
+    expect(response.body.details.field).toBe("username");
+    expect(response.body.details.value).toBe(uniqueUsername);
   });
 });
 
@@ -214,7 +223,7 @@ describe("DELETE /:id", () => {
   test("Should delete a user", async () => {
     const response = await request(app).delete(`/users/${exampleUser._id}`);
 
-    expect(response.statusCode).toEqual(200);
+    expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(response.body.message).toBe("User deleted successfully");
     expect(response.body.userId).toBe(exampleUser._id);
 
@@ -226,7 +235,7 @@ describe("DELETE /:id", () => {
     const nonExistentId = "nonexistentid";
     const response = await request(app).delete(`/users/${nonExistentId}`);
 
-    expect(response.statusCode).toEqual(404);
+    expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("User does not exist");
   });
 });

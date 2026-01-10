@@ -1,4 +1,5 @@
 import { Request, Response, Router } from "express";
+import { StatusCodes } from "http-status-codes";
 import {
   CreatePost,
   createPostSchema,
@@ -24,7 +25,7 @@ router.get(
       ? await postService.getPostsBySender(senderId)
       : await postService.getAllPosts();
 
-    res.status(200).send(response);
+    res.status(StatusCodes.OK).send(response);
   }
 );
 
@@ -34,11 +35,11 @@ router.get("/:id", async (req: Request<{ id: Post["_id"] }>, res: Response) => {
   const response = await postService.getPostById(id);
 
   if (!response) {
-    res.status(404).send({
+    res.status(StatusCodes.NOT_FOUND).send({
       message: "Post does not exist",
     });
   } else {
-    res.status(200).send(response);
+    res.status(StatusCodes.OK).send(response);
   }
 });
 
@@ -51,7 +52,7 @@ router.post(
 
     const { _id, createdAt } = await postService.createPost(postData);
 
-    res.status(201).send({
+    res.status(StatusCodes.CREATED).send({
       message: "Created new post",
       postId: _id,
       createdAt,
@@ -70,9 +71,11 @@ router.put(
     const updated = await postService.updatePost(id, postData);
 
     if (!updated) {
-      return res.status(404).send({ message: "Post does not exist" });
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .send({ message: "Post does not exist" });
     } else {
-      res.status(200).send({
+      res.status(StatusCodes.OK).send({
         message: "Updated post",
         postId: id,
         updatedAt: updated.updatedAt,

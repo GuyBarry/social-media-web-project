@@ -1,4 +1,5 @@
 import { Request, Response, Router } from "express";
+import { StatusCodes } from "http-status-codes";
 import {
   Comment,
   CreateComment,
@@ -24,10 +25,12 @@ router.get(
         ? await commentsService.getAllCommentsByPostId(postId)
         : await commentsService.getAllComments();
 
-      res.status(200).send(response);
+      res.status(StatusCodes.OK).send(response);
     } catch (error) {
       if (error instanceof Error && error.message === "Post does not exist") {
-        return res.status(400).send({ message: "Post does not exist" });
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .send({ message: "Post does not exist" });
       } else {
         throw error;
       }
@@ -43,10 +46,12 @@ router.get(
     const comment = await commentsService.getCommentById(id);
 
     if (!comment) {
-      return res.status(404).send({ message: "Comment does not exist" });
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .send({ message: "Comment does not exist" });
     }
 
-    res.status(200).send(comment);
+    res.status(StatusCodes.OK).send(comment);
   }
 );
 
@@ -61,14 +66,14 @@ router.post(
       const { _id, createdAt } = await commentsService.createComment(
         commentData
       );
-      res.status(201).send({
+      res.status(StatusCodes.CREATED).send({
         message: "Created new comment",
         commentId: _id,
         createdAt,
       });
     } catch (error) {
       if (error instanceof Error && error.message === "Post does not exist") {
-        res.status(400).send({
+        res.status(StatusCodes.BAD_REQUEST).send({
           message: "Post does not exist",
         });
       } else {
@@ -92,11 +97,11 @@ router.put(
     const updated = await commentsService.updateComment(id, commentData);
 
     if (!updated) {
-      res.status(404).send({
+      res.status(StatusCodes.NOT_FOUND).send({
         message: "Comment does not exist",
       });
     } else {
-      res.status(200).send({
+      res.status(StatusCodes.OK).send({
         message: "updated comment",
         commentId: id,
         updatedAt: updated.updatedAt,
@@ -112,10 +117,12 @@ router.delete("/:id", async (req: Request, res: Response) => {
   const deleted = await commentsService.deleteComment(id);
 
   if (!deleted) {
-    return res.status(404).send({ message: "Comment does not exist" });
+    return res
+      .status(StatusCodes.NOT_FOUND)
+      .send({ message: "Comment does not exist" });
   }
 
-  return res.status(200).send({
+  return res.status(StatusCodes.OK).send({
     message: "Comment deleted successfully",
     commentId: id,
   });

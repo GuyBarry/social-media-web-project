@@ -5,6 +5,8 @@ import {
 } from "../entities/dto/comment.dto";
 import { Post } from "../entities/dto/post.dto";
 import { CommentModel } from "../entities/mongodb/comment.module";
+import { CustomException } from "../exceptions/customException";
+import { handleDuplicateKeyException } from "../exceptions/mongoException";
 
 export const getAllComments = async (): Promise<Comment[]> =>
   await CommentModel.find({}).exec();
@@ -27,7 +29,7 @@ export const createComment = async (
   commentData: CreateComment
 ): Promise<Comment> => {
   const comment = new CommentModel(commentData);
-  return await comment.save();
+  return await comment.save().catch((err) => handleDuplicateKeyException(err));
 };
 
 export const deleteComment = async (id: Comment["_id"]): Promise<boolean> =>
