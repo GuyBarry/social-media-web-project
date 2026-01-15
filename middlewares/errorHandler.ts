@@ -1,5 +1,6 @@
-import { ErrorRequestHandler } from "express";
-import { Request, Response, NextFunction } from "express";
+import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
+import { CustomException } from "../exceptions/customException";
 
 export const errorHandler: ErrorRequestHandler = (
   error: Error,
@@ -12,7 +13,16 @@ export const errorHandler: ErrorRequestHandler = (
     stack: error?.stack,
   });
 
-  res.status(500).send({
-    message: "Oops, something went wrong!",
-  });
+  if (error instanceof CustomException) {
+    const { message, details, statusCode } = error;
+
+    res.status(statusCode).send({
+      message,
+      details,
+    });
+  } else {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+      message: "Oops, something went wrong!",
+    });
+  }
 };

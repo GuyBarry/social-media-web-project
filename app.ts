@@ -7,6 +7,7 @@ import { errorHandler } from "./middlewares/errorHandler";
 import { noRouteHandler } from "./middlewares/noRouteHandler";
 import { postsController } from "./posts/posts.controller";
 import { commentsController } from "./comments/comments.controller";
+import { usersController } from "./users/users.controller";
 import { registerSwagger } from "./swagger/setupSwagger";
 
 export const initApp = async (): Promise<Express> => {
@@ -18,6 +19,7 @@ export const initApp = async (): Promise<Express> => {
 
   app.use("/posts", postsController);
   app.use("/comments", commentsController);
+  app.use("/users", usersController);
 
   registerSwagger(app);
   app.use(noRouteHandler);

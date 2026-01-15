@@ -1,4 +1,5 @@
 import { Express } from "express";
+import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import request from "supertest";
 import { initApp } from "../app";
@@ -26,7 +27,7 @@ describe("GET / ", () => {
   test("Should return all posts", async () => {
     const response = await request(app).get("/posts");
 
-    expect(response.statusCode).toEqual(200);
+    expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toBeGreaterThan(0);
     expect(response.body[0]._id).toBe(examplePost._id);
@@ -37,9 +38,39 @@ describe("GET / ", () => {
 
     const response = await request(app).get("/posts");
 
-    expect(response.statusCode).toEqual(200);
+    expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toEqual(0);
+  });
+
+  describe("GET /?sender=", () => {
+    test("Should return posts by sender", async () => {
+      const response = await request(app).get(
+        `/posts?sender=${examplePost.sender}`
+      );
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+      expect(response.body[0]._id).toBe(examplePost._id);
+      expect(response.body[0].sender._id).toBe(examplePost.sender);
+    });
+
+    test("Should return empty array when no posts exist for sender", async () => {
+      const response = await request(app).get(`/posts?sender=unknownuser`);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toEqual(0);
+    });
+
+    test("Should return all posts when sender is null", async () => {
+      const response = await request(app).get(`/posts?sender=`);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+    });
   });
 });
 
@@ -47,7 +78,7 @@ describe("GET /:id", () => {
   test("Should return a post by id", async () => {
     const response = await request(app).get(`/posts/${examplePost._id}`);
 
-    expect(response.statusCode).toEqual(200);
+    expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(response.body._id).toBe(examplePost._id);
   });
 
@@ -55,7 +86,7 @@ describe("GET /:id", () => {
     const nonExistentId = "nonexistentid";
     const response = await request(app).get(`/posts/${nonExistentId}`);
 
-    expect(response.statusCode).toEqual(404);
+    expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("Post does not exist");
   });
 });
@@ -67,7 +98,7 @@ describe("POST / ", () => {
       sender: "testuser",
     };
     const response = await request(app).post("/posts").send(newPostData);
-    expect(response.statusCode).toEqual(201);
+    expect(response.statusCode).toEqual(StatusCodes.CREATED);
     expect(response.body.message).toBe("Created new post");
     expect(response.body.postId).toBeDefined();
     expect(response.body.createdAt).toBeDefined();
@@ -78,7 +109,7 @@ describe("POST / ", () => {
       message: "This post has no sender",
     };
     const response = await request(app).post("/posts").send(invalidPostData);
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
@@ -88,14 +119,14 @@ describe("POST / ", () => {
       sender: "testuser",
     };
     const response = await request(app).post("/posts").send(invalidPostData);
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
 
   test("Should return 400 for empty post data", async () => {
     const response = await request(app).post("/posts").send({});
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
@@ -107,16 +138,30 @@ describe("POST / ", () => {
       sender: "testuser",
     };
     const response = await request(app).post("/posts").send(invalidPostData);
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
+  });
+
+  test("Should return 409 for duplicate post", async () => {
+    const duplicatePostData = {
+      _id: examplePost._id,
+      message: examplePost.message,
+      sender: examplePost.sender,
+    };
+    const response = await request(app).post("/posts").send(duplicatePostData);
+
+    expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
+    expect(response.body.message).toBe("Post already exists");
+    expect(response.body.details.field).toBe("_id");
+    expect(response.body.details.value).toBe(examplePost._id);
   });
 });
 
 describe("GET /invalid-endpoint", () => {
   test("Should return 404 for invalid endpoint", async () => {
     const response = await request(app).get("/invalid-endpoint");
-    expect(response.statusCode).toEqual(404);
+    expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("Route does not exist");
   });
 });
@@ -130,7 +175,7 @@ describe("PUT /:id", () => {
       .put(`/posts/${examplePost._id}`)
       .send(updatedPostData);
 
-    expect(response.statusCode).toEqual(200);
+    expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(response.body.message).toBe("Updated post");
     expect(response.body.postId).toBe(examplePost._id);
     expect(response.body.updatedAt).toBeDefined();
@@ -145,7 +190,7 @@ describe("PUT /:id", () => {
       .put(`/posts/${nonExistentId}`)
       .send(updatedPostData);
 
-    expect(response.statusCode).toEqual(404);
+    expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("Post does not exist");
   });
 
@@ -157,7 +202,7 @@ describe("PUT /:id", () => {
       .put(`/posts/${examplePost._id}`)
       .send(updatedPostData);
 
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
@@ -171,7 +216,7 @@ describe("PUT /:id", () => {
       .put(`/posts/${examplePost._id}`)
       .send(updatedPostData);
 
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
@@ -181,7 +226,7 @@ describe("PUT /:id", () => {
       .put(`/posts/${examplePost._id}`)
       .send({});
 
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
@@ -194,38 +239,8 @@ describe("PUT /:id", () => {
       .put(`/posts/${examplePost._id}`)
       .send(updatedPostData);
 
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
-  });
-});
-
-describe("GET /?sender=", () => {
-  test("Should return posts by sender", async () => {
-    const response = await request(app).get(
-      `/posts?sender=${examplePost.sender}`
-    );
-
-    expect(response.statusCode).toEqual(200);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toBeGreaterThan(0);
-    expect(response.body[0]._id).toBe(examplePost._id);
-    expect(response.body[0].sender).toBe(examplePost.sender);
-  });
-
-  test("Should return empty array when no posts exist for sender", async () => {
-    const response = await request(app).get(`/posts?sender=unknownuser`);
-
-    expect(response.statusCode).toEqual(200);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toEqual(0);
-  });
-
-  test("Should return all posts when sender is null", async () => {
-    const response = await request(app).get(`/posts?sender=`);
-
-    expect(response.statusCode).toEqual(200);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toBeGreaterThan(0);
   });
 });

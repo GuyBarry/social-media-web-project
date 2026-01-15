@@ -6,6 +6,8 @@ import {
   UpdateComment,
 } from "../entities/dto/comment.dto";
 import { Post } from "../entities/dto/post.dto";
+import { CustomException } from "../exceptions/customException";
+import { StatusCodes } from "http-status-codes";
 
 export const getAllComments = async (): Promise<Comment[]> =>
   await commentsRepository.getAllComments();
@@ -14,7 +16,7 @@ export const getAllCommentsByPostId = async (
   postId: Post["_id"]
 ): Promise<Comment[]> => {
   if (!(await postService.getPostById(postId))) {
-    throw new Error("Post does not exist");
+    throw new CustomException("Post does not exist", StatusCodes.NOT_FOUND);
   }
 
   return await commentsRepository.getAllCommentsByPostId(postId);
@@ -33,7 +35,7 @@ export const createComment = async (
   commentData: CreateComment
 ): Promise<Comment> => {
   if (!(await postService.getPostById(commentData.postId))) {
-    throw new Error("Post does not exist");
+    throw new CustomException("Post does not exist", StatusCodes.NOT_FOUND);
   }
 
   return await commentsRepository.createComment(commentData);

@@ -1,19 +1,13 @@
 /**
  * @openapi
- * /posts/:
+ * /users/:
  *   get:
  *     tags:
- *      - Posts
- *     summary: Get all posts
- *     parameters:
- *       - in: query
- *         name: sender
- *         schema:
- *           type: string
- *         description: Optional sender id to filter posts
+ *      - Users
+ *     summary: Get all users
  *     responses:
  *       200:
- *         description: A list of posts
+ *         description: A list of users
  *         content:
  *           application/json:
  *             schema:
@@ -23,9 +17,13 @@
  *                 properties:
  *                   _id:
  *                     type: string
- *                   message:
+ *                   username:
  *                     type: string
- *                   sender:
+ *                   email:
+ *                     type: string
+ *                   bio:
+ *                     type: string
+ *                   birthDate:
  *                     type: string
  *                   createdAt:
  *                     type: string
@@ -35,21 +33,21 @@
 
 /**
  * @openapi
- * /posts/{id}:
+ * /users/{id}:
  *   get:
  *     tags:
- *      - Posts
- *     summary: Get post by id
+ *      - Users
+ *     summary: Get user by id
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: The requested post id
+ *         description: The requested user id
  *     responses:
  *       200:
- *         description: The requested post
+ *         description: The requested user
  *         content:
  *           application/json:
  *             schema:
@@ -57,9 +55,13 @@
  *               properties:
  *                _id:
  *                  type: string
- *                message:
+ *                username:
  *                  type: string
- *                sender:
+ *                email:
+ *                  type: string
+ *                bio:
+ *                  type: string
+ *                birthDate:
  *                  type: string
  *                createdAt:
  *                  type: string
@@ -74,25 +76,25 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Post does not exist
+ *                   example: User does not exist
  */
 
 /**
  * @openapi
- * /posts/:
+ * /users/:
  *   post:
  *     tags:
- *      - Posts
- *     summary: Create new post
+ *      - Users
+ *     summary: Create new user
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreatePost'
+ *             $ref: '#/components/schemas/CreateUser'
  *     responses:
  *       201:
- *         description: Returns the created post id
+ *         description: Returns the created user id
  *         content:
  *          application/json:
  *            schema:
@@ -100,8 +102,8 @@
  *              properties:
  *                message:
  *                  type: string
- *                  example: Created new post
- *                postId:
+ *                  example: Created new user
+ *                userId:
  *                  type: string
  *                  example: 1234
  *                createdAt:
@@ -125,7 +127,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Post already exists
+ *                   example: User already exists
  *                 details:
  *                   type: object
  *                   properties:
@@ -137,11 +139,11 @@
 
 /**
  * @openapi
- * /posts/{id}:
+ * /users/{id}:
  *   put:
  *     tags:
- *      - Posts
- *     summary: Update post
+ *      - Users
+ *     summary: Update user
  *     parameters:
  *       - in: path
  *         name: id
@@ -153,23 +155,29 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UpdatePost'
+ *             $ref: '#/components/schemas/UpdateUser'
  *     responses:
  *       200:
- *         description: Updated
+ *         description: Updated user
  *         content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                message:
- *                  type: string
- *                  example: Updated post
- *                postId:
- *                  type: string
- *                  example: 1234
- *                updatedAt:
- *                  type: string
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                 username:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 bio:
+ *                   type: string
+ *                 birthDate:
+ *                   type: string
+ *                 createdAt:
+ *                   type: string
+ *                 updatedAt:
+ *                   type: string
  *       400:
  *         description: Bad request
  *         content:
@@ -181,7 +189,7 @@
  *                   type: string
  *                   example: Invalid request body
  *       404:
- *         description: Bad request
+ *         description: Not found
  *         content:
  *           application/json:
  *             schema:
@@ -189,5 +197,61 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Post does not exist
+ *                   example: User does not exist
+ *       409:
+ *         description: Conflict
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User already exists
+ *                 details:
+ *                   type: object
+ *                   properties:
+ *                     field: 
+ *                       type: string
+ *                     value: 
+ *                       type: string
+ */
+
+/**
+ * @openapi
+ * /users/{id}:
+ *   delete:
+ *     tags:
+ *      - Users
+ *     summary: Delete user
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User deleted successfully
+ *                 userId:
+ *                   type: string
+ *                   example: 1234
+ *       404:
+ *         description: Not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User does not exist
  */

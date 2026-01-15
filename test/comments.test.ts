@@ -1,4 +1,5 @@
 import { Express } from "express";
+import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import request from "supertest";
 import { initApp } from "../app";
@@ -26,7 +27,7 @@ describe("GET / ", () => {
   test("Should return all comments", async () => {
     const response = await request(app).get("/comments");
 
-    expect(response.statusCode).toEqual(200);
+    expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toBeGreaterThan(0);
     expect(response.body[0]._id).toBe(exampleComment._id);
@@ -36,7 +37,7 @@ describe("GET / ", () => {
     await CommentModel.deleteMany();
     const response = await request(app).get("/comments");
 
-    expect(response.statusCode).toEqual(200);
+    expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toEqual(0);
   });
@@ -47,7 +48,7 @@ describe("GET / ", () => {
         `/comments?postId=${exampleComment.postId}`
       );
 
-      expect(response.statusCode).toEqual(200);
+      expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body.length).toBeGreaterThan(0);
       expect(response.body[0]._id).toBe(exampleComment._id);
@@ -60,15 +61,15 @@ describe("GET / ", () => {
         `/comments?postId=${examplePost._id}`
       );
 
-      expect(response.statusCode).toEqual(200);
+      expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body.length).toEqual(0);
     });
 
-    test("Should return 400 when post does not exist", async () => {
+    test("Should return 404 when post does not exist", async () => {
       const response = await request(app).get(`/comments?postId=nonexistentid`);
 
-      expect(response.statusCode).toEqual(400);
+      expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
       expect(response.body.message).toBe("Post does not exist");
     });
   });
@@ -79,7 +80,7 @@ describe("GET / ", () => {
         `/comments/${exampleComment._id}`
       );
 
-      expect(response.statusCode).toEqual(200);
+      expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(response.body).toBeDefined();
       expect(response.body._id).toBe(exampleComment._id);
       expect(response.body.postId).toBe(exampleComment.postId);
@@ -89,7 +90,7 @@ describe("GET / ", () => {
       const nonExistentId = "nonexistentid";
       const response = await request(app).get(`/comments/${nonExistentId}`);
 
-      expect(response.statusCode).toEqual(404);
+      expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
       expect(response.body.message).toBe("Comment does not exist");
     });
   });
@@ -103,7 +104,7 @@ describe("PUT /:id", () => {
       .put(`/comments/${exampleComment._id}`)
       .send(newMessage);
 
-    expect(response.statusCode).toEqual(200);
+    expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(response.body.message).toEqual("updated comment");
     expect(response.body.commentId).toEqual(exampleComment._id);
 
@@ -117,7 +118,7 @@ describe("PUT /:id", () => {
       .put(`/comments/${exampleComment._id}`)
       .send({ message: "" });
 
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toEqual("Invalid request body");
     expect(Array.isArray(response.body.violations)).toBe(true);
     expect(response.body.violations.length).toBeGreaterThan(0);
@@ -128,7 +129,7 @@ describe("PUT /:id", () => {
       .put(`/comments/${exampleComment._id}`)
       .send({ message: 12345 });
 
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toEqual("Invalid request body");
     expect(Array.isArray(response.body.violations)).toBe(true);
     expect(response.body.violations.length).toBeGreaterThan(0);
@@ -138,7 +139,7 @@ describe("PUT /:id", () => {
     const response = await request(app)
       .put(`/comments/${exampleComment._id}`)
       .send({});
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toEqual("Invalid request body");
     expect(Array.isArray(response.body.violations)).toBe(true);
     expect(response.body.violations.length).toBeGreaterThan(0);
@@ -149,7 +150,7 @@ describe("PUT /:id", () => {
       .put(`/comments/nonexistentid`)
       .send({ message: "nope" });
 
-    expect(response.statusCode).toEqual(404);
+    expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toEqual("Comment does not exist");
   });
 });
@@ -164,7 +165,7 @@ describe("POST / ", () => {
 
     const response = await request(app).post("/comments").send(newCommentData);
 
-    expect(response.statusCode).toEqual(201);
+    expect(response.statusCode).toEqual(StatusCodes.CREATED);
     expect(response.body.message).toBe("Created new comment");
     expect(response.body).toHaveProperty("commentId");
     expect(response.body).toHaveProperty("createdAt");
@@ -187,7 +188,7 @@ describe("POST / ", () => {
       .post("/comments")
       .send(invalidCommentData);
 
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
@@ -203,7 +204,7 @@ describe("POST / ", () => {
       .post("/comments")
       .send(invalidCommentData);
 
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
@@ -220,8 +221,25 @@ describe("POST / ", () => {
       .send(newCommentData)
       .set("Content-Type", "application/json");
 
-    expect(response.statusCode).toEqual(400);
+    expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("Post does not exist");
+  });
+
+  test("Should return 409 when creating a duplicate comment", async () => {
+    const duplicateCommentData = {
+      _id: exampleComment._id,
+      sender: exampleComment.sender,
+      message: exampleComment.message,
+      postId: exampleComment.postId,
+    };
+    const response = await request(app)
+      .post("/comments")
+      .send(duplicateCommentData);
+      
+    expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
+    expect(response.body.message).toBe("Comment already exists");
+    expect(response.body.details.field).toBe("_id");
+    expect(response.body.details.value).toBe(exampleComment._id);
   });
 });
 
@@ -230,7 +248,7 @@ describe("DELETE /:id", () => {
     const response = await request(app).delete(
       `/comments/${exampleComment._id}`
     );
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(StatusCodes.OK);
     expect(response.body.message).toBe("Comment deleted successfully");
     expect(response.body.commentId).toBe(exampleComment._id);
 
@@ -241,7 +259,7 @@ describe("DELETE /:id", () => {
   test("should return 404 when deleting a non-existent comment", async () => {
     const response = await request(app).delete("/comments/nonexistentid");
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("Comment does not exist");
   });
 });
