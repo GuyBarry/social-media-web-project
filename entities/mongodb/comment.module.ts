@@ -1,11 +1,16 @@
 import { Schema, model } from "mongoose";
 import { v4 as uuidV4 } from "uuid";
+import { Comment } from "../dto/comment.dto";
 
-const postSchema = new Schema(
+const commentSchema = new Schema(
   {
     _id: {
       type: String,
       default: uuidV4,
+    },
+    postId: {
+      type: String,
+      required: true,
     },
     message: {
       type: String,
@@ -19,4 +24,4 @@ const postSchema = new Schema(
   { timestamps: true }
 );
 
-export const Post = model("Post", postSchema);
+export const CommentModel = model<Comment>("Comment", commentSchema);

@@ -1,21 +1,21 @@
+import { Express } from "express";
 import mongoose from "mongoose";
 import request from "supertest";
-import { initApp } from "../app.js";
-import { Comment } from "../entities/mongodb/comment.module.js";
-import { exampleComment, examplePost } from "./testUtils.js";
+import { initApp } from "../app";
+import { CommentModel } from "../entities/mongodb/comment.module";
+import { exampleComment, examplePost } from "./testUtils";
 
-let app;
+let app: Express;
 
 beforeAll(async () => {
   await initApp().then(async (appInstance) => {
     app = appInstance;
   });
-  await Comment.deleteMany();
 });
 
 beforeEach(async () => {
-  await Comment.deleteMany();
-  await Comment.create(exampleComment);
+  await CommentModel.deleteMany();
+  await CommentModel.create(exampleComment);
 });
 
 afterAll(async () => {
@@ -33,7 +33,7 @@ describe("GET / ", () => {
   });
 
   test("Should return empty array when no comments exist", async () => {
-    await Comment.deleteMany();
+    await CommentModel.deleteMany();
     const response = await request(app).get("/comments");
 
     expect(response.statusCode).toEqual(200);
@@ -55,11 +55,21 @@ describe("GET / ", () => {
     });
 
     test("Should return empty array when no comments exist for postId", async () => {
-      const response = await request(app).get(`/comments?postId=nonexistentid`);
+      await CommentModel.deleteMany();
+      const response = await request(app).get(
+        `/comments?postId=${examplePost._id}`
+      );
 
       expect(response.statusCode).toEqual(200);
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body.length).toEqual(0);
+    });
+
+    test("Should return 400 when post does not exist", async () => {
+      const response = await request(app).get(`/comments?postId=nonexistentid`);
+
+      expect(response.statusCode).toEqual(400);
+      expect(response.body.message).toBe("Post does not exist");
     });
   });
 
@@ -97,8 +107,8 @@ describe("PUT /:id", () => {
     expect(response.body.message).toEqual("updated comment");
     expect(response.body.commentId).toEqual(exampleComment._id);
 
-    const updated = await Comment.findById(exampleComment._id);
-    expect(updated.message).toEqual(newMessage.message);
+    const updated = await CommentModel.findById(exampleComment._id);
+    expect(updated!.message).toEqual(newMessage.message);
     expect(response.body.updatedAt).toBeDefined();
   });
 
@@ -159,11 +169,11 @@ describe("POST / ", () => {
     expect(response.body).toHaveProperty("commentId");
     expect(response.body).toHaveProperty("createdAt");
 
-    const createdComment = await Comment.findById(response.body.commentId);
+    const createdComment = await CommentModel.findById(response.body.commentId);
     expect(createdComment).not.toBeNull();
-    expect(createdComment.sender).toBe(newCommentData.sender);
-    expect(createdComment.message).toBe(newCommentData.message);
-    expect(createdComment.postId).toBe(newCommentData.postId);
+    expect(createdComment!.sender).toBe(newCommentData.sender);
+    expect(createdComment!.message).toBe(newCommentData.message);
+    expect(createdComment!.postId).toBe(newCommentData.postId);
   });
 
   test("Should not create a new comment with invalid sender", async () => {
@@ -215,20 +225,23 @@ describe("POST / ", () => {
   });
 });
 
-describe('DELETE /:id', () => {
-    test('should delete a comment', async () => {
-        const response = await request(app).delete(`/comments/${exampleComment._id}`);
-        expect(response.status).toBe(200);
-        expect(response.body.message).toBe('Comment deleted successfully');
+describe("DELETE /:id", () => {
+  test("should delete a comment", async () => {
+    const response = await request(app).delete(
+      `/comments/${exampleComment._id}`
+    );
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe("Comment deleted successfully");
+    expect(response.body.commentId).toBe(exampleComment._id);
 
-        const commentInDB = await Comment.findById(exampleComment._id);
-        expect(commentInDB).toBeNull();
-    });
+    const commentInDB = await CommentModel.findById(exampleComment._id);
+    expect(commentInDB).toBeNull();
+  });
 
-    test('should return 404 when deleting a non-existent comment', async () => {
-        const response = await request(app).delete('/comments/nonexistentid');
+  test("should return 404 when deleting a non-existent comment", async () => {
+    const response = await request(app).delete("/comments/nonexistentid");
 
-        expect(response.status).toBe(404);
-        expect(response.body.message).toBe('Comment does not exist');
-    });
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe("Comment does not exist");
+  });
 });
