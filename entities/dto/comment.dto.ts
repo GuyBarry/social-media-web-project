@@ -5,7 +5,7 @@ import { postSchema } from "./post.dto";
 
 export const commentSchema = baseModule
   .extend({
-    sender: notEmptyStringSchema("Sender "),
+    sender: notEmptyStringSchema("Sender"),
     message: notEmptyStringSchema("Message"),
     postId: postSchema.shape._id,
   })
