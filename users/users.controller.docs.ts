@@ -5,6 +5,8 @@
  *     tags:
  *      - Users
  *     summary: Get all users
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: A list of users
@@ -29,6 +31,16 @@
  *                     type: string
  *                   updatedAt:
  *                     type: string
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
  */
 
 /**
@@ -38,6 +50,8 @@
  *     tags:
  *      - Users
  *     summary: Get user by id
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -67,6 +81,16 @@
  *                  type: string
  *                updatedAt:
  *                  type: string
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
  *       404:
  *         description: Not found
  *         content:
@@ -86,6 +110,8 @@
  *     tags:
  *      - Users
  *     summary: Create new user
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -108,6 +134,16 @@
  *                  example: 1234
  *                createdAt:
  *                  type: string
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
  *       400:
  *         description: Bad request
  *         content:
@@ -131,9 +167,9 @@
  *                 details:
  *                   type: object
  *                   properties:
- *                     field: 
+ *                     field:
  *                       type: string
- *                     value: 
+ *                     value:
  *                       type: string
  */
 
@@ -144,6 +180,8 @@
  *     tags:
  *      - Users
  *     summary: Update user
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -178,6 +216,16 @@
  *                   type: string
  *                 updatedAt:
  *                   type: string
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
  *       400:
  *         description: Bad request
  *         content:
@@ -211,9 +259,9 @@
  *                 details:
  *                   type: object
  *                   properties:
- *                     field: 
+ *                     field:
  *                       type: string
- *                     value: 
+ *                     value:
  *                       type: string
  */
 
@@ -224,6 +272,8 @@
  *     tags:
  *      - Users
  *     summary: Delete user
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -244,6 +294,16 @@
  *                 userId:
  *                   type: string
  *                   example: 1234
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
  *       404:
  *         description: Not found
  *         content:

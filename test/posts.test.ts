@@ -4,13 +4,22 @@ import mongoose from "mongoose";
 import request from "supertest";
 import { initApp } from "../app";
 import { PostModel } from "../entities/mongodb/post.module";
-import { examplePost } from "./testUtils";
+import { examplePost, getAuthHeader, loginUser } from "./testUtils";
+import { authService } from "../auth/auth.service";
+import { UserModel } from "../entities/mongodb/user.module";
 
 let app: Express;
+let loginHeaders: Record<string, string>;
 
 beforeAll(async () => {
   await initApp().then(async (appInstance) => {
     app = appInstance;
+
+    const { accessToken } = authService.buildLoginTokens(loginUser._id);
+    loginHeaders = getAuthHeader(accessToken);
+    if (!(await UserModel.exists({ _id: loginUser._id }))) {
+      await UserModel.create(loginUser);
+    }
   });
 });
 
@@ -25,7 +34,7 @@ afterAll(async () => {
 
 describe("GET / ", () => {
   test("Should return all posts", async () => {
-    const response = await request(app).get("/posts");
+    const response = await request(app).get("/posts").set(loginHeaders);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
@@ -36,7 +45,7 @@ describe("GET / ", () => {
   test("Should return empty array when no posts exist", async () => {
     await PostModel.deleteMany();
 
-    const response = await request(app).get("/posts");
+    const response = await request(app).get("/posts").set(loginHeaders);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
@@ -45,9 +54,9 @@ describe("GET / ", () => {
 
   describe("GET /?sender=", () => {
     test("Should return posts by sender", async () => {
-      const response = await request(app).get(
-        `/posts?sender=${examplePost.sender}`
-      );
+      const response = await request(app)
+        .get(`/posts?sender=${examplePost.sender}`)
+        .set(loginHeaders);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(Array.isArray(response.body)).toBe(true);
@@ -57,7 +66,9 @@ describe("GET / ", () => {
     });
 
     test("Should return empty array when no posts exist for sender", async () => {
-      const response = await request(app).get(`/posts?sender=unknownuser`);
+      const response = await request(app)
+        .get(`/posts?sender=unknownuser`)
+        .set(loginHeaders);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(Array.isArray(response.body)).toBe(true);
@@ -65,7 +76,9 @@ describe("GET / ", () => {
     });
 
     test("Should return all posts when sender is null", async () => {
-      const response = await request(app).get(`/posts?sender=`);
+      const response = await request(app)
+        .get(`/posts?sender=`)
+        .set(loginHeaders);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(Array.isArray(response.body)).toBe(true);
@@ -76,7 +89,9 @@ describe("GET / ", () => {
 
 describe("GET /:id", () => {
   test("Should return a post by id", async () => {
-    const response = await request(app).get(`/posts/${examplePost._id}`);
+    const response = await request(app)
+      .get(`/posts/${examplePost._id}`)
+      .set(loginHeaders);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(response.body._id).toBe(examplePost._id);
@@ -84,7 +99,9 @@ describe("GET /:id", () => {
 
   test("Should return 404 when post does not exist", async () => {
     const nonExistentId = "nonexistentid";
-    const response = await request(app).get(`/posts/${nonExistentId}`);
+    const response = await request(app)
+      .get(`/posts/${nonExistentId}`)
+      .set(loginHeaders);
 
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("Post does not exist");
@@ -97,7 +114,10 @@ describe("POST / ", () => {
       message: "This is a new test post",
       sender: "testuser",
     };
-    const response = await request(app).post("/posts").send(newPostData);
+    const response = await request(app)
+      .post("/posts")
+      .set(loginHeaders)
+      .send(newPostData);
     expect(response.statusCode).toEqual(StatusCodes.CREATED);
     expect(response.body.message).toBe("Created new post");
     expect(response.body.postId).toBeDefined();
@@ -108,7 +128,10 @@ describe("POST / ", () => {
     const invalidPostData = {
       message: "This post has no sender",
     };
-    const response = await request(app).post("/posts").send(invalidPostData);
+    const response = await request(app)
+      .post("/posts")
+      .set(loginHeaders)
+      .send(invalidPostData);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
@@ -118,14 +141,20 @@ describe("POST / ", () => {
     const invalidPostData = {
       sender: "testuser",
     };
-    const response = await request(app).post("/posts").send(invalidPostData);
+    const response = await request(app)
+      .post("/posts")
+      .set(loginHeaders)
+      .send(invalidPostData);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
 
   test("Should return 400 for empty post data", async () => {
-    const response = await request(app).post("/posts").send({});
+    const response = await request(app)
+      .post("/posts")
+      .set(loginHeaders)
+      .send({});
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
@@ -137,7 +166,10 @@ describe("POST / ", () => {
       message: "This is a new test post",
       sender: "testuser",
     };
-    const response = await request(app).post("/posts").send(invalidPostData);
+    const response = await request(app)
+      .post("/posts")
+      .set(loginHeaders)
+      .send(invalidPostData);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
@@ -149,7 +181,10 @@ describe("POST / ", () => {
       message: examplePost.message,
       sender: examplePost.sender,
     };
-    const response = await request(app).post("/posts").send(duplicatePostData);
+    const response = await request(app)
+      .post("/posts")
+      .set(loginHeaders)
+      .send(duplicatePostData);
 
     expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
     expect(response.body.message).toBe("Post already exists");
@@ -160,7 +195,9 @@ describe("POST / ", () => {
 
 describe("GET /invalid-endpoint", () => {
   test("Should return 404 for invalid endpoint", async () => {
-    const response = await request(app).get("/invalid-endpoint");
+    const response = await request(app)
+      .get("/invalid-endpoint")
+      .set(loginHeaders);
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("Route does not exist");
   });
@@ -173,6 +210,7 @@ describe("PUT /:id", () => {
     };
     const response = await request(app)
       .put(`/posts/${examplePost._id}`)
+      .set(loginHeaders)
       .send(updatedPostData);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
@@ -188,6 +226,7 @@ describe("PUT /:id", () => {
     };
     const response = await request(app)
       .put(`/posts/${nonExistentId}`)
+      .set(loginHeaders)
       .send(updatedPostData);
 
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
@@ -200,6 +239,7 @@ describe("PUT /:id", () => {
     };
     const response = await request(app)
       .put(`/posts/${examplePost._id}`)
+      .set(loginHeaders)
       .send(updatedPostData);
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -214,6 +254,7 @@ describe("PUT /:id", () => {
     };
     const response = await request(app)
       .put(`/posts/${examplePost._id}`)
+      .set(loginHeaders)
       .send(updatedPostData);
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -224,6 +265,7 @@ describe("PUT /:id", () => {
   test("Should return 400 for empty update data", async () => {
     const response = await request(app)
       .put(`/posts/${examplePost._id}`)
+      .set(loginHeaders)
       .send({});
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -237,6 +279,7 @@ describe("PUT /:id", () => {
     };
     const response = await request(app)
       .put(`/posts/${examplePost._id}`)
+      .set(loginHeaders)
       .send(updatedPostData);
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);

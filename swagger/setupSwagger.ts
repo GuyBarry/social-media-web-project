@@ -9,6 +9,15 @@ const apiSpec = swaggerJSDoc({
       title: "Social Media API",
       version: "1.0.0",
     },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
   },
   tags: [{ name: "Posts" }, { name: "Comments" }],
   apis: ["**/*.docs.ts", "**/*.dto.ts"],

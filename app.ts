@@ -1,14 +1,17 @@
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 import express, { Express } from "express";
 import mongoose from "mongoose";
+import { authController } from "./auth/auth.contoller";
+import { commentsController } from "./comments/comments.controller";
 import { dbConfig } from "./config/db.config";
 import { serverConfig } from "./config/server.config";
+import { validateAccessToken } from "./middlewares/authMiddleware";
 import { errorHandler } from "./middlewares/errorHandler";
 import { noRouteHandler } from "./middlewares/noRouteHandler";
 import { postsController } from "./posts/posts.controller";
-import { commentsController } from "./comments/comments.controller";
-import { usersController } from "./users/users.controller";
 import { registerSwagger } from "./swagger/setupSwagger";
+import { usersController } from "./users/users.controller";
 
 export const initApp = async (): Promise<Express> => {
   const port = serverConfig.port;
@@ -16,10 +19,12 @@ export const initApp = async (): Promise<Express> => {
 
   app.use(bodyParser.urlencoded({ extended: true, limit: "1mb" }));
   app.use(bodyParser.json());
+  app.use(cookieParser());
 
-  app.use("/posts", postsController);
-  app.use("/comments", commentsController);
-  app.use("/users", usersController);
+  app.use("/posts", validateAccessToken, postsController);
+  app.use("/comments", validateAccessToken, commentsController);
+  app.use("/users", validateAccessToken, usersController);
+  app.use("/auth", authController);
 
   registerSwagger(app);
   app.use(noRouteHandler);
