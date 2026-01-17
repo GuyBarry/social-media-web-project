@@ -6,7 +6,13 @@ import { initApp } from "../app";
 import { authService } from "../auth/auth.service";
 import { PostModel } from "../entities/mongodb/post.module";
 import { UserModel } from "../entities/mongodb/user.module";
-import { examplePost, getAuthHeader, loginUser } from "./testUtils";
+import {
+  examplePost,
+  exampleUser,
+  getAuthHeader,
+  loginUser,
+  truncateDatabase,
+} from "./testUtils";
 
 let app: Express;
 let loginHeaders: Record<string, string>;
@@ -14,6 +20,7 @@ let loginHeaders: Record<string, string>;
 beforeAll(async () => {
   await initApp().then(async (appInstance) => {
     app = appInstance;
+    await truncateDatabase();
 
     const { accessToken } = authService.buildLoginTokens(loginUser._id);
     loginHeaders = getAuthHeader(accessToken);
@@ -173,6 +180,23 @@ describe("POST / ", () => {
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
+  });
+
+  test("should return 401 for auth token not equal to login user", async () => {
+    await UserModel.create(exampleUser);
+
+    const newPostData = {
+      message: "This is a new test post",
+      sender: exampleUser._id,
+    };
+
+    const response = await request(app)
+      .post("/posts")
+      .set(loginHeaders)
+      .send(newPostData);
+
+    expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+    expect(response.body.message).toBe("User is unauthorized");
   });
 
   test("should return 404 for non-existing sender", async () => {

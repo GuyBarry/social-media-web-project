@@ -5,12 +5,15 @@ import request from "supertest";
 import { initApp } from "../app";
 import { authService } from "../auth/auth.service";
 import { CommentModel } from "../entities/mongodb/comment.module";
+import { PostModel } from "../entities/mongodb/post.module";
 import { UserModel } from "../entities/mongodb/user.module";
 import {
   exampleComment,
   examplePost,
+  exampleUser,
   getAuthHeader,
   loginUser,
+  truncateDatabase,
 } from "./testUtils";
 
 let app: Express;
@@ -19,11 +22,15 @@ let loginHeaders: Record<string, string>;
 beforeAll(async () => {
   await initApp().then(async (appInstance) => {
     app = appInstance;
+    await truncateDatabase();
 
     const { accessToken } = authService.buildLoginTokens(loginUser._id);
     loginHeaders = getAuthHeader(accessToken);
     if (!(await UserModel.exists({ _id: loginUser._id }))) {
       await UserModel.create(loginUser);
+    }
+    if (!(await PostModel.exists({ _id: examplePost._id }))) {
+      await PostModel.create(examplePost);
     }
   });
 });
@@ -201,6 +208,23 @@ describe("POST / ", () => {
     expect(createdComment!.sender).toBe(newCommentData.sender);
     expect(createdComment!.message).toBe(newCommentData.message);
     expect(createdComment!.postId).toBe(newCommentData.postId);
+  });
+
+  test("should return 401 for auth token not equal to login user", async () => {
+    await UserModel.create(exampleUser);
+
+    const newPostData = {
+      message: "This is a new test post",
+      sender: exampleUser._id,
+    };
+
+    const response = await request(app)
+      .post("/posts")
+      .set(loginHeaders)
+      .send(newPostData);
+
+    expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+    expect(response.body.message).toBe("User is unauthorized");
   });
 
   test("should return 404 for non-existing sender", async () => {
