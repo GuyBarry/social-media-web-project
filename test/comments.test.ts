@@ -3,15 +3,15 @@ import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import request from "supertest";
 import { initApp } from "../app";
+import { authService } from "../auth/auth.service";
 import { CommentModel } from "../entities/mongodb/comment.module";
+import { UserModel } from "../entities/mongodb/user.module";
 import {
   exampleComment,
   examplePost,
   getAuthHeader,
   loginUser,
 } from "./testUtils";
-import { authService } from "../auth/auth.service";
-import { UserModel } from "../entities/mongodb/user.module";
 
 let app: Express;
 let loginHeaders: Record<string, string>;
@@ -181,7 +181,7 @@ describe("PUT /:id", () => {
 describe("POST / ", () => {
   test("Should create a new comment", async () => {
     const newCommentData = {
-      sender: "Alice",
+      sender: loginUser._id,
       message: "Great post!",
       postId: examplePost._id,
     };
@@ -203,13 +203,28 @@ describe("POST / ", () => {
     expect(createdComment!.postId).toBe(newCommentData.postId);
   });
 
+  test("should return 404 for non-existing sender", async () => {
+    const invalidCommentData = {
+      sender: "nonexistentid",
+      message: "Great post!",
+      postId: examplePost._id,
+    };
+
+    const response = await request(app)
+      .post("/comments")
+      .set(loginHeaders)
+      .send(invalidCommentData);
+
+    expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
+    expect(response.body.message).toBe("User does not exist");
+  });
+
   test("Should not create a new comment with invalid sender", async () => {
     const invalidCommentData = {
       sender: "",
       message: "Great post!",
       postId: examplePost._id,
     };
-
     const response = await request(app)
       .post("/comments")
       .set(loginHeaders)
@@ -222,7 +237,7 @@ describe("POST / ", () => {
 
   test("Should not create a new comment with invalid message", async () => {
     const invalidCommentData = {
-      sender: "Alice",
+      sender: loginUser._id,
       message: "",
       postId: examplePost._id,
     };
@@ -239,7 +254,7 @@ describe("POST / ", () => {
 
   test("Should not create a new comment if post does not exist", async () => {
     const newCommentData = {
-      sender: "Alice",
+      sender: loginUser._id,
       message: "Great post!",
       postId: "nonexistentid",
     };

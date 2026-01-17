@@ -3,10 +3,10 @@ import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import request from "supertest";
 import { initApp } from "../app";
-import { PostModel } from "../entities/mongodb/post.module";
-import { examplePost, getAuthHeader, loginUser } from "./testUtils";
 import { authService } from "../auth/auth.service";
+import { PostModel } from "../entities/mongodb/post.module";
 import { UserModel } from "../entities/mongodb/user.module";
+import { examplePost, getAuthHeader, loginUser } from "./testUtils";
 
 let app: Express;
 let loginHeaders: Record<string, string>;
@@ -112,7 +112,7 @@ describe("POST / ", () => {
   test("Should create a new post", async () => {
     const newPostData = {
       message: "This is a new test post",
-      sender: "testuser",
+      sender: loginUser._id,
     };
     const response = await request(app)
       .post("/posts")
@@ -139,7 +139,7 @@ describe("POST / ", () => {
 
   test("Should return 400 for missing message field", async () => {
     const invalidPostData = {
-      sender: "testuser",
+      sender: loginUser._id,
     };
     const response = await request(app)
       .post("/posts")
@@ -164,7 +164,7 @@ describe("POST / ", () => {
     const invalidPostData = {
       notExistingField: "some value",
       message: "This is a new test post",
-      sender: "testuser",
+      sender: loginUser._id,
     };
     const response = await request(app)
       .post("/posts")
@@ -173,6 +173,20 @@ describe("POST / ", () => {
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
+  });
+
+  test("should return 404 for non-existing sender", async () => {
+    const invalidPostSender = {
+      message: "This is a new test post",
+      sender: "nonexistinguser",
+    };
+
+    const response = await request(app)
+      .post("/posts")
+      .set(loginHeaders)
+      .send(invalidPostSender);
+    expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
+    expect(response.body.message).toBe("User does not exist");
   });
 
   test("Should return 409 for duplicate post", async () => {
