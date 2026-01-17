@@ -34,13 +34,7 @@ router.get("/:id", async (req: Request<{ id: Post["_id"] }>, res: Response) => {
   const id = req.params.id;
   const response = await postService.getPostById(id);
 
-  if (!response) {
-    res.status(StatusCodes.NOT_FOUND).send({
-      message: "Post does not exist",
-    });
-  } else {
-    res.status(StatusCodes.OK).send(response);
-  }
+  res.status(StatusCodes.OK).send(response);
 });
 
 // Create post
@@ -68,19 +62,13 @@ router.put(
     const id = req.params.id;
     const postData = req.body;
 
-    const updated = await postService.updatePost(id, postData);
+    const { _id, updatedAt } = await postService.updatePost(id, postData);
 
-    if (!updated) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .send({ message: "Post does not exist" });
-    } else {
-      res.status(StatusCodes.OK).send({
-        message: "Updated post",
-        postId: id,
-        updatedAt: updated.updatedAt,
-      });
-    }
+    res.status(StatusCodes.OK).send({
+      message: "Updated post",
+      postId: _id,
+      updatedAt: updatedAt,
+    });
   }
 );
 

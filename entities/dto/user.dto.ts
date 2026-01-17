@@ -7,6 +7,7 @@ export const userSchema = baseModule.extend({
   email: z.string().email().min(1),
   birthDate: z.string().date(),
   bio: z.string().optional(),
+  password: notEmptyStringSchema("Password"),
 });
 export type User = z.infer<typeof userSchema>;
 
@@ -20,6 +21,7 @@ export type User = z.infer<typeof userSchema>;
  *         - username
  *         - email
  *         - birthDate
+ *         - password
  *       properties:
  *         _id:
  *           type: string
@@ -31,6 +33,8 @@ export type User = z.infer<typeof userSchema>;
  *           type: string
  *         birthDate:
  *           type: string
+ *         password:
+ *           type: string
  */
 export const createUserSchema = z.strictObject({
   _id: userSchema.shape._id.optional(),
@@ -38,6 +42,7 @@ export const createUserSchema = z.strictObject({
   email: userSchema.shape.email,
   birthDate: userSchema.shape.birthDate,
   bio: userSchema.shape.bio,
+  password: userSchema.shape.password,
 });
 export type CreateUser = z.infer<typeof createUserSchema>;
 

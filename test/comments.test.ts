@@ -4,13 +4,27 @@ import mongoose from "mongoose";
 import request from "supertest";
 import { initApp } from "../app";
 import { CommentModel } from "../entities/mongodb/comment.module";
-import { exampleComment, examplePost } from "./testUtils";
+import {
+  exampleComment,
+  examplePost,
+  getAuthHeader,
+  loginUser,
+} from "./testUtils";
+import { authService } from "../auth/auth.service";
+import { UserModel } from "../entities/mongodb/user.module";
 
 let app: Express;
+let loginHeaders: Record<string, string>;
 
 beforeAll(async () => {
   await initApp().then(async (appInstance) => {
     app = appInstance;
+
+    const { accessToken } = authService.buildLoginTokens(loginUser._id);
+    loginHeaders = getAuthHeader(accessToken);
+    if (!(await UserModel.exists({ _id: loginUser._id }))) {
+      await UserModel.create(loginUser);
+    }
   });
 });
 
@@ -25,7 +39,7 @@ afterAll(async () => {
 
 describe("GET / ", () => {
   test("Should return all comments", async () => {
-    const response = await request(app).get("/comments");
+    const response = await request(app).get("/comments").set(loginHeaders);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
@@ -35,7 +49,7 @@ describe("GET / ", () => {
 
   test("Should return empty array when no comments exist", async () => {
     await CommentModel.deleteMany();
-    const response = await request(app).get("/comments");
+    const response = await request(app).get("/comments").set(loginHeaders);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
@@ -44,9 +58,9 @@ describe("GET / ", () => {
 
   describe("GET /?postId=", () => {
     test("Should return comments by postId", async () => {
-      const response = await request(app).get(
-        `/comments?postId=${exampleComment.postId}`
-      );
+      const response = await request(app)
+        .get(`/comments?postId=${exampleComment.postId}`)
+        .set(loginHeaders);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(Array.isArray(response.body)).toBe(true);
@@ -57,9 +71,9 @@ describe("GET / ", () => {
 
     test("Should return empty array when no comments exist for postId", async () => {
       await CommentModel.deleteMany();
-      const response = await request(app).get(
-        `/comments?postId=${examplePost._id}`
-      );
+      const response = await request(app)
+        .get(`/comments?postId=${examplePost._id}`)
+        .set(loginHeaders);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(Array.isArray(response.body)).toBe(true);
@@ -67,7 +81,9 @@ describe("GET / ", () => {
     });
 
     test("Should return 404 when post does not exist", async () => {
-      const response = await request(app).get(`/comments?postId=nonexistentid`);
+      const response = await request(app)
+        .get(`/comments?postId=nonexistentid`)
+        .set(loginHeaders);
 
       expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
       expect(response.body.message).toBe("Post does not exist");
@@ -76,9 +92,9 @@ describe("GET / ", () => {
 
   describe("GET /:id", () => {
     test("Should return comment by id", async () => {
-      const response = await request(app).get(
-        `/comments/${exampleComment._id}`
-      );
+      const response = await request(app)
+        .get(`/comments/${exampleComment._id}`)
+        .set(loginHeaders);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(response.body).toBeDefined();
@@ -88,7 +104,9 @@ describe("GET / ", () => {
 
     test("Should return 404 when comment does not exist", async () => {
       const nonExistentId = "nonexistentid";
-      const response = await request(app).get(`/comments/${nonExistentId}`);
+      const response = await request(app)
+        .get(`/comments/${nonExistentId}`)
+        .set(loginHeaders);
 
       expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
       expect(response.body.message).toBe("Comment does not exist");
@@ -102,6 +120,7 @@ describe("PUT /:id", () => {
 
     const response = await request(app)
       .put(`/comments/${exampleComment._id}`)
+      .set(loginHeaders)
       .send(newMessage);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
@@ -116,6 +135,7 @@ describe("PUT /:id", () => {
   test("Should return 400 when update body is invalid", async () => {
     const response = await request(app)
       .put(`/comments/${exampleComment._id}`)
+      .set(loginHeaders)
       .send({ message: "" });
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -127,6 +147,7 @@ describe("PUT /:id", () => {
   test("Should return 400 when update body is invalid - empty string", async () => {
     const response = await request(app)
       .put(`/comments/${exampleComment._id}`)
+      .set(loginHeaders)
       .send({ message: 12345 });
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -138,6 +159,7 @@ describe("PUT /:id", () => {
   test("Should return 400 when update body is missing - wrong type", async () => {
     const response = await request(app)
       .put(`/comments/${exampleComment._id}`)
+      .set(loginHeaders)
       .send({});
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toEqual("Invalid request body");
@@ -148,6 +170,7 @@ describe("PUT /:id", () => {
   test("Should return 404 when updating non-existing comment", async () => {
     const response = await request(app)
       .put(`/comments/nonexistentid`)
+      .set(loginHeaders)
       .send({ message: "nope" });
 
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
@@ -163,7 +186,10 @@ describe("POST / ", () => {
       postId: examplePost._id,
     };
 
-    const response = await request(app).post("/comments").send(newCommentData);
+    const response = await request(app)
+      .post("/comments")
+      .set(loginHeaders)
+      .send(newCommentData);
 
     expect(response.statusCode).toEqual(StatusCodes.CREATED);
     expect(response.body.message).toBe("Created new comment");
@@ -186,6 +212,7 @@ describe("POST / ", () => {
 
     const response = await request(app)
       .post("/comments")
+      .set(loginHeaders)
       .send(invalidCommentData);
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -202,6 +229,7 @@ describe("POST / ", () => {
 
     const response = await request(app)
       .post("/comments")
+      .set(loginHeaders)
       .send(invalidCommentData);
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -218,6 +246,7 @@ describe("POST / ", () => {
 
     const response = await request(app)
       .post("/comments")
+      .set(loginHeaders)
       .send(newCommentData)
       .set("Content-Type", "application/json");
 
@@ -234,8 +263,9 @@ describe("POST / ", () => {
     };
     const response = await request(app)
       .post("/comments")
+      .set(loginHeaders)
       .send(duplicateCommentData);
-      
+
     expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
     expect(response.body.message).toBe("Comment already exists");
     expect(response.body.details.field).toBe("_id");
@@ -245,9 +275,9 @@ describe("POST / ", () => {
 
 describe("DELETE /:id", () => {
   test("should delete a comment", async () => {
-    const response = await request(app).delete(
-      `/comments/${exampleComment._id}`
-    );
+    const response = await request(app)
+      .delete(`/comments/${exampleComment._id}`)
+      .set(loginHeaders);
     expect(response.status).toBe(StatusCodes.OK);
     expect(response.body.message).toBe("Comment deleted successfully");
     expect(response.body.commentId).toBe(exampleComment._id);
@@ -257,7 +287,9 @@ describe("DELETE /:id", () => {
   });
 
   test("should return 404 when deleting a non-existent comment", async () => {
-    const response = await request(app).delete("/comments/nonexistentid");
+    const response = await request(app)
+      .delete("/comments/nonexistentid")
+      .set(loginHeaders);
 
     expect(response.status).toBe(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("Comment does not exist");

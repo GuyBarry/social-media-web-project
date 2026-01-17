@@ -5,6 +5,8 @@
  *     tags:
  *      - Comments
  *     summary: Get all comments
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: postId
@@ -33,6 +35,16 @@
  *                     type: string
  *                   updatedAt:
  *                     type: string
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
  *       404:
  *         description: Not found
  *         content:
@@ -52,6 +64,8 @@
  *     tags:
  *      - Comments
  *     summary: Get comment by id
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -78,6 +92,16 @@
  *                   type: string
  *                 updatedAt:
  *                   type: string
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
  *       404:
  *         description: Not found
  *         content:
@@ -97,6 +121,8 @@
  *     tags:
  *      - Comments
  *     summary: Create new comment
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -119,6 +145,16 @@
  *                  example: 1234
  *                createdAt:
  *                  type: string
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
  *       400:
  *         description: Bad request
  *         content:
@@ -165,6 +201,8 @@
  *     tags:
  *      - Comments
  *     summary: Update a comment by id
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -194,6 +232,16 @@
  *                  example: 1234
  *                updatedAt:
  *                  type: string
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
  *       400:
  *         description: Bad request
  *         content:
@@ -223,6 +271,8 @@
  *     tags:
  *      - Comments
  *     summary: Delete comment by id
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -244,6 +294,16 @@
  *                 commentId:
  *                   type: string
  *                   example: 1234
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
  *       404:
  *         description: Bad request
  *         content:

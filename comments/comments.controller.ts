@@ -35,12 +35,6 @@ router.get(
     const id = req.params.id;
     const comment = await commentsService.getCommentById(id);
 
-    if (!comment) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .send({ message: "Comment does not exist" });
-    }
-
     res.status(StatusCodes.OK).send(comment);
   }
 );
@@ -73,19 +67,16 @@ router.put(
     const id = req.params.id;
     const commentData = req.body;
 
-    const updated = await commentsService.updateComment(id, commentData);
+    const { _id, updatedAt } = await commentsService.updateComment(
+      id,
+      commentData
+    );
 
-    if (!updated) {
-      res.status(StatusCodes.NOT_FOUND).send({
-        message: "Comment does not exist",
-      });
-    } else {
-      res.status(StatusCodes.OK).send({
-        message: "updated comment",
-        commentId: id,
-        updatedAt: updated.updatedAt,
-      });
-    }
+    res.status(StatusCodes.OK).send({
+      message: "updated comment",
+      commentId: _id,
+      updatedAt: updatedAt,
+    });
   }
 );
 
@@ -93,13 +84,7 @@ router.put(
 router.delete("/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const deleted = await commentsService.deleteComment(id);
-
-  if (!deleted) {
-    return res
-      .status(StatusCodes.NOT_FOUND)
-      .send({ message: "Comment does not exist" });
-  }
+  await commentsService.deleteComment(id);
 
   return res.status(StatusCodes.OK).send({
     message: "Comment deleted successfully",

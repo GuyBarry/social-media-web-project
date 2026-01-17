@@ -26,6 +26,10 @@ const userSchema = new Schema(
       type: Date,
       required: true,
     },
+    password: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );
@@ -34,5 +38,7 @@ export const USER_POPULATE_FIELDS = {
   field: "sender",
   subFields: ["username"],
 } as const;
+
+export const USER_FIELDS_EXCEPT_PASSWORD = ["-password"];
 
 export const UserModel = model<User>("User", userSchema);

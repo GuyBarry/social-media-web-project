@@ -5,6 +5,8 @@
  *     tags:
  *      - Posts
  *     summary: Get all posts
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: sender
@@ -31,6 +33,16 @@
  *                     type: string
  *                   updatedAt:
  *                     type: string
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
  */
 
 /**
@@ -40,6 +52,8 @@
  *     tags:
  *      - Posts
  *     summary: Get post by id
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -65,6 +79,16 @@
  *                  type: string
  *                updatedAt:
  *                  type: string
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
  *       404:
  *         description: Not found
  *         content:
@@ -84,6 +108,8 @@
  *     tags:
  *      - Posts
  *     summary: Create new post
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -106,6 +132,16 @@
  *                  example: 1234
  *                createdAt:
  *                  type: string
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
  *       400:
  *         description: Bad request
  *         content:
@@ -142,6 +178,8 @@
  *     tags:
  *      - Posts
  *     summary: Update post
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -170,6 +208,16 @@
  *                  example: 1234
  *                updatedAt:
  *                  type: string
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
  *       400:
  *         description: Bad request
  *         content:
