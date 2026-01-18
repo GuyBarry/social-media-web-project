@@ -8,6 +8,7 @@ import {
   updatePostSchema,
 } from "../entities/dto/post.dto";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
+import { validateExistingSender } from "../middlewares/validateExistingUser";
 import { postService } from "./posts.service";
 
 const router = Router();
@@ -41,6 +42,7 @@ router.get("/:id", async (req: Request<{ id: Post["_id"] }>, res: Response) => {
 router.post(
   "/",
   validateRequestBody(createPostSchema),
+  validateExistingSender,
   async (req: Request<{}, {}, CreatePost>, res: Response) => {
     const postData = req.body;
 

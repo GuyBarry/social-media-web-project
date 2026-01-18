@@ -8,6 +8,7 @@ import {
   updateCommentSchema,
 } from "../entities/dto/comment.dto";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
+import { validateExistingSender } from "../middlewares/validateExistingUser";
 import { commentsService } from "./comments.service";
 
 const router = Router();
@@ -43,6 +44,7 @@ router.get(
 router.post(
   "/",
   validateRequestBody(createCommentSchema),
+  validateExistingSender,
   async (req: Request<{}, {}, CreateComment>, res: Response) => {
     const commentData = req.body;
 
