@@ -28,7 +28,11 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
+      default: "",
+    },
+    googleId: {
+      type: String,
+      default: "",
     },
   },
   { timestamps: true }
@@ -39,6 +43,6 @@ export const USER_POPULATE_FIELDS = {
   subFields: ["username"],
 } as const;
 
-export const USER_FIELDS_EXCEPT_PASSWORD = ["-password"];
+export const USER_FIELDS_EXCEPT_AUTH = ["-password", "-googleId"] as const;
 
 export const UserModel = model<User>("User", userSchema);

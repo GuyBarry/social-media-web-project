@@ -9,21 +9,21 @@ import { UserModel } from "../entities/mongodb/user.module";
 import {
   examplePost,
   exampleUser,
-  getAuthHeader,
+  getAuthCookies,
   loginUser,
-  truncateDatabase,
+  truncateDatabase
 } from "./testUtils";
 
 let app: Express;
-let loginHeaders: Record<string, string>;
-
+let authCookies: string[];
 beforeAll(async () => {
   await initApp().then(async (appInstance) => {
     app = appInstance;
     await truncateDatabase();
 
     const { accessToken } = authService.buildLoginTokens(loginUser._id);
-    loginHeaders = getAuthHeader(accessToken);
+    authCookies = getAuthCookies(accessToken.token);
+
     if (!(await UserModel.exists({ _id: loginUser._id }))) {
       await UserModel.create(loginUser);
     }
@@ -41,7 +41,9 @@ afterAll(async () => {
 
 describe("GET / ", () => {
   test("Should return all posts", async () => {
-    const response = await request(app).get("/posts").set(loginHeaders);
+    const response = await request(app)
+      .get("/posts")
+      .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
@@ -52,7 +54,9 @@ describe("GET / ", () => {
   test("Should return empty array when no posts exist", async () => {
     await PostModel.deleteMany();
 
-    const response = await request(app).get("/posts").set(loginHeaders);
+    const response = await request(app)
+      .get("/posts")
+      .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
@@ -63,7 +67,7 @@ describe("GET / ", () => {
     test("Should return posts by sender", async () => {
       const response = await request(app)
         .get(`/posts?sender=${examplePost.sender}`)
-        .set(loginHeaders);
+        .set("Cookie", authCookies);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(Array.isArray(response.body)).toBe(true);
@@ -75,7 +79,7 @@ describe("GET / ", () => {
     test("Should return empty array when no posts exist for sender", async () => {
       const response = await request(app)
         .get(`/posts?sender=unknownuser`)
-        .set(loginHeaders);
+        .set("Cookie", authCookies);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(Array.isArray(response.body)).toBe(true);
@@ -85,7 +89,7 @@ describe("GET / ", () => {
     test("Should return all posts when sender is null", async () => {
       const response = await request(app)
         .get(`/posts?sender=`)
-        .set(loginHeaders);
+        .set("Cookie", authCookies);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(Array.isArray(response.body)).toBe(true);
@@ -98,7 +102,7 @@ describe("GET /:id", () => {
   test("Should return a post by id", async () => {
     const response = await request(app)
       .get(`/posts/${examplePost._id}`)
-      .set(loginHeaders);
+      .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(response.body._id).toBe(examplePost._id);
@@ -108,7 +112,7 @@ describe("GET /:id", () => {
     const nonExistentId = "nonexistentid";
     const response = await request(app)
       .get(`/posts/${nonExistentId}`)
-      .set(loginHeaders);
+      .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("Post does not exist");
@@ -123,7 +127,7 @@ describe("POST / ", () => {
     };
     const response = await request(app)
       .post("/posts")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(newPostData);
     expect(response.statusCode).toEqual(StatusCodes.CREATED);
     expect(response.body.message).toBe("Created new post");
@@ -137,7 +141,7 @@ describe("POST / ", () => {
     };
     const response = await request(app)
       .post("/posts")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(invalidPostData);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
@@ -150,7 +154,7 @@ describe("POST / ", () => {
     };
     const response = await request(app)
       .post("/posts")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(invalidPostData);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
@@ -160,7 +164,7 @@ describe("POST / ", () => {
   test("Should return 400 for empty post data", async () => {
     const response = await request(app)
       .post("/posts")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send({});
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
@@ -175,7 +179,7 @@ describe("POST / ", () => {
     };
     const response = await request(app)
       .post("/posts")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(invalidPostData);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
@@ -192,7 +196,7 @@ describe("POST / ", () => {
 
     const response = await request(app)
       .post("/posts")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(newPostData);
 
     expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
@@ -207,7 +211,7 @@ describe("POST / ", () => {
 
     const response = await request(app)
       .post("/posts")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(invalidPostSender);
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("User does not exist");
@@ -221,7 +225,7 @@ describe("POST / ", () => {
     };
     const response = await request(app)
       .post("/posts")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(duplicatePostData);
 
     expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
@@ -235,7 +239,7 @@ describe("GET /invalid-endpoint", () => {
   test("Should return 404 for invalid endpoint", async () => {
     const response = await request(app)
       .get("/invalid-endpoint")
-      .set(loginHeaders);
+      .set("Cookie", authCookies);
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("Route does not exist");
   });
@@ -248,7 +252,7 @@ describe("PUT /:id", () => {
     };
     const response = await request(app)
       .put(`/posts/${examplePost._id}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(updatedPostData);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
@@ -264,7 +268,7 @@ describe("PUT /:id", () => {
     };
     const response = await request(app)
       .put(`/posts/${nonExistentId}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(updatedPostData);
 
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
@@ -277,7 +281,7 @@ describe("PUT /:id", () => {
     };
     const response = await request(app)
       .put(`/posts/${examplePost._id}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(updatedPostData);
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -292,7 +296,7 @@ describe("PUT /:id", () => {
     };
     const response = await request(app)
       .put(`/posts/${examplePost._id}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(updatedPostData);
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -303,7 +307,7 @@ describe("PUT /:id", () => {
   test("Should return 400 for empty update data", async () => {
     const response = await request(app)
       .put(`/posts/${examplePost._id}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send({});
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -317,7 +321,7 @@ describe("PUT /:id", () => {
     };
     const response = await request(app)
       .put(`/posts/${examplePost._id}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(updatedPostData);
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);

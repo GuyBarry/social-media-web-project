@@ -1,7 +1,9 @@
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import express, { Express } from "express";
 import mongoose from "mongoose";
+import passport from "passport";
 import { authController } from "./auth/auth.contoller";
 import { commentsController } from "./comments/comments.controller";
 import { dbConfig } from "./config/db.config";
@@ -16,10 +18,18 @@ import { usersController } from "./users/users.controller";
 export const initApp = async (): Promise<Express> => {
   const port = serverConfig.port;
   const app = express();
+  app.use(
+    cors({
+      origin: serverConfig.clientUrl,
+      credentials: true,
+    })
+  );
 
   app.use(bodyParser.urlencoded({ extended: true, limit: "1mb" }));
   app.use(bodyParser.json());
   app.use(cookieParser());
+  app.use(passport.initialize());
+  require("./auth/auth.google");
 
   app.use("/posts", validateAccessToken, postsController);
   app.use("/comments", validateAccessToken, commentsController);

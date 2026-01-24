@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { userSchema } from "./user.dto";
 
-export const loginSchema = z
+export const userLoginSchema = z
   .object({
     password: userSchema.shape.password,
     email: userSchema.shape.email.optional(),
@@ -13,7 +13,7 @@ export const loginSchema = z
       message: "User login identification missing, provide email or username",
     }
   );
-export type Login = z.infer<typeof loginSchema>;
+export type UserLogin = z.infer<typeof userLoginSchema>;
 
 export enum ExpirationInSec {
   ONE_MINUTE = 60,
@@ -22,11 +22,12 @@ export enum ExpirationInSec {
 }
 export const ExpirationInSecSchema = z.enum(ExpirationInSec);
 
+const singleTokenSchema = z.object({
+  token: z.string(),
+  cookieExpiry: ExpirationInSecSchema,
+});
 export const LoginTokensSchema = z.object({
-  accessToken: z.string(),
-  refreshToken: z.object({
-    token: z.string(),
-    cookieExpiry: ExpirationInSecSchema,
-  }),
+  accessToken: singleTokenSchema,
+  refreshToken: singleTokenSchema,
 });
 export type LoginTokens = z.infer<typeof LoginTokensSchema>;

@@ -7,9 +7,11 @@ export const userSchema = baseModule.extend({
   email: z.string().email().min(1),
   birthDate: z.string().date(),
   bio: z.string().optional(),
-  password: notEmptyStringSchema("Password"),
+  password: z.string(),
+  googleId: z.string().optional(),
 });
 export type User = z.infer<typeof userSchema>;
+export type UserPreview = Omit<User, "password" | "googleId">;
 
 /**
  * @swagger
@@ -42,9 +44,16 @@ export const createUserSchema = z.strictObject({
   email: userSchema.shape.email,
   birthDate: userSchema.shape.birthDate,
   bio: userSchema.shape.bio,
-  password: userSchema.shape.password,
+  password: z.string(),
 });
+const createGoogleUserSchema = createUserSchema
+  .omit({ password: true })
+  .extend({
+    googleId: z.string(),
+  });
+
 export type CreateUser = z.infer<typeof createUserSchema>;
+export type CreateGoogleUser = z.infer<typeof createGoogleUserSchema>;
 
 /**
  * @swagger

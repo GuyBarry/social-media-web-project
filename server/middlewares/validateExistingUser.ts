@@ -20,7 +20,7 @@ export const validateExistingSender = async (
       throw new NotFoundException("User", { id: senderId });
     }
 
-    if (senderId !== req.userId) {
+    if (senderId !== req.authUser?._id) {
       throw new UnauthorizedException(
         "Sender does not match authenticated user"
       );

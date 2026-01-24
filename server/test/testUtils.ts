@@ -1,5 +1,5 @@
 import { hashSync } from "bcrypt";
-import { serverConfig } from "../config/server.config";
+import { ACCESS_TOKEN_COOKIE_KEY } from "../auth/auth.contoller";
 import { LoginTokens } from "../entities/dto/auth.dto";
 import { CreateComment } from "../entities/dto/comment.dto";
 import { CreatePost } from "../entities/dto/post.dto";
@@ -40,9 +40,9 @@ export const exampleUser: CreateUser = {
   password: hashSync("thebestpasswordever", PASSWORD_SALT_ROUNDS),
 };
 
-export const getAuthHeader = (accessToken: LoginTokens["accessToken"]) => ({
-  [serverConfig.authorizationHeader]: `Bearer ${accessToken}`,
-});
+export const getAuthCookies = (
+  accessToken: LoginTokens["accessToken"]["token"]
+) => [`${ACCESS_TOKEN_COOKIE_KEY}=${accessToken}`];
 
 export const truncateDatabase = async (): Promise<void> => {
   await UserModel.deleteMany();

@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import {
+  CreateGoogleUser,
   CreateUser,
   createUserSchema,
   UpdateUser,
@@ -30,9 +31,13 @@ router.get("/:id", async (req: Request<{ id: User["_id"] }>, res: Response) => {
 router.post(
   "/",
   validateRequestBody(createUserSchema),
-  async (req: Request<{}, {}, CreateUser>, res: Response) => {
+  async (
+    req: Request<{}, {}, CreateUser | CreateGoogleUser>,
+    res: Response
+  ) => {
     try {
       const user = await usersService.createUser(req.body);
+
       res.status(StatusCodes.CREATED).send({
         message: "Created new user",
         userId: user._id,

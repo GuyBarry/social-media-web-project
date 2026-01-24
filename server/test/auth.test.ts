@@ -1,13 +1,21 @@
-import { Express, Response } from "express";
+import { hashSync } from "bcrypt";
+import { Express } from "express";
 import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import request from "supertest";
 import { initApp } from "../app";
+import {
+  ACCESS_TOKEN_COOKIE_KEY,
+  REFRESH_TOKEN_COOKIE_KEY,
+} from "../auth/auth.contoller";
+import { authService } from "../auth/auth.service";
+import { LoginTokens } from "../entities/dto/auth.dto";
 import { UserModel } from "../entities/mongodb/user.module";
-import { REFRESH_TOKEN_COOKIE_KEY } from "../auth/auth.contoller";
-import { serverConfig } from "../config/server.config";
+import { loginUser } from "./testUtils";
+import { PASSWORD_SALT_ROUNDS } from "../users/users.service";
 
 let app: Express;
+let loginTokens: LoginTokens;
 
 const testUser = {
   username: "AuthTestUser",
@@ -19,10 +27,14 @@ const testUser = {
 
 beforeAll(async () => {
   app = await initApp();
+  loginTokens = authService.buildLoginTokens(loginUser._id);
 });
 
 beforeEach(async () => {
   await UserModel.deleteMany();
+  if (!(await UserModel.exists({ _id: loginUser._id }))) {
+    await UserModel.create(loginUser);
+  }
 });
 
 afterAll(async () => {
@@ -36,9 +48,7 @@ describe("POST /registration", () => {
       .send(testUser);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
-    expect(response.body.message).toBe("successfully registered!");
     expect(response.body.userId).toBeDefined();
-    expect(response.body.accessToken).toBeDefined();
   });
 
   test("Should return 409 if user already exists", async () => {
@@ -65,7 +75,10 @@ describe("POST /registration", () => {
 
 describe("POST /login", () => {
   beforeEach(async () => {
-    await request(app).post("/auth/registration").send(testUser);
+    await UserModel.create({
+      ...testUser,
+      password: hashSync(testUser.password, PASSWORD_SALT_ROUNDS),
+    });
   });
 
   test("Should login successfully with email", async () => {
@@ -75,9 +88,8 @@ describe("POST /login", () => {
     });
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
-    expect(response.body.accessToken).toBeDefined();
 
-    validateRefreshTokenCookie(response);
+    validateTokenCookies(response);
   });
 
   test("Should login successfully with username", async () => {
@@ -87,9 +99,8 @@ describe("POST /login", () => {
     });
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
-    expect(response.body.accessToken).toBeDefined();
 
-    validateRefreshTokenCookie(response);
+    validateTokenCookies(response);
   });
 
   test("Should return 401 for invalid password", async () => {
@@ -112,17 +123,12 @@ describe("POST /login", () => {
 });
 
 describe("POST /logout", () => {
-  let accessToken: string;
-
-  beforeEach(async () => {
-    const res = await request(app).post("/auth/registration").send(testUser);
-    accessToken = res.body.accessToken;
-  });
-
   test("Should logout successfully", async () => {
     const response = await request(app)
       .post("/auth/logout")
-        .set(serverConfig.authorizationHeader, `Bearer ${accessToken}`);
+      .set("Cookie", [
+        `${ACCESS_TOKEN_COOKIE_KEY}=${loginTokens.accessToken.token}`,
+      ]);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(response.body.message).toBe("User logged out");
@@ -137,23 +143,14 @@ describe("POST /logout", () => {
 });
 
 describe("POST /refresh", () => {
-  let refreshTokenCookie: string;
-
-  beforeEach(async () => {
-    const res = await request(app).post("/auth/registration").send(testUser);
-    const cookies = res.get("Set-Cookie") as string[];
-
-    refreshTokenCookie =
-      cookies.find((c: string) => c.startsWith(REFRESH_TOKEN_COOKIE_KEY)) || "";
-  });
-
   test("Should refresh token successfully", async () => {
     const response = await request(app)
       .post("/auth/refresh")
-      .set("Cookie", [refreshTokenCookie]);
+      .set("Cookie", [
+        `${REFRESH_TOKEN_COOKIE_KEY}=${loginTokens.refreshToken.token}`,
+      ]);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
-    expect(response.body.accessToken).toBeDefined();
   });
 
   test("Should return 401 if no refresh token provided", async () => {
@@ -164,13 +161,21 @@ describe("POST /refresh", () => {
   });
 });
 
-const validateRefreshTokenCookie = (response: any) => {
+const validateTokenCookies = (response: any) => {
   const rawCookie = response.get("Set-Cookie");
   expect(rawCookie).toBeDefined();
 
-  const includesRefreshToken = (rawCookie as string[])[0].startsWith(
-    REFRESH_TOKEN_COOKIE_KEY
+  const tokenCookies = rawCookie as string[];
+  expect(tokenCookies.length).toBe(2);
+
+  const includesAccessToken = tokenCookies.some((cookie) =>
+    cookie.startsWith(ACCESS_TOKEN_COOKIE_KEY)
   );
 
+  const includesRefreshToken = tokenCookies.some((cookie) =>
+    cookie.startsWith(REFRESH_TOKEN_COOKIE_KEY)
+  );
+
+  expect(includesAccessToken).toBeTruthy();
   expect(includesRefreshToken).toBeTruthy();
 };

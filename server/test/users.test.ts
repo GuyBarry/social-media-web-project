@@ -4,20 +4,20 @@ import mongoose from "mongoose";
 import request from "supertest";
 import { initApp } from "../app";
 import { authService } from "../auth/auth.service";
-import { UserModel } from "../entities/mongodb/user.module";
-import { exampleUser, getAuthHeader, loginUser } from "./testUtils";
 import { User } from "../entities/dto/user.dto";
-import { _isoDateTime } from "zod/v4/core";
+import { UserModel } from "../entities/mongodb/user.module";
+import { exampleUser, getAuthCookies, loginUser } from "./testUtils";
 
 let app: Express;
-let loginHeaders: Record<string, string>;
+let authCookies: string[];
 
 beforeAll(async () => {
   await initApp().then(async (appInstance) => {
     app = appInstance;
 
     const { accessToken } = authService.buildLoginTokens(loginUser._id);
-    loginHeaders = getAuthHeader(accessToken);
+    authCookies = getAuthCookies(accessToken.token);
+
     if (!(await UserModel.exists({ _id: loginUser._id }))) {
       await UserModel.create(loginUser);
     }
@@ -36,7 +36,9 @@ afterAll(async () => {
 
 describe("GET /", () => {
   test("Should return all users", async () => {
-    const response = await request(app).get("/users").set(loginHeaders);
+    const response = await request(app)
+      .get("/users")
+      .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
@@ -52,7 +54,7 @@ describe("GET /:id", () => {
   test("Should return a user by id", async () => {
     const response = await request(app)
       .get(`/users/${exampleUser._id}`)
-      .set(loginHeaders);
+      .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(response.body._id).toBe(exampleUser._id);
@@ -62,7 +64,7 @@ describe("GET /:id", () => {
     const nonExistentId = "nonexistentid";
     const response = await request(app)
       .get(`/users/${nonExistentId}`)
-      .set(loginHeaders);
+      .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("User does not exist");
@@ -71,13 +73,16 @@ describe("GET /:id", () => {
 
 describe("POST /users", () => {
   test("Should create a new user", async () => {
-    const response = await request(app).post("/users").set(loginHeaders).send({
-      username: "New User",
-      email: "new@example.com",
-      bio: "This is a new user",
-      birthDate: "1990-01-01",
-      password: "newuserpassword",
-    });
+    const response = await request(app)
+      .post("/users")
+      .set("Cookie", authCookies)
+      .send({
+        username: "New User",
+        email: "new@example.com",
+        bio: "This is a new user",
+        birthDate: "1990-01-01",
+        password: "newuserpassword",
+      });
 
     expect(response.statusCode).toEqual(StatusCodes.CREATED);
     expect(response.body.message).toBe("Created new user");
@@ -99,7 +104,7 @@ describe("POST /users", () => {
     };
     const response = await request(app)
       .post("/users")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(invalidUserData);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
@@ -116,7 +121,7 @@ describe("POST /users", () => {
     };
     const response = await request(app)
       .post("/users")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(invalidUserData);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
@@ -132,7 +137,7 @@ describe("POST /users", () => {
     };
     const response = await request(app)
       .post("/users")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(invalidUserData);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
@@ -148,7 +153,7 @@ describe("POST /users", () => {
     };
     const response = await request(app)
       .post("/users")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(invalidUserData);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
@@ -165,7 +170,7 @@ describe("POST /users", () => {
     };
     const response = await request(app)
       .post("/users")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(invalidUserData);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
@@ -175,7 +180,7 @@ describe("POST /users", () => {
   test("Should return 409 if user already exists", async () => {
     const response = await request(app)
       .post("/users")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(exampleUser);
 
     expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
@@ -189,7 +194,7 @@ describe("PUT /users/:id", () => {
   test("Should update an existing user", async () => {
     const response = await request(app)
       .put(`/users/${exampleUser._id}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send({
         username: "Updated User",
         bio: "This is an updated bio",
@@ -207,7 +212,7 @@ describe("PUT /users/:id", () => {
     const nonExistentId = "nonexistentid";
     const response = await request(app)
       .put(`/users/${nonExistentId}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send({ bio: "This user does not exist" });
 
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
@@ -220,7 +225,7 @@ describe("PUT /users/:id", () => {
     };
     const response = await request(app)
       .put(`/users/${exampleUser._id}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(invalidUpdateData);
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -241,7 +246,7 @@ describe("PUT /users/:id", () => {
 
     const response = await request(app)
       .put(`/users/${exampleUser._id}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send({ email: anotherUser.email });
 
     expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
@@ -263,7 +268,7 @@ describe("PUT /users/:id", () => {
 
     const response = await request(app)
       .put(`/users/${exampleUser._id}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send({ username: anotherUser.username });
 
     expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
@@ -277,7 +282,7 @@ describe("DELETE /:id", () => {
   test("Should delete a user", async () => {
     const response = await request(app)
       .delete(`/users/${exampleUser._id}`)
-      .set(loginHeaders);
+      .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(response.body.message).toBe("User deleted successfully");
@@ -291,7 +296,7 @@ describe("DELETE /:id", () => {
     const nonExistentId = "nonexistentid";
     const response = await request(app)
       .delete(`/users/${nonExistentId}`)
-      .set(loginHeaders);
+      .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("User does not exist");

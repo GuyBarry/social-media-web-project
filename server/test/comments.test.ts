@@ -11,21 +11,21 @@ import {
   exampleComment,
   examplePost,
   exampleUser,
-  getAuthHeader,
+  getAuthCookies,
   loginUser,
   truncateDatabase,
 } from "./testUtils";
 
 let app: Express;
-let loginHeaders: Record<string, string>;
-
+let authCookies: string[];
 beforeAll(async () => {
   await initApp().then(async (appInstance) => {
     app = appInstance;
     await truncateDatabase();
 
     const { accessToken } = authService.buildLoginTokens(loginUser._id);
-    loginHeaders = getAuthHeader(accessToken);
+    authCookies = getAuthCookies(accessToken.token);
+
     if (!(await UserModel.exists({ _id: loginUser._id }))) {
       await UserModel.create(loginUser);
     }
@@ -46,7 +46,9 @@ afterAll(async () => {
 
 describe("GET / ", () => {
   test("Should return all comments", async () => {
-    const response = await request(app).get("/comments").set(loginHeaders);
+    const response = await request(app)
+      .get("/comments")
+      .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
@@ -56,7 +58,9 @@ describe("GET / ", () => {
 
   test("Should return empty array when no comments exist", async () => {
     await CommentModel.deleteMany();
-    const response = await request(app).get("/comments").set(loginHeaders);
+    const response = await request(app)
+      .get("/comments")
+      .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
@@ -67,7 +71,7 @@ describe("GET / ", () => {
     test("Should return comments by postId", async () => {
       const response = await request(app)
         .get(`/comments?postId=${exampleComment.postId}`)
-        .set(loginHeaders);
+        .set("Cookie", authCookies);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(Array.isArray(response.body)).toBe(true);
@@ -80,7 +84,7 @@ describe("GET / ", () => {
       await CommentModel.deleteMany();
       const response = await request(app)
         .get(`/comments?postId=${examplePost._id}`)
-        .set(loginHeaders);
+        .set("Cookie", authCookies);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(Array.isArray(response.body)).toBe(true);
@@ -90,7 +94,7 @@ describe("GET / ", () => {
     test("Should return 404 when post does not exist", async () => {
       const response = await request(app)
         .get(`/comments?postId=nonexistentid`)
-        .set(loginHeaders);
+        .set("Cookie", authCookies);
 
       expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
       expect(response.body.message).toBe("Post does not exist");
@@ -101,7 +105,7 @@ describe("GET / ", () => {
     test("Should return comment by id", async () => {
       const response = await request(app)
         .get(`/comments/${exampleComment._id}`)
-        .set(loginHeaders);
+        .set("Cookie", authCookies);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(response.body).toBeDefined();
@@ -113,7 +117,7 @@ describe("GET / ", () => {
       const nonExistentId = "nonexistentid";
       const response = await request(app)
         .get(`/comments/${nonExistentId}`)
-        .set(loginHeaders);
+        .set("Cookie", authCookies);
 
       expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
       expect(response.body.message).toBe("Comment does not exist");
@@ -127,7 +131,7 @@ describe("PUT /:id", () => {
 
     const response = await request(app)
       .put(`/comments/${exampleComment._id}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(newMessage);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
@@ -142,7 +146,7 @@ describe("PUT /:id", () => {
   test("Should return 400 when update body is invalid", async () => {
     const response = await request(app)
       .put(`/comments/${exampleComment._id}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send({ message: "" });
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -154,7 +158,7 @@ describe("PUT /:id", () => {
   test("Should return 400 when update body is invalid - empty string", async () => {
     const response = await request(app)
       .put(`/comments/${exampleComment._id}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send({ message: 12345 });
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -166,7 +170,7 @@ describe("PUT /:id", () => {
   test("Should return 400 when update body is missing - wrong type", async () => {
     const response = await request(app)
       .put(`/comments/${exampleComment._id}`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send({});
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toEqual("Invalid request body");
@@ -177,7 +181,7 @@ describe("PUT /:id", () => {
   test("Should return 404 when updating non-existing comment", async () => {
     const response = await request(app)
       .put(`/comments/nonexistentid`)
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send({ message: "nope" });
 
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
@@ -195,7 +199,7 @@ describe("POST / ", () => {
 
     const response = await request(app)
       .post("/comments")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(newCommentData);
 
     expect(response.statusCode).toEqual(StatusCodes.CREATED);
@@ -220,7 +224,7 @@ describe("POST / ", () => {
 
     const response = await request(app)
       .post("/posts")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(newPostData);
 
     expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
@@ -236,7 +240,7 @@ describe("POST / ", () => {
 
     const response = await request(app)
       .post("/comments")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(invalidCommentData);
 
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
@@ -251,7 +255,7 @@ describe("POST / ", () => {
     };
     const response = await request(app)
       .post("/comments")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(invalidCommentData);
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -268,7 +272,7 @@ describe("POST / ", () => {
 
     const response = await request(app)
       .post("/comments")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(invalidCommentData);
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
@@ -285,7 +289,7 @@ describe("POST / ", () => {
 
     const response = await request(app)
       .post("/comments")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(newCommentData)
       .set("Content-Type", "application/json");
 
@@ -302,7 +306,7 @@ describe("POST / ", () => {
     };
     const response = await request(app)
       .post("/comments")
-      .set(loginHeaders)
+      .set("Cookie", authCookies)
       .send(duplicateCommentData);
 
     expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
@@ -316,7 +320,7 @@ describe("DELETE /:id", () => {
   test("should delete a comment", async () => {
     const response = await request(app)
       .delete(`/comments/${exampleComment._id}`)
-      .set(loginHeaders);
+      .set("Cookie", authCookies);
     expect(response.status).toBe(StatusCodes.OK);
     expect(response.body.message).toBe("Comment deleted successfully");
     expect(response.body.commentId).toBe(exampleComment._id);
@@ -328,7 +332,7 @@ describe("DELETE /:id", () => {
   test("should return 404 when deleting a non-existent comment", async () => {
     const response = await request(app)
       .delete("/comments/nonexistentid")
-      .set(loginHeaders);
+      .set("Cookie", authCookies);
 
     expect(response.status).toBe(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("Comment does not exist");

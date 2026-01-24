@@ -1,24 +1,40 @@
-import { compare } from "bcrypt";
+import { compare, hash } from "bcrypt";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { serverConfig } from "../config/server.config";
-import { Login, LoginTokens } from "../entities/dto/auth.dto";
+import {
+  ExpirationInSec,
+  UserLogin,
+  LoginTokens,
+} from "../entities/dto/auth.dto";
 import { User } from "../entities/dto/user.dto";
 import { UnauthorizedException } from "../exceptions/unauthorizedException";
 import { usersService } from "../users/users.service";
-import { ExpirationInSec } from "../entities/dto/auth.dto";
 
 const invalidCredentialsError = new UnauthorizedException(
-  "User credentials do not match"
+  "User identification and/or password are wrong"
 );
 
-const loginUser = async (userCredentials: Login): Promise<LoginTokens> => {
+const loginUser = async (
+  userCredentials: UserLogin
+): Promise<{ user: User; tokens: LoginTokens }> => {
   const user = await getUserByCredentials(userCredentials);
 
   if (!user) {
     throw invalidCredentialsError;
   }
 
-  const { password: hashedPassword, _id: userId } = user;
+  const {
+    password: hashedPassword,
+    _id: userId,
+    googleId,
+    ...otherUserFields
+  } = user;
+
+  if (googleId) {
+    throw new UnauthorizedException(
+      "Exists google account connected to user, authenticate via Google"
+    );
+  }
 
   const isPasswordValid = await compare(
     userCredentials.password,
@@ -29,12 +45,16 @@ const loginUser = async (userCredentials: Login): Promise<LoginTokens> => {
     throw invalidCredentialsError;
   }
 
-  return buildLoginTokens(userId);
+  console.log({ _id: userId, ...otherUserFields } as User);
+  return {
+    user: { _id: userId, ...otherUserFields } as User,
+    tokens: buildLoginTokens(userId),
+  };
 };
 
 const refreshAccessToken = async (
   refreshToken: string | undefined
-): Promise<string> => {
+): Promise<LoginTokens> => {
   if (!refreshToken) {
     throw new UnauthorizedException("Missing refresh token");
   }
@@ -53,7 +73,7 @@ const refreshAccessToken = async (
       );
     }
 
-    return generateAccessToken(userId);
+    return buildLoginTokens(userId);
   } catch (error) {
     if (error instanceof UnauthorizedException) {
       throw error;
@@ -69,35 +89,31 @@ const refreshAccessToken = async (
 const getUserByCredentials = async ({
   username,
   email,
-}: Login): Promise<User | null> => {
+}: UserLogin): Promise<User | null> => {
   return username
     ? await usersService.getUserByUsername(username)
     : await usersService.getUserByEmail(email as User["email"]);
 };
 
 const buildLoginTokens = (userId: User["_id"]): LoginTokens => {
-  const accessToken = generateAccessToken(userId);
-  const refreshToken = generateRefreshToken(userId);
+  const accessToken = jwt.sign({ userId }, serverConfig.accessTokenSecret, {
+    expiresIn: ExpirationInSec.ONE_HOUR,
+  });
+
+  const refreshToken = jwt.sign({ userId }, serverConfig.refreshTokenSecret, {
+    expiresIn: ExpirationInSec.ONE_DAY,
+  });
 
   return {
-    accessToken,
+    accessToken: {
+      token: accessToken,
+      cookieExpiry: ExpirationInSec.ONE_HOUR,
+    },
     refreshToken: {
       token: refreshToken,
       cookieExpiry: ExpirationInSec.ONE_DAY,
     },
   };
-};
-
-const generateAccessToken = (userId: User["_id"]): string => {
-  return jwt.sign({ userId }, serverConfig.accessTokenSecret, {
-    expiresIn: ExpirationInSec.ONE_HOUR,
-  });
-};
-
-const generateRefreshToken = (userId: User["_id"]): string => {
-  return jwt.sign({ userId }, serverConfig.refreshTokenSecret, {
-    expiresIn: ExpirationInSec.ONE_DAY,
-  });
 };
 
 export const authService = {

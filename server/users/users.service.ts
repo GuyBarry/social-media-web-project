@@ -1,14 +1,20 @@
-import { CreateUser, UpdateUser, User } from "../entities/dto/user.dto";
+import { hash } from "bcrypt";
+import {
+  CreateGoogleUser,
+  CreateUser,
+  UpdateUser,
+  User,
+  UserPreview,
+} from "../entities/dto/user.dto";
 import { NotFoundException } from "../exceptions/notFoundException";
 import { usersRepository } from "./users.repository";
-import { hash } from "bcrypt";
 
 export const PASSWORD_SALT_ROUNDS = 10;
 
-export const getAllUsers = async (): Promise<User[]> =>
+export const getAllUsers = async (): Promise<UserPreview[]> =>
   await usersRepository.getAllUsers();
 
-export const getUserById = async (id: User["_id"]): Promise<User> => {
+export const getUserById = async (id: User["_id"]): Promise<UserPreview> => {
   const user = await usersRepository.getUserById(id);
 
   if (!user) {
@@ -25,9 +31,21 @@ export const getUserByEmail = async (
   email: User["email"]
 ): Promise<User | null> => await usersRepository.getUserByEmail(email);
 
-export const createUser = async (userData: CreateUser): Promise<User> => {
+export const createUser = async (
+  userData: CreateUser | CreateGoogleUser
+): Promise<UserPreview> => {
+  if (isGoogleUserDTO(userData)) {
+    return await usersRepository.createUser(userData);
+  }
+
   userData.password = await hash(userData.password, PASSWORD_SALT_ROUNDS);
   return await usersRepository.createUser(userData);
+};
+
+export const isGoogleUserDTO = (
+  user: CreateUser | CreateGoogleUser
+): user is CreateGoogleUser => {
+  return user.hasOwnProperty("googleId");
 };
 
 export const updateUser = async (
