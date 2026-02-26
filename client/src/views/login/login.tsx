@@ -63,7 +63,7 @@ export const LoginScreen = () => {
           <Typography variant="h5" fontWeight="bold" textAlign="center" mb={1}>
             Sign In
           </Typography>
-          <Typography color="text.secondary" textAlign="center" mb={3}>
+          <Typography color="text.secondary" textAlign="center" mb={2}>
             Enter your credentials to access your account
           </Typography>
 

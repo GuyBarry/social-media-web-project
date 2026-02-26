@@ -81,7 +81,7 @@ export const RegisterScreen = () => {
           <Typography variant="h5" fontWeight="bold" textAlign="center" mb={1}>
             Create Account
           </Typography>
-          <Typography color="text.secondary" textAlign="center" mb={3}>
+          <Typography color="text.secondary" textAlign="center" mb={2}>
             Start your journey with us today
           </Typography>
 
