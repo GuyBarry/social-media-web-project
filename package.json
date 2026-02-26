@@ -1,0 +1,11 @@
+{
+  "name": "social-media-web-project",
+  "version": "1.0.0",
+  "description": "Root package for running client and server together",
+  "scripts": {
+    "dev": "concurrently --names \"server,client\" --prefix-colors \"blue,green\" \"npm run start --prefix server\" \"npm run dev --prefix client\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
