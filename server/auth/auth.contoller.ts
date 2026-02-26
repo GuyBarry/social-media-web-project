@@ -48,6 +48,7 @@ router.post(
       user,
       tokens: { accessToken, refreshToken },
     } = await authService.loginUser(req.body);
+
     res.cookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken.token, {
       httpOnly: true,
       sameSite: "lax",

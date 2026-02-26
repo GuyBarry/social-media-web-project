@@ -5,7 +5,7 @@ import { notEmptyStringSchema } from "./zodUtils";
 export const userSchema = baseModule.extend({
   username: notEmptyStringSchema("Username"),
   email: z.string().email().min(1),
-  birthDate: z.string().date(),
+  birthDate: z.string().date().optional(),
   bio: z.string().optional(),
   password: z.string(),
   googleId: z.string().optional(),

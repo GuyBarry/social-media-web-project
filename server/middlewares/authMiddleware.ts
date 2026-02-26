@@ -16,7 +16,7 @@ declare module "express" {
 export const validateAccessToken = async (
   req: Request,
   _res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const accessToken: string | undefined =
     req.cookies?.[ACCESS_TOKEN_COOKIE_KEY];
@@ -24,11 +24,11 @@ export const validateAccessToken = async (
   if (!accessToken) {
     throw new UnauthorizedException("Missing access token");
   }
-
+  
   try {
     const { userId } = jwt.verify(
       accessToken,
-      serverConfig.accessTokenSecret
+      serverConfig.accessTokenSecret,
     ) as JwtPayload;
 
     const userResult = await usersService.getUserById(userId);
@@ -46,13 +46,13 @@ export const validateAccessToken = async (
       error.message === "User does not exist"
     ) {
       throw new UnauthorizedException(
-        "Invalid Refresh Token User Identification"
+        "Invalid Access Token User Identification",
       );
     }
 
     throw new UnauthorizedException(
       "Invalid access token",
-      (error as Error).stack
+      (error as Error).stack,
     );
   }
 };

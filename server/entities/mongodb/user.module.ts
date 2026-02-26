@@ -24,7 +24,6 @@ const userSchema = new Schema(
     },
     birthDate: {
       type: Date,
-      required: true,
     },
     password: {
       type: String,
@@ -35,7 +34,7 @@ const userSchema = new Schema(
       default: "",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const USER_POPULATE_FIELDS = {
