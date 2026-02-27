@@ -56,6 +56,17 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     }
   }, [getUserMe, user]);
 
+  const logout = useCallback(async () => {
+    try {
+      await authApi.post("/logout");
+    } catch (error) {
+      console.error("Logout went wrong", error);
+    } finally {
+      saveUser(null);
+      navigate("/login");
+    }
+  }, [navigate, saveUser]);
+
   const onAuthenticationSuccess = useCallback(
     (rawUser: User) => {
       saveUser(rawUser);
@@ -97,7 +108,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   );
 
   return (
-    <AuthContext.Provider value={{ user, login, register, isLoadingUserAuth }}>
+    <AuthContext.Provider
+      value={{ user, login, register, logout, isLoadingUserAuth }}
+    >
       {children}
     </AuthContext.Provider>
   );
