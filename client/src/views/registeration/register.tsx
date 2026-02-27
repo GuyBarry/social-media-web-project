@@ -59,7 +59,6 @@ export const RegisterScreen = () => {
         birthDate: new Date(formData.birthdate),
       },
       {
-        onSuccess: () => navigate("/"),
         onError: () => setError("Registration failed"),
       },
     );

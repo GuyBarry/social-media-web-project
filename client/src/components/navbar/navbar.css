@@ -1,0 +1,31 @@
+.navbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 32px;
+  background-color: var(--background-paper, #ffffff);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.navbar-profile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.navbar-profile:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}

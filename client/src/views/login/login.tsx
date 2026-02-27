@@ -37,7 +37,6 @@ export const LoginScreen = () => {
         password: formData.password,
       },
       {
-        onSuccess: () => navigate("/"),
         onError: () => setError("Login failed"),
       },
     );
