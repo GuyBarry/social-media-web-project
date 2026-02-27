@@ -18,6 +18,7 @@ interface AuthContextValue {
     registrationData: UserRegistration,
     authHandlers?: AuthResultHandlers,
   ) => Promise<void>;
+  logout: (authHandlers?: AuthResultHandlers) => Promise<void>;
   isLoadingUserAuth: boolean;
 }
 export const AuthContext = createContext<AuthContextValue>(
