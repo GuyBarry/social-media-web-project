@@ -18,7 +18,17 @@ const postSchema = new Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
+
+postSchema.virtual("likes", {
+  ref: "Like",
+  localField: "_id",
+  foreignField: "postId",
+});
 
 export const PostModel = model<Post>("Post", postSchema);

@@ -29,6 +29,11 @@
  *                     type: string
  *                   sender:
  *                     type: string
+ *                   likes:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                     description: Array of user IDs who liked this post
  *                   createdAt:
  *                     type: string
  *                   updatedAt:
@@ -75,6 +80,11 @@
  *                  type: string
  *                sender:
  *                  type: string
+ *                likes:
+ *                  type: array
+ *                  items:
+ *                    type: string
+ *                  description: Array of user IDs who liked this post
  *                createdAt:
  *                  type: string
  *                updatedAt:

@@ -24,4 +24,9 @@ const likeSchema = new Schema(
 
 likeSchema.index({ postId: 1, userId: 1 }, { unique: true });
 
+export const LIKES_POPULATE_FIELD = {
+  path: "likes",
+  select: "userId -_id",
+};
+
 export const LikeModel = model<Like>("Like", likeSchema);

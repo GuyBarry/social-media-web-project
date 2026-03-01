@@ -25,6 +25,11 @@ export const examplePost: CreatePost = {
   message: "Hello, world!",
 };
 
+export const exampleLike = {
+  postId: examplePost._id,
+  userId: loginUser._id,
+};
+
 export const exampleComment: CreateComment = {
   _id: "5678",
   postId: "1234",
