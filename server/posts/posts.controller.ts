@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
-import { LikeMethod, likeMethodSchema } from "../entities/dto/like.dto";
+import { LikeRequest, likeRequestSchema } from "../entities/dto/like.dto";
 import {
   CreatePost,
   createPostSchema,
@@ -20,7 +20,7 @@ router.get(
   "/",
   async (
     req: Request<{}, {}, {}, { sender?: Post["sender"] }>,
-    res: Response
+    res: Response,
   ) => {
     const senderId = req.query.sender;
 
@@ -29,7 +29,7 @@ router.get(
       : await postService.getAllPosts();
 
     res.status(StatusCodes.OK).send(response);
-  }
+  },
 );
 
 // Get post by id
@@ -55,7 +55,7 @@ router.post(
       postId: _id,
       createdAt,
     });
-  }
+  },
 );
 
 // Update post
@@ -73,17 +73,14 @@ router.put(
       postId: _id,
       updatedAt: updatedAt,
     });
-  }
+  },
 );
 
 // Like / Dislike post
 router.patch(
   "/:id/like",
-  validateRequestBody(likeMethodSchema),
-  async (
-    req: Request<{ id: Post["_id"] }, {}, LikeMethod>,
-    res: Response
-  ) => {
+  validateRequestBody(likeRequestSchema),
+  async (req: Request<{ id: Post["_id"] }, {}, LikeRequest>, res: Response) => {
     const id = req.params.id;
     const userId = req.authUser!._id;
     const { method } = req.body;
@@ -93,7 +90,7 @@ router.patch(
     res.status(StatusCodes.OK).send({
       message: method === "like" ? "Post liked" : "Post disliked",
     });
-  }
+  },
 );
 
 export const postsController = router;

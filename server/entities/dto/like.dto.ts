@@ -25,10 +25,13 @@ export type Like = z.infer<typeof likeSchema>;
  *           type: string
  *           enum: [like, dislike]
  */
-export const likeMethodSchema = z
+
+export const likeMethodSchema = z.enum(["like", "dislike"]);
+export const likeRequestSchema = z
   .object({
-    method: z.enum(["like", "dislike"]),
+    method: likeMethodSchema,
   })
   .strict();
 
 export type LikeMethod = z.infer<typeof likeMethodSchema>;
+export type LikeRequest = z.infer<typeof likeRequestSchema>;

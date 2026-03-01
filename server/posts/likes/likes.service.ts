@@ -6,7 +6,7 @@ import { likesRepository } from "./likes.repository";
 export const handleLike = async (
   postId: string,
   userId: string,
-  method: LikeMethod["method"]
+  method: LikeMethod
 ): Promise<void> => {
   const post = await postRepository.getPostById(postId);
   if (!post) {
