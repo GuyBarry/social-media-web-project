@@ -1,11 +1,13 @@
 import { z } from "zod";
 import { notEmptyStringSchema } from "./zodUtils";
 import { baseModule } from "./base.dto";
+import { userSchema } from "./user.dto";
 
 export const postSchema = baseModule
   .extend({
     sender: notEmptyStringSchema("Sender"),
     message: notEmptyStringSchema("Message"),
+    likes: z.array(userSchema.shape._id),
   })
   .strict();
 export type Post = z.infer<typeof postSchema>;

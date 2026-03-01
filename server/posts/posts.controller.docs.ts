@@ -29,6 +29,11 @@
  *                     type: string
  *                   sender:
  *                     type: string
+ *                   likes:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                     description: Array of user IDs who liked this post
  *                   createdAt:
  *                     type: string
  *                   updatedAt:
@@ -75,6 +80,11 @@
  *                  type: string
  *                sender:
  *                  type: string
+ *                likes:
+ *                  type: array
+ *                  items:
+ *                    type: string
+ *                  description: Array of user IDs who liked this post
  *                createdAt:
  *                  type: string
  *                updatedAt:
@@ -238,4 +248,83 @@
  *                 message:
  *                   type: string
  *                   example: Post does not exist
+ */
+
+/**
+ * @openapi
+ * /posts/{id}/like:
+ *   patch:
+ *     tags:
+ *      - Posts
+ *     summary: Like or dislike a post
+ *     description: >
+ *       Like or dislike the specified post based on the `method` field.
+ *       Liking a post you already liked returns 409 Conflict.
+ *       Disliking a post you have not liked returns 404 Not Found.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The id of the post to like or dislike
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LikeRequest'
+ *     responses:
+ *       200:
+ *         description: Like action processed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Post liked
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid request body
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
+ *       404:
+ *         description: Post or Like not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Post does not exist
+ *       409:
+ *         description: Already liked
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Like already exists
  */

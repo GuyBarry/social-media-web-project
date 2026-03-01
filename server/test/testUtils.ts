@@ -5,6 +5,7 @@ import { CreateComment } from "../entities/dto/comment.dto";
 import { CreatePost } from "../entities/dto/post.dto";
 import { CreateUser } from "../entities/dto/user.dto";
 import { CommentModel } from "../entities/mongodb/comment.module";
+import { LikeModel } from "../entities/mongodb/like.module";
 import { PostModel } from "../entities/mongodb/post.module";
 import { UserModel } from "../entities/mongodb/user.module";
 import { PASSWORD_SALT_ROUNDS } from "../users/users.service";
@@ -22,6 +23,11 @@ export const examplePost: CreatePost = {
   _id: "1234",
   sender: loginUser._id,
   message: "Hello, world!",
+};
+
+export const exampleLike = {
+  postId: examplePost._id,
+  userId: loginUser._id,
 };
 
 export const exampleComment: CreateComment = {
@@ -48,4 +54,5 @@ export const truncateDatabase = async (): Promise<void> => {
   await UserModel.deleteMany();
   await PostModel.deleteMany();
   await CommentModel.deleteMany();
+  await LikeModel.deleteMany();
 };

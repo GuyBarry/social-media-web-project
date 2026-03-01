@@ -4,14 +4,16 @@ import mongoose from "mongoose";
 import request from "supertest";
 import { initApp } from "../app";
 import { authService } from "../auth/auth.service";
+import { LikeModel } from "../entities/mongodb/like.module";
 import { PostModel } from "../entities/mongodb/post.module";
 import { UserModel } from "../entities/mongodb/user.module";
 import {
+  exampleLike,
   examplePost,
   exampleUser,
   getAuthCookies,
   loginUser,
-  truncateDatabase
+  truncateDatabase,
 } from "./testUtils";
 
 let app: Express;
@@ -32,7 +34,9 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await PostModel.deleteMany();
+  await LikeModel.deleteMany();
   await PostModel.create(examplePost);
+  await LikeModel.create(exampleLike);
 });
 
 afterAll(async () => {
@@ -49,6 +53,9 @@ describe("GET / ", () => {
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toBeGreaterThan(0);
     expect(response.body[0]._id).toBe(examplePost._id);
+    expect(Array.isArray(response.body[0].likes)).toBe(true);
+    expect(response.body[0].likes).toHaveLength(1);
+    expect(response.body[0].likes).toContain(loginUser._id);
   });
 
   test("Should return empty array when no posts exist", async () => {
@@ -61,6 +68,20 @@ describe("GET / ", () => {
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toEqual(0);
+  });
+
+  test("Should return empty array of likes when no likes exist for a post", async () => {
+    await LikeModel.deleteMany();
+
+    const response = await request(app)
+      .get("/posts")
+      .set("Cookie", authCookies);
+
+    expect(response.statusCode).toEqual(StatusCodes.OK);
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toBeGreaterThan(0);
+    expect(Array.isArray(response.body[0].likes)).toBe(true);
+    expect(response.body[0].likes).toHaveLength(0);
   });
 
   describe("GET /?sender=", () => {
@@ -106,6 +127,9 @@ describe("GET /:id", () => {
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(response.body._id).toBe(examplePost._id);
+    expect(Array.isArray(response.body.likes)).toBe(true);
+    expect(response.body.likes).toHaveLength(1);
+    expect(response.body.likes).toContain(loginUser._id);
   });
 
   test("Should return 404 when post does not exist", async () => {
@@ -327,5 +351,122 @@ describe("PUT /:id", () => {
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
+  });
+});
+
+describe("PATCH /:id/like", () => {
+  beforeEach(async () => {
+    await LikeModel.deleteMany();
+  });
+
+  test("Should like a post", async () => {
+    const response = await request(app)
+      .patch(`/posts/${examplePost._id}/like`)
+      .set("Cookie", authCookies)
+      .send({ method: "like" });
+
+    expect(response.statusCode).toEqual(StatusCodes.OK);
+    expect(response.body.message).toBe("Post liked");
+  });
+
+  test("Should reflect liked userId in post likes array", async () => {
+    await request(app)
+      .patch(`/posts/${examplePost._id}/like`)
+      .set("Cookie", authCookies)
+      .send({ method: "like" });
+
+    const postResponse = await request(app)
+      .get(`/posts/${examplePost._id}`)
+      .set("Cookie", authCookies);
+
+    expect(postResponse.body.likes).toContain(loginUser._id);
+  });
+
+  test("Should remove userId from post likes array after disliking", async () => {
+    await LikeModel.create({ postId: examplePost._id, userId: loginUser._id });
+
+    await request(app)
+      .patch(`/posts/${examplePost._id}/like`)
+      .set("Cookie", authCookies)
+      .send({ method: "dislike" });
+
+    const postResponse = await request(app)
+      .get(`/posts/${examplePost._id}`)
+      .set("Cookie", authCookies);
+
+    expect(postResponse.body.likes).not.toContain(loginUser._id);
+  });
+
+  test("Should dislike a post after liking it", async () => {
+    await LikeModel.create({ postId: examplePost._id, userId: loginUser._id });
+
+    const response = await request(app)
+      .patch(`/posts/${examplePost._id}/like`)
+      .set("Cookie", authCookies)
+      .send({ method: "dislike" });
+
+    expect(response.statusCode).toEqual(StatusCodes.OK);
+    expect(response.body.message).toBe("Post disliked");
+  });
+
+  test("Should return 409 when liking a post already liked", async () => {
+    await LikeModel.create({ postId: examplePost._id, userId: loginUser._id });
+
+    const response = await request(app)
+      .patch(`/posts/${examplePost._id}/like`)
+      .set("Cookie", authCookies)
+      .send({ method: "like" });
+
+    expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
+  });
+
+  test("Should return 404 when disliking a post that was not liked", async () => {
+    const response = await request(app)
+      .patch(`/posts/${examplePost._id}/like`)
+      .set("Cookie", authCookies)
+      .send({ method: "dislike" });
+
+    expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
+    expect(response.body.message).toBe("Like does not exist");
+  });
+
+  test("Should return 404 when liking a non-existent post", async () => {
+    const response = await request(app)
+      .patch(`/posts/nonexistentid/like`)
+      .set("Cookie", authCookies)
+      .send({ method: "like" });
+
+    expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
+    expect(response.body.message).toBe("Post does not exist");
+  });
+
+  test("Should return 400 for invalid method value", async () => {
+    const response = await request(app)
+      .patch(`/posts/${examplePost._id}/like`)
+      .set("Cookie", authCookies)
+      .send({ method: "upvote" });
+
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
+    expect(response.body.message).toBe("Invalid request body");
+    expect(response.body.violations).toBeDefined();
+  });
+
+  test("Should return 400 when method field is missing", async () => {
+    const response = await request(app)
+      .patch(`/posts/${examplePost._id}/like`)
+      .set("Cookie", authCookies)
+      .send({});
+
+    expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
+    expect(response.body.message).toBe("Invalid request body");
+    expect(response.body.violations).toBeDefined();
+  });
+
+  test("Should return 401 when not authenticated", async () => {
+    const response = await request(app)
+      .patch(`/posts/${examplePost._id}/like`)
+      .send({ method: "like" });
+
+    expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
   });
 });
