@@ -12,11 +12,14 @@ export const likeSchema = baseModule
 
 export type Like = z.infer<typeof likeSchema>;
 
+export const likeMethodSchema = z.enum(["like", "dislike"]);
+export type LikeMethod = z.infer<typeof likeMethodSchema>;
+
 /**
  * @swagger
  * components:
  *   schemas:
- *     LikeMethod:
+ *     LikeRequest:
  *       type: object
  *       required:
  *         - method
@@ -26,12 +29,9 @@ export type Like = z.infer<typeof likeSchema>;
  *           enum: [like, dislike]
  */
 
-export const likeMethodSchema = z.enum(["like", "dislike"]);
 export const likeRequestSchema = z
   .object({
     method: likeMethodSchema,
   })
   .strict();
-
-export type LikeMethod = z.infer<typeof likeMethodSchema>;
 export type LikeRequest = z.infer<typeof likeRequestSchema>;

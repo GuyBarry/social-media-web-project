@@ -275,7 +275,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/LikeMethod'
+ *             $ref: '#/components/schemas/LikeRequest'
  *     responses:
  *       200:
  *         description: Like action processed successfully
