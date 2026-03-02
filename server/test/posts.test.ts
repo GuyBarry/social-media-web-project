@@ -10,7 +10,9 @@ import { authService } from "../auth/auth.service";
 import { LikeModel } from "../entities/mongodb/like.module";
 import { PostModel } from "../entities/mongodb/post.module";
 import { UserModel } from "../entities/mongodb/user.module";
+import { CommentModel } from "../entities/mongodb/comment.module";
 import {
+  exampleComment,
   exampleLike,
   examplePost,
   exampleUser,
@@ -40,6 +42,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   await PostModel.deleteMany();
   await LikeModel.deleteMany();
+  await CommentModel.deleteMany();
   await PostModel.create(examplePost);
   await LikeModel.create(exampleLike);
 });
@@ -61,6 +64,18 @@ describe("GET / ", () => {
     expect(Array.isArray(response.body[0].likes)).toBe(true);
     expect(response.body[0].likes).toHaveLength(1);
     expect(response.body[0].likes).toContain(loginUser._id);
+    expect(response.body[0].numComments).toBe(0);
+  });
+
+  test("Should return numComments reflecting the number of comments", async () => {
+    await CommentModel.create(exampleComment);
+
+    const response = await request(app)
+      .get("/posts")
+      .set("Cookie", authCookies);
+
+    expect(response.statusCode).toEqual(StatusCodes.OK);
+    expect(response.body[0].numComments).toBe(1);
   });
 
   test("Should return empty array when no posts exist", async () => {
@@ -100,6 +115,18 @@ describe("GET / ", () => {
       expect(response.body.length).toBeGreaterThan(0);
       expect(response.body[0]._id).toBe(examplePost._id);
       expect(response.body[0].sender._id).toBe(examplePost.sender);
+      expect(response.body[0].numComments).toBe(0);
+    });
+
+    test("Should return numComments reflecting the number of comments when filtering by sender", async () => {
+      await CommentModel.create(exampleComment);
+
+      const response = await request(app)
+        .get(`/posts?sender=${examplePost.sender}`)
+        .set("Cookie", authCookies);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(response.body[0].numComments).toBe(1);
     });
 
     test("Should return empty array when no posts exist for sender", async () => {
@@ -135,6 +162,18 @@ describe("GET /:id", () => {
     expect(Array.isArray(response.body.likes)).toBe(true);
     expect(response.body.likes).toHaveLength(1);
     expect(response.body.likes).toContain(loginUser._id);
+    expect(response.body.numComments).toBe(0);
+  });
+
+  test("Should return numComments reflecting the number of comments", async () => {
+    await CommentModel.create(exampleComment);
+
+    const response = await request(app)
+      .get(`/posts/${examplePost._id}`)
+      .set("Cookie", authCookies);
+
+    expect(response.statusCode).toEqual(StatusCodes.OK);
+    expect(response.body.numComments).toBe(1);
   });
 
   test("Should return 404 when post does not exist", async () => {

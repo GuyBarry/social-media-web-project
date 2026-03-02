@@ -34,6 +34,9 @@
  *                     items:
  *                       type: string
  *                     description: Array of user IDs who liked this post
+ *                   numComments:
+ *                     type: integer
+ *                     description: Number of comments on this post
  *                   createdAt:
  *                     type: string
  *                   updatedAt:
@@ -85,6 +88,9 @@
  *                  items:
  *                    type: string
  *                  description: Array of user IDs who liked this post
+ *                numComments:
+ *                  type: integer
+ *                  description: Number of comments on this post
  *                createdAt:
  *                  type: string
  *                updatedAt:

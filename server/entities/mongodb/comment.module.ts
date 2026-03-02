@@ -25,4 +25,8 @@ const commentSchema = new Schema(
   { timestamps: true }
 );
 
+export const COMMENTS_POPULATE_FIELD = {
+  path: "numComments",
+};
+
 export const CommentModel = model<Comment>("Comment", commentSchema);

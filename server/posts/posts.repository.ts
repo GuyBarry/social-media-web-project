@@ -1,4 +1,5 @@
 import { CreatePost, Post, UpdatePost } from "../entities/dto/post.dto";
+import { COMMENTS_POPULATE_FIELD } from "../entities/mongodb/comment.module";
 import { LIKES_POPULATE_FIELD } from "../entities/mongodb/like.module";
 import { PostModel } from "../entities/mongodb/post.module";
 import { USER_POPULATE_FIELDS } from "../entities/mongodb/user.module";
@@ -18,6 +19,7 @@ export const getAllPosts = async (): Promise<Post[]> => {
   const posts = await PostModel.find({})
     .populate(USER_POPULATE_FIELDS.field, USER_POPULATE_FIELDS.subFields)
     .populate(LIKES_POPULATE_FIELD)
+    .populate(COMMENTS_POPULATE_FIELD)
     .exec();
   return posts.map(extractLikeUserIds);
 };
@@ -26,6 +28,7 @@ export const getPostById = async (id: Post["_id"]): Promise<Post | null> => {
   const post = await PostModel.findById(id)
     .populate(USER_POPULATE_FIELDS.field, USER_POPULATE_FIELDS.subFields)
     .populate(LIKES_POPULATE_FIELD)
+    .populate(COMMENTS_POPULATE_FIELD)
     .exec();
   return post ? extractLikeUserIds(post) : null;
 };
@@ -36,6 +39,7 @@ export const getPostsBySender = async (
   const posts = await PostModel.find({ sender })
     .populate(USER_POPULATE_FIELDS.field, USER_POPULATE_FIELDS.subFields)
     .populate(LIKES_POPULATE_FIELD)
+    .populate(COMMENTS_POPULATE_FIELD)
     .exec();
   return posts.map(extractLikeUserIds);
 };
