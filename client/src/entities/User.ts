@@ -7,4 +7,7 @@ export interface User {
   password: string;
   bio?: string;
   birthDate: Date;
+  bannerColor?: string;
+  postsCount?: number;
+  likesCount?: number;
 }
