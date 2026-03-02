@@ -229,6 +229,79 @@ describe("GET / ", () => {
       expect(response.body.limit).toBe(10);
       expect(response.body.docs).toHaveLength(5);
     });
+
+    describe("Should return posts in correct order based on createdAt", () => {
+      const olderPost = {
+        _id: "pagination-older-post",
+        sender: loginUser._id,
+        message: "Older post",
+        picture: "http://localhost/public/older.png",
+        createdAt: new Date("2024-01-01"),
+      };
+      const newerPost = {
+        _id: "pagination-newer-post",
+        sender: loginUser._id,
+        message: "Newer post",
+        picture: "http://localhost/public/newer.png",
+        createdAt: new Date("2024-01-02"),
+      };
+
+      beforeEach(async () => {
+        await PostModel.deleteMany();
+        await PostModel.create(olderPost);
+        await PostModel.create(newerPost);
+      });
+
+      test("Should return the newer post on page 1 with limit 1", async () => {
+        const response = await request(app)
+          .get("/posts?page=1&limit=1")
+          .set("Cookie", authCookies);
+
+        expect(response.statusCode).toEqual(StatusCodes.OK);
+        expect(response.body.docs).toHaveLength(1);
+        expect(response.body.docs[0]._id).toBe(newerPost._id);
+        expect(response.body.totalDocs).toBe(2);
+        expect(response.body.totalPages).toBe(2);
+      });
+
+      test("Should return the older post on page 2 with limit 1", async () => {
+        const response = await request(app)
+          .get("/posts?page=2&limit=1")
+          .set("Cookie", authCookies);
+
+        expect(response.statusCode).toEqual(StatusCodes.OK);
+        expect(response.body.docs).toHaveLength(1);
+        expect(response.body.docs[0]._id).toBe(olderPost._id);
+        expect(response.body.totalDocs).toBe(2);
+        expect(response.body.totalPages).toBe(2);
+      });
+
+      describe("GET /?sender=&page=&limit=", () => {
+        test("Should return the newer post on page 1 with limit 1 filtered by sender", async () => {
+          const response = await request(app)
+            .get(`/posts?sender=${loginUser._id}&page=1&limit=1`)
+            .set("Cookie", authCookies);
+
+          expect(response.statusCode).toEqual(StatusCodes.OK);
+          expect(response.body.docs).toHaveLength(1);
+          expect(response.body.docs[0]._id).toBe(newerPost._id);
+          expect(response.body.totalDocs).toBe(2);
+          expect(response.body.totalPages).toBe(2);
+        });
+
+        test("Should return the older post on page 2 with limit 1 filtered by sender", async () => {
+          const response = await request(app)
+            .get(`/posts?sender=${loginUser._id}&page=2&limit=1`)
+            .set("Cookie", authCookies);
+
+          expect(response.statusCode).toEqual(StatusCodes.OK);
+          expect(response.body.docs).toHaveLength(1);
+          expect(response.body.docs[0]._id).toBe(olderPost._id);
+          expect(response.body.totalDocs).toBe(2);
+          expect(response.body.totalPages).toBe(2);
+        });
+      });
+    });
   });
 });
 

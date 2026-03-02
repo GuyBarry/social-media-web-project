@@ -101,6 +101,79 @@ describe("GET / ", () => {
     });
   });
 
+  describe("GET /?page=&limit=", () => {
+    const olderComment = {
+      _id: "pagination-older-comment",
+      postId: examplePost._id,
+      sender: loginUser._id,
+      message: "Older comment",
+      createdAt: new Date("2024-01-01"),
+    };
+    const newerComment = {
+      _id: "pagination-newer-comment",
+      postId: examplePost._id,
+      sender: loginUser._id,
+      message: "Newer comment",
+      createdAt: new Date("2024-01-02"),
+    };
+
+    beforeEach(async () => {
+      await CommentModel.deleteMany();
+      await CommentModel.create(olderComment);
+      await CommentModel.create(newerComment);
+    });
+
+    test("Should return the newer comment on page 1 with limit 1", async () => {
+      const response = await request(app)
+        .get("/comments?page=1&limit=1")
+        .set("Cookie", authCookies);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(response.body.docs).toHaveLength(1);
+      expect(response.body.docs[0]._id).toBe(newerComment._id);
+      expect(response.body.totalDocs).toBe(2);
+      expect(response.body.totalPages).toBe(2);
+    });
+
+    test("Should return the older comment on page 2 with limit 1", async () => {
+      const response = await request(app)
+        .get("/comments?page=2&limit=1")
+        .set("Cookie", authCookies);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(response.body.docs).toHaveLength(1);
+      expect(response.body.docs[0]._id).toBe(olderComment._id);
+      expect(response.body.totalDocs).toBe(2);
+      expect(response.body.totalPages).toBe(2);
+    });
+
+    describe("GET /?postId=&page=&limit=", () => {
+      test("Should return the newer comment on page 1 with limit 1 filtered by postId", async () => {
+        const response = await request(app)
+          .get(`/comments?postId=${examplePost._id}&page=1&limit=1`)
+          .set("Cookie", authCookies);
+
+        expect(response.statusCode).toEqual(StatusCodes.OK);
+        expect(response.body.docs).toHaveLength(1);
+        expect(response.body.docs[0]._id).toBe(newerComment._id);
+        expect(response.body.totalDocs).toBe(2);
+        expect(response.body.totalPages).toBe(2);
+      });
+
+      test("Should return the older comment on page 2 with limit 1 filtered by postId", async () => {
+        const response = await request(app)
+          .get(`/comments?postId=${examplePost._id}&page=2&limit=1`)
+          .set("Cookie", authCookies);
+
+        expect(response.statusCode).toEqual(StatusCodes.OK);
+        expect(response.body.docs).toHaveLength(1);
+        expect(response.body.docs[0]._id).toBe(olderComment._id);
+        expect(response.body.totalDocs).toBe(2);
+        expect(response.body.totalPages).toBe(2);
+      });
+    });
+  });
+
   describe("GET /:id", () => {
     test("Should return comment by id", async () => {
       const response = await request(app)
