@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { LikeRequest, likeRequestSchema } from "../entities/dto/like.dto";
 import {
@@ -10,7 +10,7 @@ import {
 } from "../entities/dto/post.dto";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { validateExistingSender } from "../middlewares/validateExistingUser";
-import { getFileUrl, upload } from "../pictures/pictures.service";
+import { getFileUrl, upload, deleteFile, injectUploadedFileUrl } from "../pictures/pictures.service";
 import { likesService } from "./likes/likes.service";
 import { postService } from "./posts.service";
 
@@ -70,10 +70,17 @@ router.post(
 // Update post
 router.put(
   "/:id",
+  upload.single("picture"),
+  injectUploadedFileUrl,
   validateRequestBody(updatePostSchema),
   async (req: Request<{ id: Post["_id"] }, {}, UpdatePost>, res: Response) => {
     const id = req.params.id;
     const postData = req.body;
+
+    if (req.file) {
+      const existingPost = await postService.getPostById(id);
+      await deleteFile(existingPost.picture);
+    }
 
     const { _id, updatedAt } = await postService.updatePost(id, postData);
 

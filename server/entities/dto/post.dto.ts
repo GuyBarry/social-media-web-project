@@ -46,16 +46,19 @@ export type CreatePost = z.infer<typeof createPostSchema>;
  *   schemas:
  *     UpdatePost:
  *       type: object
- *       required:
- *         - message
  *       properties:
  *         message:
  *           type: string
- *           required: true
+ *         picture:
+ *           type: string
  */
 export const updatePostSchema = z
   .object({
-    message: postSchema.shape.message,
+    message: postSchema.shape.message.optional(),
+    picture: postSchema.shape.picture.optional(),
   })
-  .strict();
+  .strict()
+  .refine((data) => data.message !== undefined || data.picture !== undefined, {
+    message: "At least one of 'message' or 'picture' must be provided",
+  });
 export type UpdatePost = z.infer<typeof updatePostSchema>;
