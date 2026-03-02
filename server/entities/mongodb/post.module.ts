@@ -12,6 +12,10 @@ const postSchema = new Schema(
       type: String,
       required: true,
     },
+    picture: {
+      type: String,
+      required: true,
+    },
     sender: {
       type: String,
       ref: "User",

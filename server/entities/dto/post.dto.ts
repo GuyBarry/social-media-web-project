@@ -7,6 +7,7 @@ export const postSchema = baseModule
   .extend({
     sender: notEmptyStringSchema("Sender"),
     message: notEmptyStringSchema("Message"),
+    picture: notEmptyStringSchema("Picture"),
     likes: z.array(userSchema.shape._id),
   })
   .strict();
@@ -34,6 +35,7 @@ export const createPostSchema = z
     _id: postSchema.shape._id.optional(),
     sender: postSchema.shape.sender,
     message: postSchema.shape.message,
+    picture: postSchema.shape.picture.optional(),
   })
   .strict();
 export type CreatePost = z.infer<typeof createPostSchema>;

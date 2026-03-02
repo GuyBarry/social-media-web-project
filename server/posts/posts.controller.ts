@@ -10,6 +10,7 @@ import {
 } from "../entities/dto/post.dto";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { validateExistingSender } from "../middlewares/validateExistingUser";
+import { getFileUrl, upload } from "../pictures/pictures.service";
 import { likesService } from "./likes/likes.service";
 import { postService } from "./posts.service";
 
@@ -43,10 +44,18 @@ router.get("/:id", async (req: Request<{ id: Post["_id"] }>, res: Response) => {
 // Create post
 router.post(
   "/",
+  upload.single("picture"),
   validateRequestBody(createPostSchema),
   validateExistingSender,
   async (req: Request<{}, {}, CreatePost>, res: Response) => {
     const postData = req.body;
+
+    if (!req.file) {
+      res.status(StatusCodes.BAD_REQUEST).send({ message: "Picture file is required" });
+      return;
+    }
+
+    postData.picture = getFileUrl(req.file.filename);
 
     const { _id, createdAt } = await postService.createPost(postData);
 
