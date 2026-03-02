@@ -6,7 +6,7 @@
  *      - Posts
  *     summary: Get all posts
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: query
  *         name: sender
@@ -90,7 +90,7 @@
  *      - Posts
  *     summary: Get post by id
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -154,7 +154,7 @@
  *      - Posts
  *     summary: Create new post
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -239,7 +239,7 @@
  *      - Posts
  *     summary: Update post
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -321,7 +321,7 @@
  *       Liking a post you already liked returns 409 Conflict.
  *       Disliking a post you have not liked returns 404 Not Found.
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id

@@ -6,7 +6,7 @@
  *      - Comments
  *     summary: Get all comments
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: query
  *         name: postId
@@ -90,7 +90,7 @@
  *      - Comments
  *     summary: Get comment by id
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -147,7 +147,7 @@
  *      - Comments
  *     summary: Create new comment
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -227,7 +227,7 @@
  *      - Comments
  *     summary: Update a comment by id
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -297,7 +297,7 @@
  *      - Comments
  *     summary: Delete comment by id
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
