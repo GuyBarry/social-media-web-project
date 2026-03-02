@@ -5,7 +5,7 @@ import { postRepository } from "./posts.repository";
 export const getAllPosts = async (): Promise<Post[]> =>
   await postRepository.getAllPosts();
 
-export const getPostById = async (id: Post["_id"]): Promise<Post | null> => {
+export const getPostById = async (id: Post["_id"]): Promise<Post> => {
   const post = await postRepository.getPostById(id);
 
   if (!post) {

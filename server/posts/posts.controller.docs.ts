@@ -123,9 +123,24 @@
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/CreatePost'
+ *             type: object
+ *             required:
+ *               - sender
+ *               - message
+ *               - picture
+ *             properties:
+ *               sender:
+ *                 type: string
+ *                 description: The id of the post sender
+ *               message:
+ *                 type: string
+ *                 description: The post message content
+ *               picture:
+ *                 type: string
+ *                 format: binary
+ *                 description: The post picture file (jpeg, png, gif, webp — max 5MB)
  *     responses:
  *       201:
  *         description: Returns the created post id
@@ -199,9 +214,18 @@
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/UpdatePost'
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *                 description: The updated post message content
+ *               picture:
+ *                 type: string
+ *                 format: binary
+ *                 description: The updated post picture file (jpeg, png, gif, webp — max 5MB)
+ *           description: At least one of message or picture must be provided
  *     responses:
  *       200:
  *         description: Updated

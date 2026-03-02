@@ -4,6 +4,7 @@ import cors from "cors";
 import express, { Express } from "express";
 import mongoose from "mongoose";
 import passport from "passport";
+import path from "path";
 import { authController } from "./auth/auth.contoller";
 import { commentsController } from "./comments/comments.controller";
 import { dbConfig } from "./config/db.config";
@@ -30,6 +31,8 @@ export const initApp = async (): Promise<Express> => {
   app.use(cookieParser());
   app.use(passport.initialize());
   require("./auth/auth.google");
+
+  app.use("/public", express.static(path.resolve(__dirname, "public")));
 
   app.use("/posts", validateAccessToken, postsController);
   app.use("/comments", validateAccessToken, commentsController);

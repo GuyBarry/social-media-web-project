@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { LikeRequest, likeRequestSchema } from "../entities/dto/like.dto";
 import {
@@ -10,8 +10,10 @@ import {
 } from "../entities/dto/post.dto";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { validateExistingSender } from "../middlewares/validateExistingUser";
+import { getFileUrl, upload, deleteFile } from "../pictures/pictures.service";
 import { likesService } from "./likes/likes.service";
 import { postService } from "./posts.service";
+import { injectUploadedFileUrl } from "../middlewares/pictureMiddleware";
 
 const router = Router();
 
@@ -43,10 +45,18 @@ router.get("/:id", async (req: Request<{ id: Post["_id"] }>, res: Response) => {
 // Create post
 router.post(
   "/",
+  upload.single("picture"),
   validateRequestBody(createPostSchema),
   validateExistingSender,
   async (req: Request<{}, {}, CreatePost>, res: Response) => {
     const postData = req.body;
+
+    if (!req.file) {
+      res.status(StatusCodes.BAD_REQUEST).send({ message: "Picture file is required" });
+      return;
+    }
+
+    postData.picture = getFileUrl(req.file.filename);
 
     const { _id, createdAt } = await postService.createPost(postData);
 
@@ -61,10 +71,17 @@ router.post(
 // Update post
 router.put(
   "/:id",
+  upload.single("picture"),
+  injectUploadedFileUrl,
   validateRequestBody(updatePostSchema),
   async (req: Request<{ id: Post["_id"] }, {}, UpdatePost>, res: Response) => {
     const id = req.params.id;
     const postData = req.body;
+
+    if (req.file) {
+      const existingPost = await postService.getPostById(id);
+      await deleteFile(existingPost.picture);
+    }
 
     const { _id, updatedAt } = await postService.updatePost(id, postData);
 

@@ -1,7 +1,10 @@
 import { Express } from "express";
+import fs from "fs/promises";
 import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
+import path from "path";
 import request from "supertest";
+import { UPLOAD_DIR } from "../pictures/pictures.config";
 import { initApp } from "../app";
 import { authService } from "../auth/auth.service";
 import { LikeModel } from "../entities/mongodb/like.module";
@@ -15,6 +18,8 @@ import {
   loginUser,
   truncateDatabase,
 } from "./testUtils";
+
+const TEST_PNG = path.resolve(__dirname, "resources/test.png");
 
 let app: Express;
 let authCookies: string[];
@@ -145,14 +150,12 @@ describe("GET /:id", () => {
 
 describe("POST / ", () => {
   test("Should create a new post", async () => {
-    const newPostData = {
-      message: "This is a new test post",
-      sender: loginUser._id,
-    };
     const response = await request(app)
       .post("/posts")
       .set("Cookie", authCookies)
-      .send(newPostData);
+      .field("message", "This is a new test post")
+      .field("sender", loginUser._id)
+      .attach("picture", TEST_PNG);
     expect(response.statusCode).toEqual(StatusCodes.CREATED);
     expect(response.body.message).toBe("Created new post");
     expect(response.body.postId).toBeDefined();
@@ -160,26 +163,22 @@ describe("POST / ", () => {
   });
 
   test("Should return 400 for missing sender field", async () => {
-    const invalidPostData = {
-      message: "This post has no sender",
-    };
     const response = await request(app)
       .post("/posts")
       .set("Cookie", authCookies)
-      .send(invalidPostData);
+      .field("message", "This post has no sender")
+      .attach("picture", TEST_PNG);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
 
   test("Should return 400 for missing message field", async () => {
-    const invalidPostData = {
-      sender: loginUser._id,
-    };
     const response = await request(app)
       .post("/posts")
       .set("Cookie", authCookies)
-      .send(invalidPostData);
+      .field("sender", loginUser._id)
+      .attach("picture", TEST_PNG);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
@@ -189,22 +188,20 @@ describe("POST / ", () => {
     const response = await request(app)
       .post("/posts")
       .set("Cookie", authCookies)
-      .send({});
+      .attach("picture", TEST_PNG);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
   });
 
   test("Should return 400 for non-existing fields", async () => {
-    const invalidPostData = {
-      notExistingField: "some value",
-      message: "This is a new test post",
-      sender: loginUser._id,
-    };
     const response = await request(app)
       .post("/posts")
       .set("Cookie", authCookies)
-      .send(invalidPostData);
+      .field("notExistingField", "some value")
+      .field("message", "This is a new test post")
+      .field("sender", loginUser._id)
+      .attach("picture", TEST_PNG);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
@@ -213,44 +210,36 @@ describe("POST / ", () => {
   test("should return 401 for auth token not equal to login user", async () => {
     await UserModel.create(exampleUser);
 
-    const newPostData = {
-      message: "This is a new test post",
-      sender: exampleUser._id,
-    };
-
     const response = await request(app)
       .post("/posts")
       .set("Cookie", authCookies)
-      .send(newPostData);
+      .field("message", "This is a new test post")
+      .field("sender", exampleUser._id!)
+      .attach("picture", TEST_PNG);
 
     expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
     expect(response.body.message).toBe("User is unauthorized");
   });
 
   test("should return 404 for non-existing sender", async () => {
-    const invalidPostSender = {
-      message: "This is a new test post",
-      sender: "nonexistinguser",
-    };
-
     const response = await request(app)
       .post("/posts")
       .set("Cookie", authCookies)
-      .send(invalidPostSender);
+      .field("message", "This is a new test post")
+      .field("sender", "nonexistinguser")
+      .attach("picture", TEST_PNG);
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("User does not exist");
   });
 
   test("Should return 409 for duplicate post", async () => {
-    const duplicatePostData = {
-      _id: examplePost._id,
-      message: examplePost.message,
-      sender: examplePost.sender,
-    };
     const response = await request(app)
       .post("/posts")
       .set("Cookie", authCookies)
-      .send(duplicatePostData);
+      .field("_id", examplePost._id!)
+      .field("message", examplePost.message)
+      .field("sender", examplePost.sender)
+      .attach("picture", TEST_PNG);
 
     expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
     expect(response.body.message).toBe("Post already exists");
@@ -351,6 +340,72 @@ describe("PUT /:id", () => {
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
+  });
+
+  describe("picture update", () => {
+    const OLD_PICTURE_FILENAME = "old-picture.png";
+    const oldPicturePath = path.join(UPLOAD_DIR, OLD_PICTURE_FILENAME);
+
+    beforeEach(async () => {
+      // Place a real file on disk so deleteFile can unlink it
+      await fs.copyFile(TEST_PNG, oldPicturePath);
+      // Point the seeded post's picture at that file
+      await PostModel.findByIdAndUpdate(examplePost._id, {
+        picture: `http://localhost/public/${OLD_PICTURE_FILENAME}`,
+      });
+    });
+
+    afterEach(async () => {
+      // Clean up in case the test did not delete it
+      await fs.unlink(oldPicturePath).catch(() => undefined);
+    });
+
+    test("Should update the picture of an existing post", async () => {
+      const response = await request(app)
+        .put(`/posts/${examplePost._id}`)
+        .set("Cookie", authCookies)
+        .attach("picture", TEST_PNG);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(response.body.message).toBe("Updated post");
+      expect(response.body.postId).toBe(examplePost._id);
+      expect(response.body.updatedAt).toBeDefined();
+
+      // Old file should have been removed from disk
+      await expect(fs.access(oldPicturePath)).rejects.toThrow();
+
+      // Persisted picture URL should now point at the newly uploaded file
+      const updatedPost = await PostModel.findById(examplePost._id);
+      expect(updatedPost?.picture).not.toBe(
+        `http://localhost/public/${OLD_PICTURE_FILENAME}`,
+      );
+      expect(updatedPost?.picture).toMatch(/\/public\/.+\.png$/);
+    });
+
+    test("Should update both message and picture", async () => {
+      const response = await request(app)
+        .put(`/posts/${examplePost._id}`)
+        .set("Cookie", authCookies)
+        .field("message", "Updated message with new picture")
+        .attach("picture", TEST_PNG);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(response.body.message).toBe("Updated post");
+
+      const updatedPost = await PostModel.findById(examplePost._id);
+      expect(updatedPost?.message).toBe("Updated message with new picture");
+      expect(updatedPost?.picture).toMatch(/\/public\/.+\.png$/);
+    });
+
+    test("Should return 404 when updating picture of a non-existent post", async () => {
+      const response = await request(app)
+        .put(`/posts/nonexistentid`)
+        .set("Cookie", authCookies)
+        .attach("picture", TEST_PNG);
+
+      expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
+      expect(response.body.message).toBe("Post does not exist");
+    });
   });
 });
 
