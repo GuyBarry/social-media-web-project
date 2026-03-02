@@ -12,9 +12,9 @@ import { injectUploadedFileUrl } from "../middlewares/pictureMiddleware";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { validateExistingSender } from "../middlewares/validateExistingUser";
 import { deleteFile, getFileUrl, upload } from "../pictures/pictures.service";
+import { parsePaginationParams } from "../config/pagination.config";
 import { likesService } from "./likes/likes.service";
 import { postService } from "./posts.service";
-import { PaginationParams } from "./posts.repository";
 
 const router = Router();
 
@@ -31,9 +31,7 @@ router.get(
     res: Response,
   ) => {
     const senderId = req.query.sender;
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
-    const pagination: PaginationParams = { page, limit };
+    const pagination = parsePaginationParams(req.query.page, req.query.limit);
 
     const response = senderId
       ? await postService.getPostsBySender(senderId, pagination)

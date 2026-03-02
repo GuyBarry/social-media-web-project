@@ -1,6 +1,7 @@
 import { CreatePost, Post, UpdatePost } from "../entities/dto/post.dto";
 import { NotFoundException } from "../exceptions/notFoundException";
-import { PaginationParams, postRepository } from "./posts.repository";
+import { PaginationParams } from "../config/pagination.config";
+import { postRepository } from "./posts.repository";
 import { PaginateResult } from "mongoose";
 
 export const getAllPosts = async (pagination: PaginationParams): Promise<PaginateResult<Post>> =>

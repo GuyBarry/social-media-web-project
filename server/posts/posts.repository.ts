@@ -5,10 +5,8 @@ import { PopulatedLike, PostModel } from "../entities/mongodb/post.module";
 import { USER_POPULATE_FIELDS } from "../entities/mongodb/user.module";
 import { handleDuplicateKeyException } from "../exceptions/mongoException";
 import { PaginateResult, PopulateOptions } from "mongoose";
+import { PAGINATE_SORT, PaginationParams } from "../config/pagination.config";
 
-export type PaginationParams = { page: number; limit: number };
-
-const PAGINATE_SORT = { createdAt: -1 } as const;
 
 const POPULATE_OPTIONS: PopulateOptions[] = [
   { path: USER_POPULATE_FIELDS.field, select: USER_POPULATE_FIELDS.subFields },

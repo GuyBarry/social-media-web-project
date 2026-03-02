@@ -9,6 +9,7 @@ import {
 } from "../entities/dto/comment.dto";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { validateExistingSender } from "../middlewares/validateExistingUser";
+import { parsePaginationParams } from "../config/pagination.config";
 import { commentsService } from "./comments.service";
 
 const router = Router();
@@ -16,14 +17,15 @@ const router = Router();
 router.get(
   "/",
   async (
-    req: Request<{}, {}, {}, { postId?: Comment["postId"] }>,
+    req: Request<{}, {}, {}, { postId?: Comment["postId"]; page?: string; limit?: string }>,
     res: Response
   ) => {
-    const postId = req.query.postId;
+    const { postId, page, limit } = req.query;
+    const pagination = parsePaginationParams(page, limit);
 
     const response = postId
-      ? await commentsService.getAllCommentsByPostId(postId)
-      : await commentsService.getAllComments();
+      ? await commentsService.getAllCommentsByPostId(postId, pagination)
+      : await commentsService.getAllComments(pagination);
 
     res.status(StatusCodes.OK).send(response);
   }

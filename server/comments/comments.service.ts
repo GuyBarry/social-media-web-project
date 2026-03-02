@@ -1,3 +1,5 @@
+import { PaginateResult } from "mongoose";
+import { PaginationParams } from "../config/pagination.config";
 import { postService } from "../posts/posts.service";
 import { commentsRepository } from "./comments.repository";
 import {
@@ -8,17 +10,20 @@ import {
 import { Post } from "../entities/dto/post.dto";
 import { NotFoundException } from "../exceptions/notFoundException";
 
-export const getAllComments = async (): Promise<Comment[]> =>
-  await commentsRepository.getAllComments();
+export const getAllComments = async (
+  pagination: PaginationParams,
+): Promise<PaginateResult<Comment>> =>
+  await commentsRepository.getAllComments(pagination);
 
 export const getAllCommentsByPostId = async (
-  postId: Post["_id"]
-): Promise<Comment[]> => {
+  postId: Post["_id"],
+  pagination: PaginationParams,
+): Promise<PaginateResult<Comment>> => {
   if (!(await postService.getPostById(postId))) {
     throw new NotFoundException("Post", { postId });
   }
 
-  return await commentsRepository.getAllCommentsByPostId(postId);
+  return await commentsRepository.getAllCommentsByPostId(postId, pagination);
 };
 export const getCommentById = async (id: Comment["_id"]): Promise<Comment> => {
   const comment = await commentsRepository.getCommentById(id);

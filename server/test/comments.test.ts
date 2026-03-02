@@ -51,9 +51,9 @@ describe("GET / ", () => {
       .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toBeGreaterThan(0);
-    expect(response.body[0]._id).toBe(exampleComment._id);
+    expect(Array.isArray(response.body.docs)).toBe(true);
+    expect(response.body.docs.length).toBeGreaterThan(0);
+    expect(response.body.docs[0]._id).toBe(exampleComment._id);
   });
 
   test("Should return empty array when no comments exist", async () => {
@@ -63,8 +63,8 @@ describe("GET / ", () => {
       .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toEqual(0);
+    expect(Array.isArray(response.body.docs)).toBe(true);
+    expect(response.body.docs.length).toEqual(0);
   });
 
   describe("GET /?postId=", () => {
@@ -74,10 +74,10 @@ describe("GET / ", () => {
         .set("Cookie", authCookies);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThan(0);
-      expect(response.body[0]._id).toBe(exampleComment._id);
-      expect(response.body[0].postId).toBe(exampleComment.postId);
+      expect(Array.isArray(response.body.docs)).toBe(true);
+      expect(response.body.docs.length).toBeGreaterThan(0);
+      expect(response.body.docs[0]._id).toBe(exampleComment._id);
+      expect(response.body.docs[0].postId).toBe(exampleComment.postId);
     });
 
     test("Should return empty array when no comments exist for postId", async () => {
@@ -87,8 +87,8 @@ describe("GET / ", () => {
         .set("Cookie", authCookies);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toEqual(0);
+      expect(Array.isArray(response.body.docs)).toBe(true);
+      expect(response.body.docs.length).toEqual(0);
     });
 
     test("Should return 404 when post does not exist", async () => {
