@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { Request, Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { LikeRequest, likeRequestSchema } from "../entities/dto/like.dto";
 import {
