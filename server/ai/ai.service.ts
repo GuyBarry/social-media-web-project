@@ -1,6 +1,14 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const apiKey = process.env.GEMINI_API_KEY;
+
+if (!apiKey) {
+  throw new Error(
+    "GEMINI_API_KEY environment variable is not set. Please configure it before starting the server."
+  );
+}
+
+const ai = new GoogleGenAI({ apiKey });
 const model = "gemini-3-flash-preview";
 
 const systemInstruction = "help me generate content for a social media post based on the following description: ";
