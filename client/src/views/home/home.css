@@ -1,8 +1,20 @@
 .home-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
   width: 100%;
   min-height: 100vh;
   background-color: var(--background-default, #f5f5f5);
+  gap: 16px;
+
+  > * {
+    padding: 30px;
+  }
+}
+
+.home-sidebar {
+  /* left / right column — 1/4 of screen each */
+}
+
+.home-main {
+  /* center column — 1/2 of screen */
 }
