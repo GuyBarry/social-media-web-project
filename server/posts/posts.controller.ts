@@ -10,9 +10,10 @@ import {
 } from "../entities/dto/post.dto";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { validateExistingSender } from "../middlewares/validateExistingUser";
-import { getFileUrl, upload, deleteFile, injectUploadedFileUrl } from "../pictures/pictures.service";
+import { getFileUrl, upload, deleteFile } from "../pictures/pictures.service";
 import { likesService } from "./likes/likes.service";
 import { postService } from "./posts.service";
+import { injectUploadedFileUrl } from "../middlewares/pictureMiddleware";
 
 const router = Router();
 
