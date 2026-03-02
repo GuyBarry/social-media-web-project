@@ -12,7 +12,10 @@ import { injectUploadedFileUrl } from "../middlewares/pictureMiddleware";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { validateExistingSender } from "../middlewares/validateExistingUser";
 import { deleteFile, getFileUrl, upload } from "../pictures/pictures.service";
-import { parsePaginationParams } from "../config/pagination.config";
+import {
+  PaginationParams,
+  parsePaginationParams,
+} from "../config/pagination.config";
 import { likesService } from "./likes/likes.service";
 import { postService } from "./posts.service";
 
@@ -26,15 +29,15 @@ router.get(
       {},
       {},
       {},
-      { sender?: Post["sender"]; page?: string; limit?: string }
+      Partial<PaginationParams> & { sender?: Post["sender"] }
     >,
     res: Response,
   ) => {
-    const senderId = req.query.sender;
-    const pagination = parsePaginationParams(req.query.page, req.query.limit);
+    const { page, limit, sender } = req.query;
+    const pagination = parsePaginationParams(page, limit);
 
-    const response = senderId
-      ? await postService.getPostsBySender(senderId, pagination)
+    const response = sender
+      ? await postService.getPostsBySender(sender, pagination)
       : await postService.getAllPosts(pagination);
 
     res.status(StatusCodes.OK).send(response);
