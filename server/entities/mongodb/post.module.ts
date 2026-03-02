@@ -1,6 +1,8 @@
-import { model, Schema } from "mongoose";
+import { model, Schema, PaginateModel } from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 import { v4 as uuidV4 } from "uuid";
 import { Post } from "../dto/post.dto";
+import { Like } from "../dto/like.dto";
 
 const postSchema = new Schema(
   {
@@ -26,7 +28,7 @@ const postSchema = new Schema(
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
 postSchema.virtual("likes", {
@@ -42,4 +44,8 @@ postSchema.virtual("numComments", {
   count: true,
 });
 
-export const PostModel = model<Post>("Post", postSchema);
+postSchema.plugin(mongoosePaginate);
+
+export const PostModel = model<Post>("Post", postSchema) as PaginateModel<Post>;
+
+export type PopulatedLike = Pick<Like, "userId">;

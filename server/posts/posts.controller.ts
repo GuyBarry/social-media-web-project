@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { Request, Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { LikeRequest, likeRequestSchema } from "../entities/dto/like.dto";
 import {
@@ -8,12 +8,13 @@ import {
   UpdatePost,
   updatePostSchema,
 } from "../entities/dto/post.dto";
+import { injectUploadedFileUrl } from "../middlewares/pictureMiddleware";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { validateExistingSender } from "../middlewares/validateExistingUser";
-import { getFileUrl, upload, deleteFile } from "../pictures/pictures.service";
+import { deleteFile, getFileUrl, upload } from "../pictures/pictures.service";
 import { likesService } from "./likes/likes.service";
 import { postService } from "./posts.service";
-import { injectUploadedFileUrl } from "../middlewares/pictureMiddleware";
+import { PaginationParams } from "./posts.repository";
 
 const router = Router();
 
@@ -21,14 +22,22 @@ const router = Router();
 router.get(
   "/",
   async (
-    req: Request<{}, {}, {}, { sender?: Post["sender"] }>,
+    req: Request<
+      {},
+      {},
+      {},
+      { sender?: Post["sender"]; page?: string; limit?: string }
+    >,
     res: Response,
   ) => {
     const senderId = req.query.sender;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const pagination: PaginationParams = { page, limit };
 
     const response = senderId
-      ? await postService.getPostsBySender(senderId)
-      : await postService.getAllPosts();
+      ? await postService.getPostsBySender(senderId, pagination)
+      : await postService.getAllPosts(pagination);
 
     res.status(StatusCodes.OK).send(response);
   },
@@ -52,7 +61,9 @@ router.post(
     const postData = req.body;
 
     if (!req.file) {
-      res.status(StatusCodes.BAD_REQUEST).send({ message: "Picture file is required" });
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .send({ message: "Picture file is required" });
       return;
     }
 

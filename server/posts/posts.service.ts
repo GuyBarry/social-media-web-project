@@ -1,9 +1,10 @@
 import { CreatePost, Post, UpdatePost } from "../entities/dto/post.dto";
 import { NotFoundException } from "../exceptions/notFoundException";
-import { postRepository } from "./posts.repository";
+import { PaginationParams, postRepository } from "./posts.repository";
+import { PaginateResult } from "mongoose";
 
-export const getAllPosts = async (): Promise<Post[]> =>
-  await postRepository.getAllPosts();
+export const getAllPosts = async (pagination: PaginationParams): Promise<PaginateResult<Post>> =>
+  await postRepository.getAllPosts(pagination);
 
 export const getPostById = async (id: Post["_id"]): Promise<Post> => {
   const post = await postRepository.getPostById(id);
@@ -15,8 +16,9 @@ export const getPostById = async (id: Post["_id"]): Promise<Post> => {
 };
 
 export const getPostsBySender = async (
-  senderId: Post["sender"]
-): Promise<Post[]> => await postRepository.getPostsBySender(senderId);
+  senderId: Post["sender"],
+  pagination: PaginationParams,
+): Promise<PaginateResult<Post>> => await postRepository.getPostsBySender(senderId, pagination);
 
 export const createPost = async (postData: CreatePost): Promise<Post> =>
   await postRepository.createPost(postData);

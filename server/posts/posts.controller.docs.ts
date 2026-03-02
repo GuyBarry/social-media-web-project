@@ -13,34 +13,63 @@
  *         schema:
  *           type: string
  *         description: Optional sender id to filter posts
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *           minimum: 1
+ *         description: Page number (1-based)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *           minimum: 1
+ *         description: Number of posts per page
  *     responses:
  *       200:
- *         description: A list of posts
+ *         description: A paginated list of posts
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                   message:
- *                     type: string
- *                   sender:
- *                     type: string
- *                   likes:
- *                     type: array
- *                     items:
- *                       type: string
- *                     description: Array of user IDs who liked this post
- *                   numComments:
- *                     type: integer
- *                     description: Number of comments on this post
- *                   createdAt:
- *                     type: string
- *                   updatedAt:
- *                     type: string
+ *               type: object
+ *               properties:
+ *                 posts:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       message:
+ *                         type: string
+ *                       sender:
+ *                         type: string
+ *                       likes:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                         description: Array of user IDs who liked this post
+ *                       numComments:
+ *                         type: integer
+ *                         description: Number of comments on this post
+ *                       createdAt:
+ *                         type: string
+ *                       updatedAt:
+ *                         type: string
+ *                 total:
+ *                   type: integer
+ *                   description: Total number of posts matching the query
+ *                 page:
+ *                   type: integer
+ *                   description: Current page number
+ *                 limit:
+ *                   type: integer
+ *                   description: Number of posts per page
+ *                 totalPages:
+ *                   type: integer
+ *                   description: Total number of pages
  *       401:
  *         description: Unauthorized
  *         content:

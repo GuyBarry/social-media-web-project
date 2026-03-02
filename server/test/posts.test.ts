@@ -58,13 +58,17 @@ describe("GET / ", () => {
       .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toBeGreaterThan(0);
-    expect(response.body[0]._id).toBe(examplePost._id);
-    expect(Array.isArray(response.body[0].likes)).toBe(true);
-    expect(response.body[0].likes).toHaveLength(1);
-    expect(response.body[0].likes).toContain(loginUser._id);
-    expect(response.body[0].numComments).toBe(0);
+    expect(Array.isArray(response.body.docs)).toBe(true);
+    expect(response.body.docs.length).toBeGreaterThan(0);
+    expect(response.body.docs[0]._id).toBe(examplePost._id);
+    expect(Array.isArray(response.body.docs[0].likes)).toBe(true);
+    expect(response.body.docs[0].likes).toHaveLength(1);
+    expect(response.body.docs[0].likes).toContain(loginUser._id);
+    expect(response.body.docs[0].numComments).toBe(0);
+    expect(response.body.totalDocs).toBe(1);
+    expect(response.body.page).toBe(1);
+    expect(response.body.limit).toBe(10);
+    expect(response.body.totalPages).toBe(1);
   });
 
   test("Should return numComments reflecting the number of comments", async () => {
@@ -75,7 +79,7 @@ describe("GET / ", () => {
       .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
-    expect(response.body[0].numComments).toBe(1);
+    expect(response.body.docs[0].numComments).toBe(1);
   });
 
   test("Should return empty array when no posts exist", async () => {
@@ -86,8 +90,10 @@ describe("GET / ", () => {
       .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toEqual(0);
+    expect(Array.isArray(response.body.docs)).toBe(true);
+    expect(response.body.docs.length).toEqual(0);
+    expect(response.body.totalDocs).toBe(0);
+    expect(response.body.totalPages).toBe(1);
   });
 
   test("Should return empty array of likes when no likes exist for a post", async () => {
@@ -98,10 +104,10 @@ describe("GET / ", () => {
       .set("Cookie", authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toBeGreaterThan(0);
-    expect(Array.isArray(response.body[0].likes)).toBe(true);
-    expect(response.body[0].likes).toHaveLength(0);
+    expect(Array.isArray(response.body.docs)).toBe(true);
+    expect(response.body.docs.length).toBeGreaterThan(0);
+    expect(Array.isArray(response.body.docs[0].likes)).toBe(true);
+    expect(response.body.docs[0].likes).toHaveLength(0);
   });
 
   describe("GET /?sender=", () => {
@@ -111,11 +117,14 @@ describe("GET / ", () => {
         .set("Cookie", authCookies);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThan(0);
-      expect(response.body[0]._id).toBe(examplePost._id);
-      expect(response.body[0].sender._id).toBe(examplePost.sender);
-      expect(response.body[0].numComments).toBe(0);
+      expect(Array.isArray(response.body.docs)).toBe(true);
+      expect(response.body.docs.length).toBeGreaterThan(0);
+      expect(response.body.docs[0]._id).toBe(examplePost._id);
+      expect(response.body.docs[0].sender._id).toBe(examplePost.sender);
+      expect(response.body.docs[0].numComments).toBe(0);
+      expect(response.body.totalDocs).toBe(1);
+      expect(response.body.page).toBe(1);
+      expect(response.body.totalPages).toBe(1);
     });
 
     test("Should return numComments reflecting the number of comments when filtering by sender", async () => {
@@ -126,7 +135,7 @@ describe("GET / ", () => {
         .set("Cookie", authCookies);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
-      expect(response.body[0].numComments).toBe(1);
+      expect(response.body.docs[0].numComments).toBe(1);
     });
 
     test("Should return empty array when no posts exist for sender", async () => {
@@ -135,8 +144,9 @@ describe("GET / ", () => {
         .set("Cookie", authCookies);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toEqual(0);
+      expect(Array.isArray(response.body.docs)).toBe(true);
+      expect(response.body.docs.length).toEqual(0);
+      expect(response.body.totalDocs).toBe(0);
     });
 
     test("Should return all posts when sender is null", async () => {
@@ -145,8 +155,77 @@ describe("GET / ", () => {
         .set("Cookie", authCookies);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThan(0);
+      expect(Array.isArray(response.body.docs)).toBe(true);
+      expect(response.body.docs.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe("GET /?page=&limit=", () => {
+    beforeEach(async () => {
+      // Seed 5 total posts for pagination tests
+      await PostModel.deleteMany();
+      await PostModel.insertMany([
+        { _id: "p1", sender: loginUser._id, message: "Post 1", picture: "http://localhost/public/1.png" },
+        { _id: "p2", sender: loginUser._id, message: "Post 2", picture: "http://localhost/public/2.png" },
+        { _id: "p3", sender: loginUser._id, message: "Post 3", picture: "http://localhost/public/3.png" },
+        { _id: "p4", sender: loginUser._id, message: "Post 4", picture: "http://localhost/public/4.png" },
+        { _id: "p5", sender: loginUser._id, message: "Post 5", picture: "http://localhost/public/5.png" },
+      ]);
+    });
+
+    test("Should return first page with correct pagination metadata", async () => {
+      const response = await request(app)
+        .get("/posts?page=1&limit=2")
+        .set("Cookie", authCookies);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(response.body.docs).toHaveLength(2);
+      expect(response.body.totalDocs).toBe(5);
+      expect(response.body.page).toBe(1);
+      expect(response.body.limit).toBe(2);
+      expect(response.body.totalPages).toBe(3);
+    });
+
+    test("Should return second page", async () => {
+      const response = await request(app)
+        .get("/posts?page=2&limit=2")
+        .set("Cookie", authCookies);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(response.body.docs).toHaveLength(2);
+      expect(response.body.page).toBe(2);
+    });
+
+    test("Should return last partial page", async () => {
+      const response = await request(app)
+        .get("/posts?page=3&limit=2")
+        .set("Cookie", authCookies);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(response.body.docs).toHaveLength(1);
+      expect(response.body.page).toBe(3);
+      expect(response.body.totalPages).toBe(3);
+    });
+
+    test("Should return empty posts array when page exceeds totalPages", async () => {
+      const response = await request(app)
+        .get("/posts?page=99&limit=10")
+        .set("Cookie", authCookies);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(response.body.docs).toHaveLength(0);
+      expect(response.body.totalDocs).toBe(5);
+    });
+
+    test("Should default to page=1 and limit=10 when not provided", async () => {
+      const response = await request(app)
+        .get("/posts")
+        .set("Cookie", authCookies);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(response.body.page).toBe(1);
+      expect(response.body.limit).toBe(10);
+      expect(response.body.docs).toHaveLength(5);
     });
   });
 });
