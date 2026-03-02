@@ -12,6 +12,7 @@ import { PostModel } from "../entities/mongodb/post.module";
 import { UserModel } from "../entities/mongodb/user.module";
 import { CommentModel } from "../entities/mongodb/comment.module";
 import {
+  cleanupTestPictures,
   exampleComment,
   exampleLike,
   examplePost,
@@ -48,6 +49,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  await cleanupTestPictures();
   await mongoose.connection.close();
 });
 
