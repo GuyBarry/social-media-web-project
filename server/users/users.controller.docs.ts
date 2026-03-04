@@ -6,7 +6,7 @@
  *      - Users
  *     summary: Get all users
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     responses:
  *       200:
  *         description: A list of users
@@ -51,7 +51,7 @@
  *      - Users
  *     summary: Get user by id
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -111,7 +111,7 @@
  *      - Users
  *     summary: Create new user
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -181,7 +181,7 @@
  *      - Users
  *     summary: Update user
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -273,7 +273,7 @@
  *      - Users
  *     summary: Delete user
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id

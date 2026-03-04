@@ -8,12 +8,16 @@ import {
   UpdatePost,
   updatePostSchema,
 } from "../entities/dto/post.dto";
+import { injectUploadedFileUrl } from "../middlewares/pictureMiddleware";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { validateExistingSender } from "../middlewares/validateExistingUser";
-import { getFileUrl, upload, deleteFile } from "../pictures/pictures.service";
+import { deleteFile, getFileUrl, upload } from "../pictures/pictures.service";
+import {
+  PaginationParams,
+  parsePaginationParams,
+} from "../config/pagination.config";
 import { likesService } from "./likes/likes.service";
 import { postService } from "./posts.service";
-import { injectUploadedFileUrl } from "../middlewares/pictureMiddleware";
 
 const router = Router();
 
@@ -21,14 +25,20 @@ const router = Router();
 router.get(
   "/",
   async (
-    req: Request<{}, {}, {}, { sender?: Post["sender"] }>,
+    req: Request<
+      {},
+      {},
+      {},
+      Partial<PaginationParams> & { sender?: Post["sender"] }
+    >,
     res: Response,
   ) => {
-    const senderId = req.query.sender;
+    const { page, limit, sender } = req.query;
+    const pagination = parsePaginationParams(page, limit);
 
-    const response = senderId
-      ? await postService.getPostsBySender(senderId)
-      : await postService.getAllPosts();
+    const response = sender
+      ? await postService.getPostsBySender(sender, pagination)
+      : await postService.getAllPosts(pagination);
 
     res.status(StatusCodes.OK).send(response);
   },
@@ -52,7 +62,9 @@ router.post(
     const postData = req.body;
 
     if (!req.file) {
-      res.status(StatusCodes.BAD_REQUEST).send({ message: "Picture file is required" });
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .send({ message: "Picture file is required" });
       return;
     }
 

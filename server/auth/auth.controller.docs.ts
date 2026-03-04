@@ -113,7 +113,7 @@
  *      - Auth
  *     summary: Logout user
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     responses:
  *       200:
  *         description: Logout successful
