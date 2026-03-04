@@ -1,4 +1,6 @@
 import { hashSync } from "bcrypt";
+import fs from "fs/promises";
+import path from "path";
 import { ACCESS_TOKEN_COOKIE_KEY } from "../auth/auth.contoller";
 import { LoginTokens } from "../entities/dto/auth.dto";
 import { CreateComment } from "../entities/dto/comment.dto";
@@ -8,6 +10,7 @@ import { CommentModel } from "../entities/mongodb/comment.module";
 import { LikeModel } from "../entities/mongodb/like.module";
 import { PostModel } from "../entities/mongodb/post.module";
 import { UserModel } from "../entities/mongodb/user.module";
+import { UPLOAD_DIR } from "../pictures/pictures.config";
 import { PASSWORD_SALT_ROUNDS } from "../users/users.service";
 
 export const loginUser = {
@@ -56,4 +59,12 @@ export const truncateDatabase = async (): Promise<void> => {
   await PostModel.deleteMany();
   await CommentModel.deleteMany();
   await LikeModel.deleteMany();
+};
+
+export const cleanupTestPictures = async (): Promise<void> => {
+  const files = await fs.readdir(UPLOAD_DIR);
+  const testFiles = files.filter((f) => f.endsWith("_test.png"));
+  await Promise.all(
+    testFiles.map((f) => fs.unlink(path.join(UPLOAD_DIR, f)).catch(() => undefined))
+  );
 };

@@ -21,8 +21,7 @@ export const storage = multer.diskStorage({
     file: MulterFile,
     callback: (error: Error | null, filename: string) => void,
   ) {
-    const ext = path.extname(file.originalname).toLowerCase();
-    callback(null, `${Date.now()}${ext}`);
+    callback(null, `${Date.now()}_${file.originalname}`);
   },
 });
 

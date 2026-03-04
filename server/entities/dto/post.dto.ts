@@ -9,6 +9,7 @@ export const postSchema = baseModule
     message: notEmptyStringSchema("Message"),
     picture: notEmptyStringSchema("Picture"),
     likes: z.array(userSchema.shape._id),
+    numComments: z.number().int().nonnegative(),
   })
   .strict();
 export type Post = z.infer<typeof postSchema>;

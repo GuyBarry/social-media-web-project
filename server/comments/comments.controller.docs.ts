@@ -6,35 +6,60 @@
  *      - Comments
  *     summary: Get all comments
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: query
  *         name: postId
  *         schema:
  *           type: string
  *         description: Optional post id to filter comments
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *           minimum: 1
+ *         description: Page number (1-based)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *           minimum: 1
+ *         description: Number of comments per page
  *     responses:
  *       200:
- *         description: A list of comments
+ *         description: A paginated list of comments
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                   message:
- *                     type: string
- *                   sender:
- *                     type: string
- *                   postId:
- *                     type: string
- *                   createdAt:
- *                     type: string
- *                   updatedAt:
- *                     type: string
+ *               type: object
+ *               properties:
+ *                 docs:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       message:
+ *                         type: string
+ *                       sender:
+ *                         type: string
+ *                       postId:
+ *                         type: string
+ *                       createdAt:
+ *                         type: string
+ *                       updatedAt:
+ *                         type: string
+ *                 totalDocs:
+ *                   type: integer
+ *                 page:
+ *                   type: integer
+ *                 limit:
+ *                   type: integer
+ *                 totalPages:
+ *                   type: integer
  *       401:
  *         description: Unauthorized
  *         content:
@@ -65,7 +90,7 @@
  *      - Comments
  *     summary: Get comment by id
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -122,7 +147,7 @@
  *      - Comments
  *     summary: Create new comment
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -202,7 +227,7 @@
  *      - Comments
  *     summary: Update a comment by id
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -272,7 +297,7 @@
  *      - Comments
  *     summary: Delete comment by id
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id

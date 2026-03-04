@@ -25,8 +25,7 @@ router.post(
 
     res.cookie(REFRESH_TOKEN_COOKIE_KEY, refreshToken.token, {
       httpOnly: true,
-      sameSite: "none",
-      secure: true,
+      sameSite: "lax",
       maxAge: refreshToken.cookieExpiry * 1_000,
     });
 

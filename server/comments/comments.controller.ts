@@ -9,6 +9,10 @@ import {
 } from "../entities/dto/comment.dto";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { validateExistingSender } from "../middlewares/validateExistingUser";
+import {
+  PaginationParams,
+  parsePaginationParams,
+} from "../config/pagination.config";
 import { commentsService } from "./comments.service";
 
 const router = Router();
@@ -16,17 +20,23 @@ const router = Router();
 router.get(
   "/",
   async (
-    req: Request<{}, {}, {}, { postId?: Comment["postId"] }>,
-    res: Response
+    req: Request<
+      {},
+      {},
+      {},
+      Partial<PaginationParams> & { postId?: Comment["postId"] }
+    >,
+    res: Response,
   ) => {
-    const postId = req.query.postId;
+    const { postId, page, limit } = req.query;
+    const pagination = parsePaginationParams(page, limit);
 
     const response = postId
-      ? await commentsService.getAllCommentsByPostId(postId)
-      : await commentsService.getAllComments();
+      ? await commentsService.getAllCommentsByPostId(postId, pagination)
+      : await commentsService.getAllComments(pagination);
 
     res.status(StatusCodes.OK).send(response);
-  }
+  },
 );
 
 // Get comment by id
@@ -37,7 +47,7 @@ router.get(
     const comment = await commentsService.getCommentById(id);
 
     res.status(StatusCodes.OK).send(comment);
-  }
+  },
 );
 
 // Create comment
@@ -55,7 +65,7 @@ router.post(
       commentId: _id,
       createdAt,
     });
-  }
+  },
 );
 
 // Update comment
@@ -64,14 +74,14 @@ router.put(
   validateRequestBody(updateCommentSchema),
   async (
     req: Request<{ id: Comment["_id"] }, {}, UpdateComment>,
-    res: Response
+    res: Response,
   ) => {
     const id = req.params.id;
     const commentData = req.body;
 
     const { _id, updatedAt } = await commentsService.updateComment(
       id,
-      commentData
+      commentData,
     );
 
     res.status(StatusCodes.OK).send({
@@ -79,7 +89,7 @@ router.put(
       commentId: _id,
       updatedAt: updatedAt,
     });
-  }
+  },
 );
 
 // Delete a comment by Id

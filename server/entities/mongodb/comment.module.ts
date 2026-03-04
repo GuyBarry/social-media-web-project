@@ -1,4 +1,5 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, PaginateModel } from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 import { v4 as uuidV4 } from "uuid";
 import { Comment } from "../dto/comment.dto";
 
@@ -25,4 +26,10 @@ const commentSchema = new Schema(
   { timestamps: true }
 );
 
-export const CommentModel = model<Comment>("Comment", commentSchema);
+export const COMMENTS_POPULATE_FIELD = {
+  path: "numComments",
+};
+
+commentSchema.plugin(mongoosePaginate);
+
+export const CommentModel = model<Comment>("Comment", commentSchema) as PaginateModel<Comment>;
