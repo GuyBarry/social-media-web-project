@@ -50,9 +50,7 @@ export const ProfileScreen = () => {
         <ProfileBanner bannercolor={bannerColor} />
 
         <AvatarRow>
-          <ProfileAvatar>
-            {displayName.charAt(0).toUpperCase()}
-          </ProfileAvatar>
+          <ProfileAvatar>{displayName.charAt(0).toUpperCase()}</ProfileAvatar>
 
           <EditProfileButton
             variant="outlined"
@@ -64,22 +62,22 @@ export const ProfileScreen = () => {
         </AvatarRow>
 
         <UserInfoBox>
-          <DisplayName variant="h6">
-            {displayName}
-          </DisplayName>
+          <DisplayName variant="h6">{displayName}</DisplayName>
           <HandleText variant="body2" color="text.secondary">
             {handle}
           </HandleText>
-          <BioText variant="body1">
-            {bio}
-          </BioText>
+          <BioText variant="body1">{bio}</BioText>
         </UserInfoBox>
 
         <MetaStack direction="row" spacing={2.5}>
           {birthDate && (
             <MetaItem spacing={0.75}>
               <CalendarTodayIcon fontSize="small" color="disabled" />
-              <Typography sx={{ display: "flex", alignItems: "center" }} variant="body2" color="text.secondary">
+              <Typography
+                sx={{ margin: "0", display: "flex", alignItems: "center" }}
+                variant="body2"
+                color="text.secondary"
+              >
                 {birthDate}
               </Typography>
             </MetaItem>
@@ -100,12 +98,8 @@ export const ProfileScreen = () => {
             { label: "LIKES", value: likesCount },
           ].map(({ label, value }) => (
             <StatItem key={label} spacing={0.25}>
-              <StatValue variant="h6">
-                {value.toLocaleString()}
-              </StatValue>
-              <StatLabel variant="caption">
-                {label}
-              </StatLabel>
+              <StatValue variant="h6">{value.toLocaleString()}</StatValue>
+              <StatLabel variant="caption">{label}</StatLabel>
             </StatItem>
           ))}
         </StatsStack>
