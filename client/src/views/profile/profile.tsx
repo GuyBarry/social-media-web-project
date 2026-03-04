@@ -169,6 +169,24 @@ export const ProfileScreen = () => {
     );
   }
 
+  if (!user) return null;
+
+  const bannerColor = user.bannerColor ?? "#667eea";
+  const displayName = user.username;
+  const handle = `@${user.username.toLowerCase().replace(/\s+/g, "")}`;
+  const bio = user.bio ?? "No bio yet.";
+  const birthDate = user.birthDate
+    ? new Date(user.birthDate).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
+    : null;
+  const email = user.email;
+
+  const postsCount = user.postsCount ?? 0;
+  const likesCount = user.likesCount ?? 0;
+
   return (
     <ProfilePage>
       <ProfileCard elevation={3}>

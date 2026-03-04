@@ -112,7 +112,6 @@ export const BioText = styled(Typography)({
 export const MetaStack = styled(Stack)({
   paddingLeft: 24,
   paddingRight: 24,
-
   flexWrap: "wrap",
 });
 
