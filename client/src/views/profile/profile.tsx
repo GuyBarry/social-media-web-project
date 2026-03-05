@@ -24,6 +24,7 @@ import {
   UserInfoBox,
 } from "./profile.styled";
 import { EditProfileScreen } from "./editProfile";
+import { avatarImageSlotProps } from "./profile.utils";
 
 export const ProfileScreen = () => {
   const { user } = useAuth();
@@ -63,7 +64,12 @@ export const ProfileScreen = () => {
         <ProfileBanner bannercolor={bannerColor} />
 
         <AvatarRow>
-          <ProfileAvatar>{displayName.charAt(0).toUpperCase()}</ProfileAvatar>
+          <ProfileAvatar
+            src={user.image ?? undefined}
+            slotProps={avatarImageSlotProps}
+          >
+            {displayName.charAt(0).toUpperCase()}
+          </ProfileAvatar>
 
           <EditProfileButton
             variant="outlined"

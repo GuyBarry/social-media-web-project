@@ -19,21 +19,29 @@ import {
   ProfilePage,
   SaveButton,
 } from "./profile.styled";
+import { avatarImageSlotProps } from "./profile.utils";
 
 interface EditProfileScreenProps {
   onCancel: () => void;
   onSave: () => void;
 }
 
-export const EditProfileScreen = ({ onCancel, onSave }: EditProfileScreenProps) => {
+export const EditProfileScreen = ({
+  onCancel,
+  onSave,
+}: EditProfileScreenProps) => {
   const { user, updateUser } = useAuth();
   const [editUsername, setEditUsername] = useState(user?.username ?? "");
   const [editBio, setEditBio] = useState(user?.bio ?? "");
   const [editBirthDate, setEditBirthDate] = useState(() => {
     const parsed = user?.birthDate ? new Date(user.birthDate) : null;
-    return parsed && !isNaN(parsed.getTime()) ? parsed.toISOString().split("T")[0] : "";
+    return parsed && !isNaN(parsed.getTime())
+      ? parsed.toISOString().split("T")[0]
+      : "";
   });
-  const [editAvatarPreview, setEditAvatarPreview] = useState<string | null>(null);
+  const [editAvatarPreview, setEditAvatarPreview] = useState<string | null>(
+    user?.image ?? null,
+  );
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -45,12 +53,14 @@ export const EditProfileScreen = ({ onCancel, onSave }: EditProfileScreenProps) 
   const handleSave = async () => {
     const formData = new FormData();
 
-    if (editUsername !== user.username) formData.append("username", editUsername);
+    if (editUsername !== user.username)
+      formData.append("username", editUsername);
     if (editBio !== (user.bio ?? "")) formData.append("bio", editBio);
     if (editBirthDate) {
-      const existingDate = user.birthDate instanceof Date && !isNaN(user.birthDate.getTime())
-        ? user.birthDate.toISOString().split("T")[0]
-        : "";
+      const existingDate =
+        user.birthDate instanceof Date && !isNaN(user.birthDate.getTime())
+          ? user.birthDate.toISOString().split("T")[0]
+          : "";
       if (editBirthDate !== existingDate) {
         formData.append("birthDate", editBirthDate);
       }
@@ -68,7 +78,11 @@ export const EditProfileScreen = ({ onCancel, onSave }: EditProfileScreenProps) 
 
         <AvatarRow>
           <AvatarWrapper onClick={() => fileInputRef.current?.click()}>
-            <ProfileAvatar className="avatar-img" src={editAvatarPreview ?? undefined}>
+            <ProfileAvatar
+              className="avatar-img"
+              src={editAvatarPreview ?? undefined}
+              slotProps={avatarImageSlotProps}
+            >
               {!editAvatarPreview && displayName.charAt(0).toUpperCase()}
             </ProfileAvatar>
             <AvatarCameraOverlay className="avatar-overlay">
@@ -129,7 +143,11 @@ export const EditProfileScreen = ({ onCancel, onSave }: EditProfileScreenProps) 
           </EditFieldWide>
 
           <EditActionsRow>
-            <SaveButton variant="contained" color="primary" onClick={handleSave}>
+            <SaveButton
+              variant="contained"
+              color="primary"
+              onClick={handleSave}
+            >
               Save Changes
             </SaveButton>
             <CancelButton variant="outlined" onClick={onCancel}>

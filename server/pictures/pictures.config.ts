@@ -1,3 +1,4 @@
+import fs from "fs";
 import multer from "multer";
 import path from "path";
 import { Request } from "express";
@@ -5,6 +6,10 @@ import { Request } from "express";
 type MulterFile = Express.Multer.File;
 
 export const UPLOAD_DIR = path.resolve(__dirname, "../public");
+
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
 
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 

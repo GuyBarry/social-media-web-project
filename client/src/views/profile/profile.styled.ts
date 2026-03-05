@@ -1,4 +1,12 @@
-import { Avatar, Box, Button, Card, Divider, Stack, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  Divider,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 const BANNER_HEIGHT = 140;
@@ -22,11 +30,13 @@ export const ProfileCard = styled(Card)({
   overflow: "visible",
 });
 
-export const ProfileBanner = styled(Box)<{ bannercolor: string }>(({ bannercolor }) => ({
-  height: BANNER_HEIGHT,
-  backgroundColor: bannercolor,
-  borderRadius: "16px 16px 0 0",
-}));
+export const ProfileBanner = styled(Box)<{ bannercolor: string }>(
+  ({ bannercolor }) => ({
+    height: BANNER_HEIGHT,
+    backgroundColor: bannercolor,
+    borderRadius: "16px 16px 0 0",
+  }),
+);
 
 export const AvatarRow = styled(Box)({
   display: "flex",
