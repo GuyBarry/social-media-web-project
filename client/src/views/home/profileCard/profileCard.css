@@ -9,31 +9,23 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   width: 100%;
   box-sizing: border-box;
-
-  > * {
-    padding: 10px 0;
-  }
-}
-
-.profile-card-avatar {
-  width: 72px !important;
-  height: 72px !important;
-  font-size: 2rem !important;
-  margin-bottom: 2px;
 }
 
 .profile-card-username {
   text-align: center;
+  padding: 10px 0;
 }
 
 .profile-card-email {
   text-align: center;
   word-break: break-all;
+  padding: 10px 0;
 }
 
 .profile-card-divider {
   width: 100%;
   margin: 4px 0;
+  padding: 10px 0;
 }
 
 .profile-card-stats {
@@ -42,6 +34,7 @@
   align-items: center;
   gap: 0;
   padding: 20px 0;
+  padding: 10px 0;
 }
 
 .profile-card-btn {
@@ -52,9 +45,11 @@
   color: var(--mui-palette-text-primary) !important;
   box-shadow: none !important;
   font-weight: 700 !important;
+  padding: 10px 0;
 }
 
 .profile-card-btn:hover {
   background-color: rgb(234, 233, 233) !important;
   box-shadow: none !important;
+  padding: 10px 0;
 }

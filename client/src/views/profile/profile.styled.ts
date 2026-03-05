@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Button,
   Card,
@@ -75,16 +74,6 @@ export const AvatarCameraOverlay = styled(Box)({
   pointerEvents: "none",
   color: "#fff",
 });
-
-export const ProfileAvatar = styled(Avatar)(({ theme }) => ({
-  width: AVATAR_SIZE,
-  height: AVATAR_SIZE,
-  backgroundColor: theme.palette.secondary.main,
-  fontSize: "2rem",
-  fontWeight: 700,
-  boxShadow: theme.shadows[2],
-  transition: "filter 0.2s ease",
-}));
 
 export const EditProfileButton = styled(Button)(({ theme }) => ({
   borderRadius: 4,

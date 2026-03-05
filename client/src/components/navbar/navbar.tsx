@@ -4,6 +4,8 @@ import { Share2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/authContext";
 import "./navbar.css";
+import { ProfileAvatar } from "../shared.styled";
+import { avatarImageSlotProps } from "../../views/profile/profile.utils";
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
@@ -19,6 +21,8 @@ export const Navbar = () => {
     });
   };
 
+  if (!user) return null;
+
   return (
     <Box className="navbar">
       <div className="navbar-logo" onClick={() => navigate("/")}>
@@ -33,9 +37,13 @@ export const Navbar = () => {
           <Typography variant="body2" color="text.secondary">
             {user?.username}
           </Typography>
-          <Avatar sx={{ width: 36, height: 36, bgcolor: "primary.main" }}>
-            {user?.username?.[0]?.toUpperCase() ?? "U"}
-          </Avatar>
+          <ProfileAvatar
+            size={44}
+            src={user.image ?? undefined}
+            slotProps={avatarImageSlotProps}
+          >
+            {user.username.charAt(0).toUpperCase()}
+          </ProfileAvatar>
         </div>
         <IconButton
           onClick={handleLogout}

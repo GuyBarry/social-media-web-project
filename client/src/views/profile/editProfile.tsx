@@ -15,12 +15,12 @@ import {
   EditFieldWide,
   EditFormBox,
   FieldLabel,
-  ProfileAvatar,
   ProfileBanner,
   ProfileCard,
   ProfilePage,
   SaveButton,
 } from "./profile.styled";
+import { ProfileAvatar } from "../../components/shared.styled";
 import { avatarImageSlotProps } from "./profile.utils";
 
 interface EditProfileScreenProps {
@@ -50,7 +50,7 @@ export const EditProfileScreen = ({
 
   if (!user) return null;
 
-  const bannerColor = user.bannerColor ?? "#667eea";
+  const bannerColor = "#8497eeff";;
   const displayName = user.username;
 
   const handleSave = async () => {

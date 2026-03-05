@@ -8,7 +8,6 @@ export interface User {
   bio?: string;
   image?: string;
   birthDate: Date;
-  bannerColor?: string;
   postsCount?: number;
   likesCount?: number;
 }

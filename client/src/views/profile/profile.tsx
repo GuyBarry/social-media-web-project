@@ -12,7 +12,6 @@ import {
   MetaItem,
   MetaStack,
   MetaText,
-  ProfileAvatar,
   ProfileBanner,
   ProfileCard,
   ProfileDivider,
@@ -23,6 +22,7 @@ import {
   StatsStack,
   UserInfoBox,
 } from "./profile.styled";
+import { ProfileAvatar } from "../../components/shared.styled";
 import { EditProfileScreen } from "./editProfile";
 import { avatarImageSlotProps } from "./profile.utils";
 
@@ -41,7 +41,7 @@ export const ProfileScreen = () => {
     );
   }
 
-  const bannerColor = user.bannerColor ?? "#667eea";
+  const bannerColor = "#8497eeff";
   const displayName = user.username;
   const handle = `@${user.username.toLowerCase().replace(/\s+/g, "")}`;
   const bio = user.bio ?? "No bio yet.";
