@@ -22,6 +22,10 @@ const userSchema = new Schema(
       type: String,
       default: "",
     },
+    image: {
+      type: String,
+      default: "",
+    },
     birthDate: {
       type: Date,
     },

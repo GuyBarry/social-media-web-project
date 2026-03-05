@@ -8,7 +8,9 @@ import {
   updateUserSchema,
   User,
 } from "../entities/dto/user.dto";
+import { injectUploadedFileUrl } from "../middlewares/pictureMiddleware";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
+import { deleteFile, upload } from "../pictures/pictures.service";
 import { usersService } from "./users.service";
 
 const router = Router();
@@ -63,10 +65,19 @@ router.post(
 // Update user
 router.put(
   "/:id",
+  upload.single("picture"),
+  injectUploadedFileUrl,
   validateRequestBody(updateUserSchema),
   async (req: Request<{ id: User["_id"] }, {}, UpdateUser>, res: Response) => {
     const { id } = req.params;
     try {
+      if (req.file) {
+        const existingUser = await usersService.getUserById(id);
+        if (existingUser.image) {
+          await deleteFile(existingUser.image);
+        }
+      }
+
       const user = await usersService.updateUser(id, req.body);
 
       res.status(StatusCodes.OK).send(user);
