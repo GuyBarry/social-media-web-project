@@ -5,8 +5,6 @@ const BANNER_HEIGHT = 140;
 const AVATAR_SIZE = 88;
 const AVATAR_OVERLAP = AVATAR_SIZE / 2;
 
-export { BANNER_HEIGHT, AVATAR_SIZE, AVATAR_OVERLAP };
-
 export const ProfilePage = styled(Box)({
   display: "flex",
   justifyContent: "center",
@@ -39,6 +37,35 @@ export const AvatarRow = styled(Box)({
   marginTop: -AVATAR_OVERLAP,
 });
 
+export const AvatarWrapper = styled(Box)({
+  position: "relative",
+  width: AVATAR_SIZE,
+  height: AVATAR_SIZE,
+  cursor: "pointer",
+  borderRadius: "50%",
+  "& .avatar-overlay": {
+    opacity: 0,
+    transition: "opacity 0.2s ease",
+  },
+  "&:hover .avatar-img": {
+    filter: "blur(2px) brightness(0.65)",
+  },
+  "&:hover .avatar-overlay": {
+    opacity: 1,
+  },
+});
+
+export const AvatarCameraOverlay = styled(Box)({
+  position: "absolute",
+  inset: 0,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  borderRadius: "50%",
+  pointerEvents: "none",
+  color: "#fff",
+});
+
 export const ProfileAvatar = styled(Avatar)(({ theme }) => ({
   width: AVATAR_SIZE,
   height: AVATAR_SIZE,
@@ -46,6 +73,7 @@ export const ProfileAvatar = styled(Avatar)(({ theme }) => ({
   fontSize: "2rem",
   fontWeight: 700,
   boxShadow: theme.shadows[2],
+  transition: "filter 0.2s ease",
 }));
 
 export const EditProfileButton = styled(Button)(({ theme }) => ({
@@ -84,8 +112,6 @@ export const BioText = styled(Typography)({
 export const MetaStack = styled(Stack)({
   paddingLeft: 24,
   paddingRight: 24,
-  paddingTop: 12,
-  paddingBottom: 4,
   flexWrap: "wrap",
 });
 
@@ -121,3 +147,67 @@ export const StatLabel = styled(Typography)(({ theme }) => ({
   letterSpacing: 0.5,
   color: theme.palette.text.secondary,
 }));
+
+export const EditFormBox = styled(Box)({
+  paddingLeft: 24,
+  paddingRight: 24,
+  paddingTop: 12,
+  paddingBottom: 24,
+  display: "flex",
+  flexDirection: "column",
+  gap: 20,
+});
+
+export const FieldLabel = styled(Typography)(({ theme }) => ({
+  fontWeight: 600,
+  color: theme.palette.text.secondary,
+  marginBottom: 4,
+  fontSize: "0.8rem",
+  textTransform: "uppercase",
+  letterSpacing: 0.5,
+}));
+
+export const SaveButton = styled(Button)({
+  borderRadius: 20,
+  textTransform: "none",
+  fontWeight: 600,
+  paddingLeft: 20,
+  paddingRight: 20,
+});
+
+export const CancelButton = styled(Button)(({ theme }) => ({
+  borderRadius: 20,
+  textTransform: "none",
+  fontWeight: 600,
+  paddingLeft: 20,
+  paddingRight: 20,
+  borderColor: theme.palette.grey[300],
+  color: theme.palette.text.secondary,
+  "&:hover": {
+    backgroundColor: theme.palette.grey[100],
+    borderColor: theme.palette.grey[400],
+  },
+}));
+
+export const EditFieldRow = styled(Stack)({
+  width: "60%",
+});
+
+export const EditFieldItem = styled(Box)({
+  flex: 1,
+});
+
+export const EditFieldWide = styled(Box)({
+  width: "60%",
+});
+
+export const MetaText = styled(Typography)({
+  margin: 0,
+  display: "flex",
+  alignItems: "center",
+});
+
+export const EditActionsRow = styled(Stack)({
+  flexDirection: "row",
+  gap: 12,
+});

@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { useState } from "react";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EmailIcon from "@mui/icons-material/Email";
 import EditIcon from "@mui/icons-material/Edit";
@@ -11,6 +11,7 @@ import {
   HandleText,
   MetaItem,
   MetaStack,
+  MetaText,
   ProfileAvatar,
   ProfileBanner,
   ProfileCard,
@@ -22,25 +23,37 @@ import {
   StatsStack,
   UserInfoBox,
 } from "./profile.styled";
+import { EditProfileScreen } from "./editProfile";
 
 export const ProfileScreen = () => {
   const { user } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
 
   if (!user) return null;
+
+  if (isEditing) {
+    return (
+      <EditProfileScreen
+        onCancel={() => setIsEditing(false)}
+        onSave={() => setIsEditing(false)}
+      />
+    );
+  }
 
   const bannerColor = user.bannerColor ?? "#667eea";
   const displayName = user.username;
   const handle = `@${user.username.toLowerCase().replace(/\s+/g, "")}`;
   const bio = user.bio ?? "No bio yet.";
-  const birthDate = user.birthDate
-    ? new Date(user.birthDate).toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })
-    : null;
+  const birthDateParsed = user.birthDate ? new Date(user.birthDate) : null;
+  const birthDate =
+    birthDateParsed && !isNaN(birthDateParsed.getTime())
+      ? birthDateParsed.toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        })
+      : null;
   const email = user.email;
-
   const postsCount = user.postsCount ?? 0;
   const likesCount = user.likesCount ?? 0;
 
@@ -56,6 +69,7 @@ export const ProfileScreen = () => {
             variant="outlined"
             size="small"
             startIcon={<EditIcon fontSize="small" />}
+            onClick={() => setIsEditing(true)}
           >
             Edit Profile
           </EditProfileButton>
@@ -70,23 +84,17 @@ export const ProfileScreen = () => {
         </UserInfoBox>
 
         <MetaStack direction="row" spacing={2.5}>
-          {birthDate && (
-            <MetaItem spacing={0.75}>
-              <CalendarTodayIcon fontSize="small" color="disabled" />
-              <Typography
-                sx={{ margin: "0", display: "flex", alignItems: "center" }}
-                variant="body2"
-                color="text.secondary"
-              >
-                {birthDate}
-              </Typography>
-            </MetaItem>
-          )}
-          <MetaItem spacing={0.75}>
+          <MetaItem>
+            <CalendarTodayIcon fontSize="small" color="disabled" />
+            <MetaText variant="body2" color="text.secondary">
+              {birthDate ?? "Unavailable"}
+            </MetaText>
+          </MetaItem>
+          <MetaItem>
             <EmailIcon fontSize="small" color="disabled" />
-            <Typography variant="body2" color="text.secondary">
+            <MetaText variant="body2" color="text.secondary">
               {email}
-            </Typography>
+            </MetaText>
           </MetaItem>
         </MetaStack>
 
