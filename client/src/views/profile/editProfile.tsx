@@ -1,9 +1,11 @@
 import { useRef, useState } from "react";
-import { TextField } from "@mui/material";
+import { Box, TextField } from "@mui/material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useAuth } from "../../context/authContext";
 import {
   AvatarCameraOverlay,
+  AvatarDeleteButton,
   AvatarRow,
   AvatarWrapper,
   CancelButton,
@@ -43,6 +45,7 @@ export const EditProfileScreen = ({
     user?.image ?? null,
   );
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [deleteImage, setDeleteImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!user) return null;
@@ -66,6 +69,7 @@ export const EditProfileScreen = ({
       }
     }
     if (selectedFile) formData.append("picture", selectedFile);
+    if (deleteImage) formData.append("image", "");
 
     await updateUser(formData);
     onSave();
@@ -77,31 +81,47 @@ export const EditProfileScreen = ({
         <ProfileBanner bannercolor={bannerColor} />
 
         <AvatarRow>
-          <AvatarWrapper onClick={() => fileInputRef.current?.click()}>
-            <ProfileAvatar
-              className="avatar-img"
-              src={editAvatarPreview ?? undefined}
-              slotProps={avatarImageSlotProps}
-            >
-              {!editAvatarPreview && displayName.charAt(0).toUpperCase()}
-            </ProfileAvatar>
-            <AvatarCameraOverlay className="avatar-overlay">
-              <CameraAltIcon fontSize="medium" />
-            </AvatarCameraOverlay>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              hidden
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                const url = URL.createObjectURL(file);
-                setEditAvatarPreview(url);
-                setSelectedFile(file);
-              }}
-            />
-          </AvatarWrapper>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <AvatarWrapper onClick={() => fileInputRef.current?.click()}>
+              <ProfileAvatar
+                className="avatar-img"
+                src={editAvatarPreview ?? undefined}
+                slotProps={avatarImageSlotProps}
+              >
+                {!editAvatarPreview && displayName.charAt(0).toUpperCase()}
+              </ProfileAvatar>
+              <AvatarCameraOverlay className="avatar-overlay">
+                <CameraAltIcon fontSize="medium" />
+              </AvatarCameraOverlay>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const url = URL.createObjectURL(file);
+                  setEditAvatarPreview(url);
+                  setSelectedFile(file);
+                }}
+              />
+            </AvatarWrapper>
+            {editAvatarPreview && (
+              <AvatarDeleteButton
+                variant="outlined"
+                size="small"
+                startIcon={<DeleteOutlineIcon fontSize="small" />}
+                onClick={() => {
+                  setEditAvatarPreview(null);
+                  setSelectedFile(null);
+                  setDeleteImage(true);
+                }}
+              >
+                Remove image
+              </AvatarDeleteButton>
+            )}
+          </Box>
         </AvatarRow>
 
         <EditFormBox>

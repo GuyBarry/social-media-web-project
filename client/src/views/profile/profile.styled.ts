@@ -223,3 +223,19 @@ export const EditActionsRow = styled(Stack)({
   flexDirection: "row",
   gap: 12,
 });
+
+export const AvatarDeleteButton = styled(Button)(({ theme }) => ({
+  marginTop: 8,
+  borderRadius: 20,
+  textTransform: "none",
+  fontWeight: 600,
+  fontSize: "0.75rem",
+  color: theme.palette.error.main,
+  borderColor: theme.palette.error.main,
+  paddingLeft: 12,
+  paddingRight: 12,
+  "&:hover": {
+    backgroundColor: theme.palette.error.light + "22",
+    borderColor: theme.palette.error.dark,
+  },
+}));
