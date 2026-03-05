@@ -6,6 +6,7 @@ export interface User {
   email: string;
   password: string;
   bio?: string;
+  image?: string;
   birthDate: Date;
   bannerColor?: string;
   postsCount?: number;

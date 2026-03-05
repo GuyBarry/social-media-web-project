@@ -26,7 +26,7 @@ interface EditProfileScreenProps {
 }
 
 export const EditProfileScreen = ({ onCancel, onSave }: EditProfileScreenProps) => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [editUsername, setEditUsername] = useState(user?.username ?? "");
   const [editBio, setEditBio] = useState(user?.bio ?? "");
   const [editBirthDate, setEditBirthDate] = useState(() => {
@@ -34,6 +34,7 @@ export const EditProfileScreen = ({ onCancel, onSave }: EditProfileScreenProps) 
     return parsed && !isNaN(parsed.getTime()) ? parsed.toISOString().split("T")[0] : "";
   });
   const [editAvatarPreview, setEditAvatarPreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!user) return null;
@@ -41,8 +42,22 @@ export const EditProfileScreen = ({ onCancel, onSave }: EditProfileScreenProps) 
   const bannerColor = user.bannerColor ?? "#667eea";
   const displayName = user.username;
 
-  const handleSave = () => {
-    // TODO: wire up save API call
+  const handleSave = async () => {
+    const formData = new FormData();
+
+    if (editUsername !== user.username) formData.append("username", editUsername);
+    if (editBio !== (user.bio ?? "")) formData.append("bio", editBio);
+    if (editBirthDate) {
+      const existingDate = user.birthDate instanceof Date && !isNaN(user.birthDate.getTime())
+        ? user.birthDate.toISOString().split("T")[0]
+        : "";
+      if (editBirthDate !== existingDate) {
+        formData.append("birthDate", editBirthDate);
+      }
+    }
+    if (selectedFile) formData.append("picture", selectedFile);
+
+    await updateUser(formData);
     onSave();
   };
 
@@ -69,6 +84,7 @@ export const EditProfileScreen = ({ onCancel, onSave }: EditProfileScreenProps) 
                 if (!file) return;
                 const url = URL.createObjectURL(file);
                 setEditAvatarPreview(url);
+                setSelectedFile(file);
               }}
             />
           </AvatarWrapper>

@@ -14,6 +14,7 @@ import { authApi } from "../api/authApi";
 import { selfAuthApi } from "../api/selfAuthApi";
 import type { UserLogin } from "../types/userLogin";
 import type { UserRegistration } from "../types/userRegistration";
+import { usersApi } from "../../api/usersApi";
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [user, setUser] = useState<User | null>(null);
@@ -107,9 +108,21 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     [onAuthenticationSuccess],
   );
 
+  const updateUser = useCallback(
+    async (formData: FormData) => {
+      if (!user) return;
+      const { data: updatedUser } = await usersApi.put<User>(
+        `/${user._id}`,
+        formData,
+      );
+      saveUser(updatedUser);
+    },
+    [user, saveUser],
+  );
+
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, isLoadingUserAuth }}
+      value={{ user, login, register, logout, updateUser, isLoadingUserAuth }}
     >
       {children}
     </AuthContext.Provider>

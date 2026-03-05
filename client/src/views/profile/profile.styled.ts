@@ -113,11 +113,13 @@ export const MetaStack = styled(Stack)({
   paddingLeft: 24,
   paddingRight: 24,
   flexWrap: "wrap",
+  marginTop: 12,
 });
 
 export const MetaItem = styled(Stack)({
   flexDirection: "row",
   alignItems: "center",
+  gap: 6,
 });
 
 export const ProfileDivider = styled(Divider)({
