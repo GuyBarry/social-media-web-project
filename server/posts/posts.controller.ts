@@ -8,7 +8,7 @@ import {
   UpdatePost,
   updatePostSchema,
 } from "../entities/dto/post.dto";
-import { injectUploadedFileUrl } from "../middlewares/pictureMiddleware";
+import { injectUploadedUrl } from "../middlewares/pictureMiddleware";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { validateExistingSender } from "../middlewares/validateExistingUser";
 import { deleteFile, getFileUrl, upload } from "../pictures/pictures.service";
@@ -84,7 +84,7 @@ router.post(
 router.put(
   "/:id",
   upload.single("picture"),
-  injectUploadedFileUrl,
+  injectUploadedUrl("picture"),
   validateRequestBody(updatePostSchema),
   async (req: Request<{ id: Post["_id"] }, {}, UpdatePost>, res: Response) => {
     const id = req.params.id;
