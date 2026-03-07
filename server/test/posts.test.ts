@@ -718,3 +718,54 @@ describe("PATCH /:id/like", () => {
     expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
   });
 });
+
+describe("DELETE /:id", () => {
+  test("Should delete an existing post", async () => {
+    const response = await request(app)
+      .delete(`/posts/${examplePost._id}`)
+      .set("Cookie", authCookies);
+
+    expect(response.statusCode).toEqual(StatusCodes.OK);
+    expect(response.body.message).toBe("Post deleted");
+  });
+
+  test("Should remove the post from the database", async () => {
+    await request(app)
+      .delete(`/posts/${examplePost._id}`)
+      .set("Cookie", authCookies);
+
+    const deletedPost = await PostModel.findById(examplePost._id);
+    expect(deletedPost).toBeNull();
+  });
+
+  test("Should delete the post's picture from disk", async () => {
+    const PICTURE_FILENAME = "delete-test-picture.png";
+    const picturePath = path.join(UPLOAD_DIR, PICTURE_FILENAME);
+
+    await fs.copyFile(TEST_PNG, picturePath);
+    await PostModel.findByIdAndUpdate(examplePost._id, {
+      picture: `http://localhost/public/${PICTURE_FILENAME}`,
+    });
+
+    await request(app)
+      .delete(`/posts/${examplePost._id}`)
+      .set("Cookie", authCookies);
+
+    await expect(fs.access(picturePath)).rejects.toThrow();
+  });
+
+  test("Should return 404 when deleting a non-existent post", async () => {
+    const response = await request(app)
+      .delete(`/posts/nonexistentid`)
+      .set("Cookie", authCookies);
+
+    expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
+    expect(response.body.message).toBe("Post does not exist");
+  });
+
+  test("Should return 401 when not authenticated", async () => {
+    const response = await request(app).delete(`/posts/${examplePost._id}`);
+
+    expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+  });
+});

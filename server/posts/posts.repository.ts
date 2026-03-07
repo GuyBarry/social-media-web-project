@@ -63,10 +63,14 @@ export const updatePost = async (
 ): Promise<Post | null> =>
   await PostModel.findByIdAndUpdate(id, postData, { new: true }).exec();
 
+export const deletePost = async (id: Post["_id"]): Promise<Post | null> =>
+  await PostModel.findByIdAndDelete(id).exec();
+
 export const postRepository = {
   getAllPosts,
   getPostById,
   getPostsBySender,
   createPost,
   updatePost,
+  deletePost,
 };

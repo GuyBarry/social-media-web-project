@@ -122,4 +122,18 @@ router.patch(
   },
 );
 
+// Delete post
+router.delete(
+  "/:id",
+  async (req: Request<{ id: Post["_id"] }>, res: Response) => {
+    const id = req.params.id;
+
+    const existingPost = await postService.getPostById(id);
+    await deleteFile(existingPost.picture);
+    await postService.deletePost(id);
+
+    res.status(StatusCodes.OK).send({ message: "Post deleted" });
+  },
+);
+
 export const postsController = router;

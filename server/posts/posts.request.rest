@@ -45,3 +45,6 @@ Content-Type: application/json
 {
     "method": "dislike"
 }
+
+### delete post
+DELETE http://localhost:8000/posts/1234
