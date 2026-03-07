@@ -16,6 +16,8 @@ const queryClient = new QueryClient({
   },
 });
 
+//TODO: delete ReactQueryDevtools
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
@@ -23,7 +25,7 @@ createRoot(document.getElementById("root")!).render(
         <CssBaseline />
         <App />
       </ThemeProvider>
-      <ReactQueryDevtools initialIsOpen={false} /> //TODO: delete
+      <ReactQueryDevtools initialIsOpen={false} /> 
     </QueryClientProvider>
   </StrictMode>,
 );

@@ -10,7 +10,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Panel } from "../../components/panel/panel";
-import { useAuth } from "../../context/authContext";
+import { useAuth } from "../../auth/context/authContext";
 import "./login.css";
 
 export const LoginScreen = () => {

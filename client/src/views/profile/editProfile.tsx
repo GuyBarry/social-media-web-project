@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Box, TextField } from "@mui/material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { useAuth } from "../../context/authContext";
+import { useAuth } from "../../auth/context/authContext";
 import {
   AvatarCameraOverlay,
   AvatarDeleteButton,

@@ -1,8 +1,10 @@
+import type { User } from "./User";
+
 export interface Post {
   _id: string;
   createdAt: Date;
   updatedAt: Date;
-  sender: string;
+  sender: Pick<User, "_id" | "username">;
   message: string;
   imageUrl: string;
   likes: string[];
@@ -12,7 +14,9 @@ export interface Post {
 // image: File is the upload field (maps to imageUrl on the server)
 type PostImageField = { image: File };
 
-export type CreatePost = Pick<Post, "sender" | "message"> & PostImageField;
+export type CreatePost = Pick<Post, "message"> & {
+  sender: string;
+} & PostImageField;
 
 export type UpdatePost = Partial<Pick<Post, "message"> & PostImageField>;
 

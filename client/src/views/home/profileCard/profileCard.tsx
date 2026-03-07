@@ -1,6 +1,6 @@
 import { Button, Divider, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../context/authContext";
+import { useAuth } from "../../../auth/context/authContext";
 import { ProfileAvatar } from "../../../components/shared.styled";
 import { avatarImageSlotProps } from "../../profile/profile.utils";
 import "./profileCard.css";

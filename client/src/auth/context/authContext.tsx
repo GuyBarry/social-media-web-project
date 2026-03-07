@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
-import type { UserLogin } from "../auth/types/userLogin";
-import type { UserRegistration } from "../auth/types/userRegistration";
-import type { User } from "../entities/User";
+import type { UserLogin } from "../types/userLogin";
+import type { UserRegistration } from "../types/userRegistration";
+import type { User } from "../../entities/User";
 
 export interface AuthResultHandlers {
   onSuccess?: (user: User) => void;

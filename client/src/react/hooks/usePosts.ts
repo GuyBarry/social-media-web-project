@@ -1,5 +1,6 @@
 import {
   useQuery,
+  useInfiniteQuery,
   useMutation,
   useQueryClient,
   type UseQueryOptions,
@@ -34,19 +35,18 @@ export interface GetPostsParams {
 
 // ─── Queries ────────────────────────────────────────────────────────────────
 
-export function useGetAllPosts(
-  params: GetPostsParams = {},
-  options?: Omit<UseQueryOptions<PaginatedPosts>, "queryKey" | "queryFn">,
-) {
-  return useQuery<PaginatedPosts>({
-    queryKey: postKeys.list(params),
-    queryFn: async () => {
+export function useGetAllPostsInfinite(limit = 10) {
+  return useInfiniteQuery<PaginatedPosts>({
+    queryKey: [...postKeys.lists(), "infinite", limit],
+    queryFn: async ({ pageParam = 1 }) => {
       const { data } = await postsApi.get<PaginatedPosts>("/", {
-        params,
+        params: { page: pageParam, limit },
       });
       return data;
     },
-    ...options,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNextPage ? lastPage.nextPage : undefined,
   });
 }
 

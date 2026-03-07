@@ -2,7 +2,7 @@ import { useState } from "react";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EmailIcon from "@mui/icons-material/Email";
 import EditIcon from "@mui/icons-material/Edit";
-import { useAuth } from "../../context/authContext";
+import { useAuth } from "../../auth/context/authContext";
 import {
   AvatarRow,
   BioText,

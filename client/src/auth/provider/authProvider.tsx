@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import {
   AuthContext,
   type AuthResultHandlers,
-} from "../../context/authContext";
+} from "../context/authContext";
 import type { User } from "../../entities/User";
 import { authApi } from "../api/authApi";
 import { selfAuthApi } from "../api/selfAuthApi";
