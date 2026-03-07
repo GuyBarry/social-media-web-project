@@ -167,11 +167,11 @@ describe("GET / ", () => {
       // Seed 5 total posts for pagination tests
       await PostModel.deleteMany();
       await PostModel.insertMany([
-        { _id: "p1", sender: loginUser._id, message: "Post 1", picture: "http://localhost/public/1.png" },
-        { _id: "p2", sender: loginUser._id, message: "Post 2", picture: "http://localhost/public/2.png" },
-        { _id: "p3", sender: loginUser._id, message: "Post 3", picture: "http://localhost/public/3.png" },
-        { _id: "p4", sender: loginUser._id, message: "Post 4", picture: "http://localhost/public/4.png" },
-        { _id: "p5", sender: loginUser._id, message: "Post 5", picture: "http://localhost/public/5.png" },
+        { _id: "p1", sender: loginUser._id, message: "Post 1", imageUrl: "http://localhost/public/1.png" },
+        { _id: "p2", sender: loginUser._id, message: "Post 2", imageUrl: "http://localhost/public/2.png" },
+        { _id: "p3", sender: loginUser._id, message: "Post 3", imageUrl: "http://localhost/public/3.png" },
+        { _id: "p4", sender: loginUser._id, message: "Post 4", imageUrl: "http://localhost/public/4.png" },
+        { _id: "p5", sender: loginUser._id, message: "Post 5", imageUrl: "http://localhost/public/5.png" },
       ]);
     });
 
@@ -235,14 +235,14 @@ describe("GET / ", () => {
         _id: "pagination-older-post",
         sender: loginUser._id,
         message: "Older post",
-        picture: "http://localhost/public/older.png",
+        imageUrl: "http://localhost/public/older.png",
         createdAt: new Date("2024-01-01"),
       };
       const newerPost = {
         _id: "pagination-newer-post",
         sender: loginUser._id,
         message: "Newer post",
-        picture: "http://localhost/public/newer.png",
+        imageUrl: "http://localhost/public/newer.png",
         createdAt: new Date("2024-01-02"),
       };
 
@@ -348,7 +348,7 @@ describe("POST / ", () => {
       .set("Cookie", authCookies)
       .field("message", "This is a new test post")
       .field("sender", loginUser._id)
-      .attach("picture", TEST_PNG);
+      .attach("image", TEST_PNG);
     expect(response.statusCode).toEqual(StatusCodes.CREATED);
     expect(response.body.message).toBe("Created new post");
     expect(response.body.postId).toBeDefined();
@@ -360,7 +360,7 @@ describe("POST / ", () => {
       .post("/posts")
       .set("Cookie", authCookies)
       .field("message", "This post has no sender")
-      .attach("picture", TEST_PNG);
+      .attach("image", TEST_PNG);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
@@ -371,7 +371,7 @@ describe("POST / ", () => {
       .post("/posts")
       .set("Cookie", authCookies)
       .field("sender", loginUser._id)
-      .attach("picture", TEST_PNG);
+      .attach("image", TEST_PNG);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
@@ -381,7 +381,7 @@ describe("POST / ", () => {
     const response = await request(app)
       .post("/posts")
       .set("Cookie", authCookies)
-      .attach("picture", TEST_PNG);
+      .attach("image", TEST_PNG);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
@@ -394,7 +394,7 @@ describe("POST / ", () => {
       .field("notExistingField", "some value")
       .field("message", "This is a new test post")
       .field("sender", loginUser._id)
-      .attach("picture", TEST_PNG);
+      .attach("image", TEST_PNG);
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
     expect(response.body.violations).toBeDefined();
@@ -408,7 +408,7 @@ describe("POST / ", () => {
       .set("Cookie", authCookies)
       .field("message", "This is a new test post")
       .field("sender", exampleUser._id!)
-      .attach("picture", TEST_PNG);
+      .attach("image", TEST_PNG);
 
     expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
     expect(response.body.message).toBe("User is unauthorized");
@@ -420,7 +420,7 @@ describe("POST / ", () => {
       .set("Cookie", authCookies)
       .field("message", "This is a new test post")
       .field("sender", "nonexistinguser")
-      .attach("picture", TEST_PNG);
+      .attach("image", TEST_PNG);
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("User does not exist");
   });
@@ -432,7 +432,7 @@ describe("POST / ", () => {
       .field("_id", examplePost._id!)
       .field("message", examplePost.message)
       .field("sender", examplePost.sender)
-      .attach("picture", TEST_PNG);
+      .attach("image", TEST_PNG);
 
     expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
     expect(response.body.message).toBe("Post already exists");
@@ -542,9 +542,9 @@ describe("PUT /:id", () => {
     beforeEach(async () => {
       // Place a real file on disk so deleteFile can unlink it
       await fs.copyFile(TEST_PNG, oldPicturePath);
-      // Point the seeded post's picture at that file
+      // Point the seeded post's imageUrl at that file
       await PostModel.findByIdAndUpdate(examplePost._id, {
-        picture: `http://localhost/public/${OLD_PICTURE_FILENAME}`,
+        imageUrl: `http://localhost/public/${OLD_PICTURE_FILENAME}`,
       });
     });
 
@@ -553,11 +553,11 @@ describe("PUT /:id", () => {
       await fs.unlink(oldPicturePath).catch(() => undefined);
     });
 
-    test("Should update the picture of an existing post", async () => {
+    test("Should update the image of an existing post", async () => {
       const response = await request(app)
         .put(`/posts/${examplePost._id}`)
         .set("Cookie", authCookies)
-        .attach("picture", TEST_PNG);
+        .attach("image", TEST_PNG);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(response.body.message).toBe("Updated post");
@@ -567,34 +567,34 @@ describe("PUT /:id", () => {
       // Old file should have been removed from disk
       await expect(fs.access(oldPicturePath)).rejects.toThrow();
 
-      // Persisted picture URL should now point at the newly uploaded file
+      // Persisted imageUrl should now point at the newly uploaded file
       const updatedPost = await PostModel.findById(examplePost._id);
-      expect(updatedPost?.picture).not.toBe(
+      expect(updatedPost?.imageUrl).not.toBe(
         `http://localhost/public/${OLD_PICTURE_FILENAME}`,
       );
-      expect(updatedPost?.picture).toMatch(/\/public\/.+\.png$/);
+      expect(updatedPost?.imageUrl).toMatch(/\/public\/.+\.png$/);
     });
 
-    test("Should update both message and picture", async () => {
+    test("Should update both message and image", async () => {
       const response = await request(app)
         .put(`/posts/${examplePost._id}`)
         .set("Cookie", authCookies)
-        .field("message", "Updated message with new picture")
-        .attach("picture", TEST_PNG);
+        .field("message", "Updated message with new image")
+        .attach("image", TEST_PNG);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(response.body.message).toBe("Updated post");
 
       const updatedPost = await PostModel.findById(examplePost._id);
-      expect(updatedPost?.message).toBe("Updated message with new picture");
-      expect(updatedPost?.picture).toMatch(/\/public\/.+\.png$/);
+      expect(updatedPost?.message).toBe("Updated message with new image");
+      expect(updatedPost?.imageUrl).toMatch(/\/public\/.+\.png$/);
     });
 
-    test("Should return 404 when updating picture of a non-existent post", async () => {
+    test("Should return 404 when updating image of a non-existent post", async () => {
       const response = await request(app)
         .put(`/posts/nonexistentid`)
         .set("Cookie", authCookies)
-        .attach("picture", TEST_PNG);
+        .attach("image", TEST_PNG);
 
       expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
       expect(response.body.message).toBe("Post does not exist");
@@ -744,7 +744,7 @@ describe("DELETE /:id", () => {
 
     await fs.copyFile(TEST_PNG, picturePath);
     await PostModel.findByIdAndUpdate(examplePost._id, {
-      picture: `http://localhost/public/${PICTURE_FILENAME}`,
+      imageUrl: `http://localhost/public/${PICTURE_FILENAME}`,
     });
 
     await request(app)

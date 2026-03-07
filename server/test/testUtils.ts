@@ -26,7 +26,7 @@ export const examplePost: CreatePost = {
   _id: "1234",
   sender: loginUser._id,
   message: "Hello, world!",
-  picture: "http://localhost/public/example.png",
+  imageUrl: "http://localhost/public/example.png",
 };
 
 export const exampleLike = {

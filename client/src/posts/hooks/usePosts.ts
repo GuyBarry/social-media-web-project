@@ -18,8 +18,7 @@ import type {
 export const postKeys = {
   all: ["posts"] as const,
   lists: () => [...postKeys.all, "list"] as const,
-  list: (params: GetPostsParams) =>
-    [...postKeys.lists(), params] as const,
+  list: (params: GetPostsParams) => [...postKeys.lists(), params] as const,
   bySender: (senderId: string, params?: GetPostsParams) =>
     [...postKeys.all, "sender", senderId, params] as const,
   details: () => [...postKeys.all, "detail"] as const,
@@ -90,11 +89,11 @@ export function useCreatePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (postData: CreatePost & { pictureFile: File }) => {
+    mutationFn: async (postData: CreatePost) => {
       const formData = new FormData();
       formData.append("sender", postData.sender);
       formData.append("message", postData.message);
-      formData.append("picture", postData.pictureFile);
+      formData.append("image", postData.image);
 
       const { data } = await postsApi.post("/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -111,18 +110,12 @@ export function useUpdatePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      postData,
-    }: {
-      id: string;
-      postData: UpdatePost;
-    }) => {
+    mutationFn: async ({ id, ...postData }: { id: string } & UpdatePost) => {
       const formData = new FormData();
       if (postData.message !== undefined)
         formData.append("message", postData.message);
-      if (postData.picture !== undefined)
-        formData.append("picture", postData.picture);
+      if (postData.image !== undefined)
+        formData.append("image", postData.image);
 
       const { data } = await postsApi.put(`/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },

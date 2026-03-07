@@ -4,21 +4,17 @@ export interface Post {
   updatedAt: Date;
   sender: string;
   message: string;
-  picture: string;
+  imageUrl: string;
   likes: string[];
   numComments: number;
 }
 
-export interface CreatePost {
-  sender: string;
-  message: string;
-  picture?: string;
-}
+// image: File is the upload field (maps to imageUrl on the server)
+type PostImageField = { image: File };
 
-export interface UpdatePost {
-  message?: string;
-  picture?: string;
-}
+export type CreatePost = Pick<Post, "sender" | "message"> & PostImageField;
+
+export type UpdatePost = Partial<Pick<Post, "message"> & PostImageField>;
 
 export type LikeMethod = "like" | "dislike";
 

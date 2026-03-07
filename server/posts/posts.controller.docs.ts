@@ -46,6 +46,9 @@
  *                         type: string
  *                       sender:
  *                         type: string
+ *                       imageUrl:
+ *                         type: string
+ *                         description: URL of the post image
  *                       likes:
  *                         type: array
  *                         items:
@@ -112,6 +115,9 @@
  *                  type: string
  *                sender:
  *                  type: string
+ *                imageUrl:
+ *                  type: string
+ *                  description: URL of the post image
  *                likes:
  *                  type: array
  *                  items:
@@ -164,7 +170,7 @@
  *             required:
  *               - sender
  *               - message
- *               - picture
+ *               - image
  *             properties:
  *               sender:
  *                 type: string
@@ -172,10 +178,10 @@
  *               message:
  *                 type: string
  *                 description: The post message content
- *               picture:
+ *               image:
  *                 type: string
  *                 format: binary
- *                 description: The post picture file (jpeg, png, gif, webp — max 5MB)
+ *                 description: The image file to upload (jpeg, png, gif, webp — max 5MB). Stored as imageUrl.
  *     responses:
  *       201:
  *         description: Returns the created post id
@@ -256,11 +262,11 @@
  *               message:
  *                 type: string
  *                 description: The updated post message content
- *               picture:
+ *               image:
  *                 type: string
  *                 format: binary
- *                 description: The updated post picture file (jpeg, png, gif, webp — max 5MB)
- *           description: At least one of message or picture must be provided
+ *                 description: The image file to upload (jpeg, png, gif, webp — max 5MB). Stored as imageUrl.
+ *           description: At least one of message or image must be provided
  *     responses:
  *       200:
  *         description: Updated
