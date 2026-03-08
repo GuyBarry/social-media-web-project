@@ -14,7 +14,7 @@ export const ProfileCard = () => {
   return (
     <div className="profile-card">
       <ProfileAvatar
-        src={user.image ?? undefined}
+        src={user.imageUrl ?? undefined}
         slotProps={avatarImageSlotProps}
       >
         {user.username.charAt(0).toUpperCase()}

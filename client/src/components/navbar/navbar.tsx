@@ -39,7 +39,7 @@ export const Navbar = () => {
           </Typography>
           <ProfileAvatar
             size={44}
-            src={user.image ?? undefined}
+            src={user.imageUrl ?? undefined}
             slotProps={avatarImageSlotProps}
           >
             {user.username.charAt(0).toUpperCase()}

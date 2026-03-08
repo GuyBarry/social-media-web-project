@@ -65,7 +65,7 @@ export const ProfileScreen = () => {
 
         <AvatarRow>
           <ProfileAvatar
-            src={user.image ?? undefined}
+            src={user.imageUrl ?? undefined}
             slotProps={avatarImageSlotProps}
           >
             {displayName.charAt(0).toUpperCase()}

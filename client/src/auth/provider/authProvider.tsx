@@ -51,6 +51,16 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     }
   }, [saveUser]);
 
+  const refreshUser = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data } = await usersApi.get<User>(`/${user._id}`);
+      saveUser(data);
+    } catch (error) {
+      console.error("Refresh user went wrong", error);
+    }
+  }, [user, saveUser]);
+
   useEffect(() => {
     if (!user) {
       getUserMe();
@@ -108,21 +118,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     [onAuthenticationSuccess],
   );
 
-  const updateUser = useCallback(
-    async (formData: FormData) => {
-      if (!user) return;
-      const { data: updatedUser } = await usersApi.put<User>(
-        `/${user._id}`,
-        formData,
-      );
-      saveUser(updatedUser);
-    },
-    [user, saveUser],
-  );
-
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, updateUser, isLoadingUserAuth }}
+      value={{ user, login, register, logout, refreshUser, isLoadingUserAuth }}
     >
       {children}
     </AuthContext.Provider>
