@@ -1,17 +1,16 @@
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import { Typography } from "@mui/material";
-import { ProfileAvatar } from "../shared.styled";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useAuth } from "../../auth/context/authContext";
 import type { Post } from "../../entities/Post";
+import { ProfileAvatar } from "../shared.styled";
 import {
   CommentButton,
-  EngagementText,
   EngagementItem,
+  EngagementText,
   LikeButton,
-  PostCard,
   PostCaption,
+  PostCard,
   PostEngagementBar,
   PostHeader,
   PostImage,
@@ -81,25 +80,24 @@ export const PostComponent = ({
       {/* Engagement bar */}
       <PostEngagementBar>
         <EngagementItem onClick={handleLikeClick}>
-          <LikeButton size="small">
+          <LikeButton isLiked={isLiked}>
             {isLiked ? (
-              <FavoriteIcon fontSize="small" color="error" />
+              <FavoriteIcon fontSize="small" />
             ) : (
               <FavoriteBorderIcon fontSize="small" />
             )}
+            <EngagementText>{post.likes.length}</EngagementText>
           </LikeButton>
-          <EngagementText color={isLiked ? "error" : "text.secondary"}>
-            {post.likes.length}
-          </EngagementText>
         </EngagementItem>
 
         <EngagementItem onClick={() => onComment?.(post._id)}>
-          <CommentButton size="small">
+          <CommentButton>
             <ChatBubbleOutlineIcon fontSize="small" />
+            <EngagementText>
+              {post.numComments}{" "}
+              {post.numComments === 1 ? "Comment" : "Comments"}
+            </EngagementText>
           </CommentButton>
-          <EngagementText>
-            {post.numComments} {post.numComments === 1 ? "Comment" : "Comments"}
-          </EngagementText>
         </EngagementItem>
       </PostEngagementBar>
     </PostCard>

@@ -1,6 +1,5 @@
 import { Box, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { IconButton2 } from "../shared.styled";
 
 export const PostCard = styled(Box)(({ theme }) => ({
   backgroundColor: "#fff",
@@ -48,7 +47,7 @@ export const PostCaption = styled(Typography)({
 
 export const PostImageContainer = styled(Box)({
   width: "100%",
-  aspectRatio: 1 / 1,
+  aspectRatio: 3 / 2,
   backgroundColor: "#f0f0f0",
   display: "flex",
   alignItems: "center",
@@ -66,20 +65,22 @@ export const PostImage = styled("img")({
 export const PostEngagementBar = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
+  justifyContent: "flex-start",
   gap: 16,
   padding: "8px 12px",
   borderTop: `1px solid ${theme.palette.divider}`,
 }));
 
-export const EngagementItem = styled(Box)({
+export const EngagementItem = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
+  justifyContent: "center",
   gap: 4,
   cursor: "pointer",
-  ":hover": {
-    backgroundColor: "grey.100",
+  "& > *": {
+    color: theme.palette.text.secondary,
   },
-});
+}));
 
 export const EngagementText = styled(Typography)({
   fontSize: "0.85rem",
@@ -87,10 +88,41 @@ export const EngagementText = styled(Typography)({
   lineHeight: 1,
 });
 
-export const LikeButton = styled(IconButton2)({
-  padding: 4,
-});
+export const LikeButton = styled("div")<{ isLiked?: boolean }>(
+  ({ isLiked }) => ({
+    padding: 4,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+    size: "small",
+    cursor: "pointer",
 
-export const CommentButton = styled(IconButton2)({
+    "& > *": {
+      transition: "color 0.2s ease",
+      ...(isLiked ? { color: "#d32f2f" } : {}),
+    },
+
+    "&:hover > *": {
+      color: "#d32f2f",
+    },
+  }),
+);
+
+export const CommentButton = styled("div")({
   padding: 4,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 4,
+  size: "small",
+  cursor: "pointer",
+
+  "& > *": {
+    transition: "color 0.2s ease",
+  },
+
+  "&:hover > *": {
+    color: "#1976d2",
+  },
 });
