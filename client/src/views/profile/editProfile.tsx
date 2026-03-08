@@ -77,6 +77,10 @@ export const EditProfileScreen = ({
     if (selectedFile) formData.append("image", selectedFile);
     if (deleteImage) formData.append("imageUrl", "");
 
+    const originalBanner = user.bannerColor ?? "1";
+    if (bannerColor !== resolveBannerColor(originalBanner))
+      formData.append("bannerColor", bannerColor);
+
     await updateUser(user._id, formData);
     await refreshUser();
     onSave();
