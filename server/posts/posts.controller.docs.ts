@@ -45,7 +45,15 @@
  *                       message:
  *                         type: string
  *                       sender:
- *                         type: string
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                           username:
+ *                             type: string
+ *                           imageUrl:
+ *                             type: string
+ *                             description: URL of the sender's profile picture
  *                       imageUrl:
  *                         type: string
  *                         description: URL of the post image
@@ -114,7 +122,15 @@
  *                message:
  *                  type: string
  *                sender:
- *                  type: string
+ *                  type: object
+ *                  properties:
+ *                    _id:
+ *                      type: string
+ *                    username:
+ *                      type: string
+ *                    imageUrl:
+ *                      type: string
+ *                      description: URL of the sender's profile picture
  *                imageUrl:
  *                  type: string
  *                  description: URL of the post image

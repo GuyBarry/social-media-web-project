@@ -17,5 +17,5 @@ export const getFileUrl = (filename: string): string => {
 export const deleteFile = async (fileUrl: string): Promise<void> => {
   const filename = path.basename(fileUrl);
   const filePath = path.join(UPLOAD_DIR, filename);
-  await fs.unlink(filePath);
+  await fs.unlink(filePath).catch(() => console.warn(`File not found, skipping deletion: ${filePath}`));
 };

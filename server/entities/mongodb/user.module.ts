@@ -43,7 +43,7 @@ const userSchema = new Schema(
 
 export const USER_POPULATE_FIELDS = {
   field: "sender",
-  subFields: ["username"],
+  subFields: ["username", "imageUrl"],
 } as const;
 
 export const USER_FIELDS_EXCEPT_AUTH = ["-password", "-googleId"] as const;

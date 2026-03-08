@@ -1,11 +1,11 @@
 import { Logout as LogoutIcon } from "@mui/icons-material";
-import { Avatar, Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import { Share2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/context/authContext";
-import "./navbar.css";
-import { ProfileAvatar } from "../shared.styled";
 import { avatarImageSlotProps } from "../../views/profile/profile.utils";
+import { ProfileAvatar } from "../shared.styled";
+import "./navbar.css";
 
 export const Navbar = () => {
   const { user, logout } = useAuth();

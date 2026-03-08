@@ -66,6 +66,7 @@ describe("GET / ", () => {
     expect(Array.isArray(response.body.docs[0].likes)).toBe(true);
     expect(response.body.docs[0].likes).toHaveLength(1);
     expect(response.body.docs[0].likes).toContain(loginUser._id);
+    expect(response.body.docs[0].sender.imageUrl).toBe(loginUser.imageUrl);
     expect(response.body.docs[0].numComments).toBe(0);
     expect(response.body.totalDocs).toBe(1);
     expect(response.body.page).toBe(1);
@@ -123,6 +124,8 @@ describe("GET / ", () => {
       expect(response.body.docs.length).toBeGreaterThan(0);
       expect(response.body.docs[0]._id).toBe(examplePost._id);
       expect(response.body.docs[0].sender._id).toBe(examplePost.sender);
+      expect(response.body.docs[0].sender.username).toBe(loginUser.username);
+      expect(response.body.docs[0].sender.imageUrl).toBe(loginUser.imageUrl);
       expect(response.body.docs[0].numComments).toBe(0);
       expect(response.body.totalDocs).toBe(1);
       expect(response.body.page).toBe(1);
@@ -313,6 +316,7 @@ describe("GET /:id", () => {
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(response.body._id).toBe(examplePost._id);
+    expect(response.body.sender.imageUrl).toBe(loginUser.imageUrl);
     expect(Array.isArray(response.body.likes)).toBe(true);
     expect(response.body.likes).toHaveLength(1);
     expect(response.body.likes).toContain(loginUser._id);

@@ -4,7 +4,7 @@ export interface Post {
   _id: string;
   createdAt: Date;
   updatedAt: Date;
-  sender: Pick<User, "_id" | "username">;
+  sender: Pick<User, "_id" | "username" | "imageUrl">;
   message: string;
   imageUrl: string;
   likes: string[];

@@ -19,6 +19,7 @@ export const loginUser = {
   email: "loginuser@example.com",
   birthDate: "2002-10-13",
   bio: "I am the best loginuser ever",
+  imageUrl: "http://localhost/public/loginuser-avatar.png",
   password: hashSync("loginuserpassword", PASSWORD_SALT_ROUNDS),
 };
 
