@@ -6,11 +6,7 @@ import { CostumButton, ProfileAvatar } from "../../../components/shared.styled";
 import type { User } from "../../../entities/User";
 import { useUpdateUser } from "../../../react/hooks/useUsers";
 import {
-  AvatarColumnBox,
   AvatarRow,
-  EditColorColumn,
-  EditContentRow,
-  EditFormColumn,
   ProfileBanner,
   ProfileCard,
   ProfilePage,
@@ -18,13 +14,17 @@ import {
 import { avatarImageSlotProps, resolveBannerColor } from "../profile.utils";
 import {
   AvatarCameraOverlay,
+  AvatarColumnBox,
   AvatarWrapper,
   EditActionsRow,
+  EditColorColumn,
+  EditContentRow,
   EditFieldItem,
   EditFieldRow,
   EditFormBox,
+  EditFormColumn,
   FieldInput,
-  FieldLabel
+  FieldLabel,
 } from "./editProfile.styled";
 
 interface EditProfileScreenProps {

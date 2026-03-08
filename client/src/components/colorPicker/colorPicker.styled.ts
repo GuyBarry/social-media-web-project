@@ -24,14 +24,17 @@ export const BannerColorSwatch = styled(Box)(({ theme }) => ({
   },
 }));
 
-export const BannerColorPickerCard = styled(Box) ({
+export const BannerColorPickerCard = styled(Box)(({ theme }) => ({
   borderRadius: 12,
-  border: `1px solid #c4c4c4`,
+  border: `1px solid ${theme.palette.grey[300]}`,
   padding: "14px 16px",
   display: "flex",
   gap: 16,
   alignItems: "stretch",
-});
+  "&:hover": {
+    borderColor: theme.palette.grey[400],
+  },
+}));
 
 export const BannerColorSwitchBox = styled(Box)({
   flex: "0 0 33.333%",

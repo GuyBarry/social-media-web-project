@@ -3,6 +3,13 @@ import { styled } from "@mui/material/styles";
 
 const AVATAR_SIZE = 88;
 
+export const AvatarColumnBox = styled(Box)({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 8,
+});
+
 export const AvatarWrapper = styled(Box)({
   position: "relative",
   width: AVATAR_SIZE,
@@ -39,6 +46,27 @@ export const EditFormBox = styled(Box)({
   gap: 20,
 });
 
+export const EditContentRow = styled(Box)({
+  display: "flex",
+  gap: 24,
+  alignItems: "stretch",
+});
+
+export const EditFormColumn = styled(Box)({
+  flex: 2,
+  display: "flex",
+  flexDirection: "column",
+  gap: 20,
+});
+
+export const EditFieldRow = styled(Stack)({
+  flexDirection: "row",
+});
+
+export const EditFieldItem = styled(Box)({
+  flex: 1,
+});
+
 export const FieldLabel = styled(Typography)(({ theme }) => ({
   fontWeight: 600,
   color: theme.palette.text.secondary,
@@ -59,11 +87,7 @@ export const FieldInput = styled(TextField)(({ theme }) => ({
   },
 }));
 
-export const EditFieldRow = styled(Stack)({
-  flexDirection: "row",
-});
-
-export const EditFieldItem = styled(Box)({
+export const EditColorColumn = styled(Box)({
   flex: 1,
 });
 
