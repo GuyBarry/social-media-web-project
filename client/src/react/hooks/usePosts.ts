@@ -21,7 +21,7 @@ export const postKeys = {
   infinite: () => [...postKeys.all, "infinite"] as const,
   listsInfinite: (limit: number) => [...postKeys.infinite(), limit] as const,
   bySenderInfinite: (senderId: User["_id"], limit: number) =>
-    [...postKeys.all, "sender", senderId, limit] as const,
+    [...postKeys.infinite(), "sender", senderId, limit] as const,
   detail: (id: Post["_id"]) => [...postKeys.all, "detail", id] as const,
 };
 
