@@ -2,6 +2,9 @@ import { createTheme } from "@mui/material/styles";
 
 export const theme = createTheme({
   cssVariables: true,
+  typography: {
+    fontFamily: "'Rubik', system-ui, Arial, sans-serif",
+  },
   palette: {
     primary: {
       main: "#667eea",
