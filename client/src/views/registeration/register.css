@@ -13,3 +13,13 @@
   padding: 40px;
   overflow-y: auto;
 }
+
+@media (min-resolution: 1.875dppx) {
+  .register-form-panel {
+    width: 100vw;
+  }
+
+  .register-container > *:first-child {
+    display: none;
+  }
+}

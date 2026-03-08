@@ -17,6 +17,12 @@
   align-self: start;
 }
 
-.home-main {
-  /* center column — 1/2 of screen */
+@media (min-resolution: 1.875dppx) {
+  .home-container {
+    grid-template-columns: 1fr;
+  }
+
+  .home-sidebar {
+    display: none;
+  }
 }
