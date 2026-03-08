@@ -7,18 +7,18 @@ export const FeedContainer = styled(Box)({
   gap: "16px",
 });
 
-export const FeedList = styled(Box)({
-  display: "flex",
-  flexDirection: "column",
-  gap: "16px",
-});
-
 export const FeedPagination = styled(Box)({
   display: "flex",
   justifyContent: "center",
   paddingTop: "8px",
   paddingBottom: "16px",
 });
+
+export const FeedGrid = styled(Box)<{ $columns: number }>(({ $columns }) => ({
+  display: "grid",
+  gridTemplateColumns: `repeat(${$columns}, 1fr)`,
+  gap: "15px",
+}));
 
 export const FeedCenter = styled(Box)({
   display: "flex",

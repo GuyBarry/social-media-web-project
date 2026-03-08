@@ -1,8 +1,14 @@
-import { useState } from "react";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import EmailIcon from "@mui/icons-material/Email";
 import EditIcon from "@mui/icons-material/Edit";
+import EmailIcon from "@mui/icons-material/Email";
+import PhotoOutlinedIcon from "@mui/icons-material/PhotoOutlined";
+import { Stack, Typography } from "@mui/material";
+import { useState } from "react";
 import { useAuth } from "../../auth/context/authContext";
+import { FeedComponent } from "../../components/feed/feed";
+import { ProfileAvatar } from "../../components/shared.styled";
+import { useGetPostsBySender } from "../../react/hooks/usePosts";
+import { EditProfileScreen } from "./editProfile";
 import {
   AvatarRow,
   BioText,
@@ -22,13 +28,17 @@ import {
   StatsStack,
   UserInfoBox,
 } from "./profile.styled";
-import { ProfileAvatar } from "../../components/shared.styled";
-import { EditProfileScreen } from "./editProfile";
 import { avatarImageSlotProps } from "./profile.utils";
+
+const PROFILE_POSTS_PER_PAGE = 6;
 
 export const ProfileScreen = () => {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const queryResult = useGetPostsBySender(
+    user?._id ?? "",
+    PROFILE_POSTS_PER_PAGE,
+  );
 
   if (!user) return null;
 
@@ -118,6 +128,15 @@ export const ProfileScreen = () => {
           ))}
         </StatsStack>
       </ProfileCard>
+
+      <Stack direction="row" alignItems="center" spacing={1}>
+        <PhotoOutlinedIcon sx={{ color: "primary.main" }} />
+        <Typography variant="h6" fontWeight="bold" color="text.primary">
+          My Posts
+        </Typography>
+      </Stack>
+
+      <FeedComponent queryResult={queryResult} columns={3} />
     </ProfilePage>
   );
 };

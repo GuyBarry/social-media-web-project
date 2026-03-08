@@ -1,30 +1,24 @@
-import {
-  Box,
-  Button,
-  Card,
-  Divider,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Card, Divider, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-const BANNER_HEIGHT = 140;
+const BANNER_HEIGHT = 100;
 const AVATAR_SIZE = 88;
 const AVATAR_OVERLAP = AVATAR_SIZE / 2;
 
 export const ProfilePage = styled(Box)({
   display: "flex",
-  justifyContent: "center",
-  alignItems: "flex-start",
+  flexDirection: "column",
+  justifyContent: "flex-start",
+  alignItems: "center",
   minHeight: "100vh",
   paddingTop: 32,
-  paddingLeft: 16,
-  paddingRight: 16,
+  paddingLeft: "5vw",
+  paddingRight: "5vw",
+  gap: 20,
 });
 
 export const ProfileCard = styled(Card)({
   width: "100%",
-  maxWidth: 1000,
   borderRadius: 16,
   overflow: "visible",
 });

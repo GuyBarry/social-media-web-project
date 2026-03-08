@@ -1,12 +1,20 @@
 import { CircularProgress, Typography } from "@mui/material";
-import { useEffect, useRef } from "react";
-import { useGetAllPostsInfinite, useLikePost } from "../../react/hooks/usePosts";
+import { useEffect, useRef, type FC } from "react";
+import type {
+  UseInfiniteQueryResult,
+  InfiniteData,
+} from "@tanstack/react-query";
+import { useLikePost } from "../../react/hooks/usePosts";
+import type { PaginatedPosts } from "../../entities/Post";
 import { PostComponent } from "../post/post";
-import { FeedCenter, FeedContainer, FeedList } from "./feed.styled";
+import { FeedCenter, FeedContainer, FeedGrid } from "./feed.styled";
 
-const POSTS_PER_PAGE = 1; //TODO: change to 10 in production
+interface FeedProps {
+  queryResult: UseInfiniteQueryResult<InfiniteData<PaginatedPosts>>;
+  columns?: number;
+}
 
-export const FeedComponent = () => {
+export const FeedComponent: FC<FeedProps> = ({ queryResult, columns = 1 }) => {
   const {
     data,
     isLoading,
@@ -14,7 +22,7 @@ export const FeedComponent = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useGetAllPostsInfinite(POSTS_PER_PAGE);
+  } = queryResult;
 
   const { mutate: likePost } = useLikePost();
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -56,7 +64,7 @@ export const FeedComponent = () => {
 
   return (
     <FeedContainer>
-      <FeedList>
+      <FeedGrid $columns={columns}>
         {posts.map((post) => (
           <PostComponent
             key={post._id}
@@ -65,7 +73,7 @@ export const FeedComponent = () => {
             onDislike={(id) => likePost({ id, method: "dislike" })}
           />
         ))}
-      </FeedList>
+      </FeedGrid>
 
       <div ref={sentinelRef} style={{ height: 1 }} />
 
