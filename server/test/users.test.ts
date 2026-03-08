@@ -305,6 +305,82 @@ describe("PUT /users/:id", () => {
     expect(response.body.details.value).toBe(uniqueUsername);
   });
 
+  describe("banner color update", () => {
+    test("Should update banner color with a valid palette key (1–9)", async () => {
+      const response = await request(app)
+        .put(`/users/${exampleUser._id}`)
+        .set("Cookie", authCookies)
+        .field("bannerColor", "5");
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+
+      const updatedUser = await UserModel.findById(exampleUser._id);
+      expect(updatedUser?.bannerColor).toBe("5");
+    });
+
+    test("Should update banner color with a valid hex code", async () => {
+      const response = await request(app)
+        .put(`/users/${exampleUser._id}`)
+        .set("Cookie", authCookies)
+        .field("bannerColor", "#a1b2c3");
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+
+      const updatedUser = await UserModel.findById(exampleUser._id);
+      expect(updatedUser?.bannerColor).toBe("#a1b2c3");
+    });
+
+    test("Should update banner color with a short hex code", async () => {
+      const response = await request(app)
+        .put(`/users/${exampleUser._id}`)
+        .set("Cookie", authCookies)
+        .field("bannerColor", "#fff");
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+
+      const updatedUser = await UserModel.findById(exampleUser._id);
+      expect(updatedUser?.bannerColor).toBe("#fff");
+    });
+
+    test("Should return 400 for an invalid banner color value", async () => {
+      const response = await request(app)
+        .put(`/users/${exampleUser._id}`)
+        .set("Cookie", authCookies)
+        .field("bannerColor", "notacolor");
+
+      expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
+      expect(response.body.message).toBe("Invalid request body");
+      expect(response.body.violations).toBeDefined();
+    });
+
+    test("Should return 400 for palette key 0 (out of range)", async () => {
+      const response = await request(app)
+        .put(`/users/${exampleUser._id}`)
+        .set("Cookie", authCookies)
+        .field("bannerColor", "0");
+
+      expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
+      expect(response.body.message).toBe("Invalid request body");
+    });
+
+    test("New user should have default banner color of '1'", async () => {
+      const createResponse = await request(app)
+        .post("/users")
+        .set("Cookie", authCookies)
+        .send({
+          username: "bannerdefaultuser",
+          email: "bannerdefault@example.com",
+          birthDate: "1990-01-01",
+          password: "somepassword",
+        });
+
+      expect(createResponse.statusCode).toEqual(StatusCodes.CREATED);
+
+      const createdUser = await UserModel.findById(createResponse.body.userId);
+      expect(createdUser?.bannerColor).toBe("1");
+    });
+  });
+
   describe("picture update", () => {
     const OLD_PICTURE_FILENAME = "old-user-picture.png";
     const oldPicturePath = path.join(UPLOAD_DIR, OLD_PICTURE_FILENAME);

@@ -60,7 +60,7 @@ export const FieldInput = styled(TextField)(({ theme }) => ({
 }));
 
 export const EditFieldRow = styled(Stack)({
-  width: "60%",
+  flexDirection: "row",
 });
 
 export const EditFieldItem = styled(Box)({

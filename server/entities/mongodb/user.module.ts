@@ -37,6 +37,10 @@ const userSchema = new Schema(
       type: String,
       default: "",
     },
+    bannerColor: {
+      type: String,
+      default: "1",
+    },
   },
   {
     timestamps: true,

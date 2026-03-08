@@ -1,17 +1,21 @@
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { Box } from "@mui/material";
 import { useRef, useState } from "react";
+import { BannerColorPicker } from "../../../components/colorPicker/BannerColorPicker";
 import { CostumButton, ProfileAvatar } from "../../../components/shared.styled";
 import type { User } from "../../../entities/User";
 import { useUpdateUser } from "../../../react/hooks/useUsers";
 import {
+  AvatarColumnBox,
   AvatarRow,
+  EditColorColumn,
+  EditContentRow,
+  EditFormColumn,
   ProfileBanner,
   ProfileCard,
   ProfilePage,
 } from "../profile.styled";
-import { avatarImageSlotProps } from "../profile.utils";
+import { avatarImageSlotProps, resolveBannerColor } from "../profile.utils";
 import {
   AvatarCameraOverlay,
   AvatarWrapper,
@@ -50,7 +54,12 @@ export const EditProfileScreen = ({
   const [deleteImage, setDeleteImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const bannerColor = "#8497eeff";
+  const [bannerColor, setBannerColor] = useState(
+    resolveBannerColor(user?.bannerColor),
+  );
+
+  // if (!user) return null;
+
   const displayName = user.username;
 
   const handleSave = async () => {
@@ -59,19 +68,26 @@ export const EditProfileScreen = ({
     if (editUsername !== user.username)
       formData.append("username", editUsername);
     if (editBio !== (user.bio ?? "")) formData.append("bio", editBio);
-    if (editBirthDate) {
-      const existingDate =
-        user.birthDate instanceof Date && !isNaN(user.birthDate.getTime())
-          ? user.birthDate.toISOString().split("T")[0]
-          : "";
-      if (editBirthDate !== existingDate) {
-        formData.append("birthDate", editBirthDate);
-      }
-    }
+    const existingDate =
+      user.birthDate instanceof Date && !isNaN(user.birthDate.getTime())
+        ? user.birthDate.toISOString().split("T")[0]
+        : "";
+    if (editBirthDate && editBirthDate !== existingDate)
+      formData.append("birthDate", editBirthDate);
     if (selectedFile) formData.append("image", selectedFile);
     if (deleteImage) formData.append("imageUrl", "");
 
+    const originalBanner = user.bannerColor ?? "1";
+    if (bannerColor !== resolveBannerColor(originalBanner))
+      formData.append("bannerColor", bannerColor);
+
+    if ([...formData.keys()].length === 0) {
+      onSave();
+      return;
+    }
+
     await updateUser({ userId: user._id, formData });
+
     onSave();
   };
 
@@ -81,14 +97,7 @@ export const EditProfileScreen = ({
         <ProfileBanner bannercolor={bannerColor} />
 
         <AvatarRow>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 1,
-            }}
-          >
+          <AvatarColumnBox>
             <AvatarWrapper onClick={() => fileInputRef.current?.click()}>
               <ProfileAvatar
                 className="avatar-img"
@@ -129,46 +138,57 @@ export const EditProfileScreen = ({
                 Remove image
               </CostumButton>
             )}
-          </Box>
+          </AvatarColumnBox>
         </AvatarRow>
 
         <EditFormBox>
-          <EditFieldRow direction="row" spacing={2}>
-            <EditFieldItem>
-              <FieldLabel>Username</FieldLabel>
-              <FieldInput
-                fullWidth
-                size="small"
-                placeholder="Username"
-                value={editUsername}
-                onChange={(e) => setEditUsername(e.target.value)}
-              />
-            </EditFieldItem>
+          <EditContentRow>
+            <EditFormColumn>
+              <EditFieldRow direction="row" spacing={2}>
+                <EditFieldItem>
+                  <FieldLabel>Username</FieldLabel>
+                  <FieldInput
+                    fullWidth
+                    size="small"
+                    placeholder="Username"
+                    value={editUsername}
+                    onChange={(e) => setEditUsername(e.target.value)}
+                  />
+                </EditFieldItem>
 
-            <EditFieldItem>
-              <FieldLabel>Birth Date</FieldLabel>
-              <FieldInput
-                fullWidth
-                size="small"
-                type="date"
-                value={editBirthDate}
-                onChange={(e) => setEditBirthDate(e.target.value)}
-              />
-            </EditFieldItem>
-          </EditFieldRow>
+                <EditFieldItem>
+                  <FieldLabel>Birth Date</FieldLabel>
+                  <FieldInput
+                    fullWidth
+                    size="small"
+                    type="date"
+                    value={editBirthDate}
+                    onChange={(e) => setEditBirthDate(e.target.value)}
+                  />
+                </EditFieldItem>
+              </EditFieldRow>
 
-          <EditFieldRow>
-            <FieldLabel>Description</FieldLabel>
-            <FieldInput
-              fullWidth
-              size="small"
-              multiline
-              minRows={3}
-              placeholder="Tell something about yourself..."
-              value={editBio}
-              onChange={(e) => setEditBio(e.target.value)}
-            />
-          </EditFieldRow>
+              <EditFieldItem>
+                <FieldLabel>Description</FieldLabel>
+                <FieldInput
+                  fullWidth
+                  size="small"
+                  multiline
+                  minRows={3}
+                  placeholder="Tell something about yourself..."
+                  value={editBio}
+                  onChange={(e) => setEditBio(e.target.value)}
+                />
+              </EditFieldItem>
+            </EditFormColumn>
+
+            <EditColorColumn>
+              <BannerColorPicker
+                color={bannerColor}
+                onChange={setBannerColor}
+              />
+            </EditColorColumn>
+          </EditContentRow>
 
           <EditActionsRow>
             <CostumButton

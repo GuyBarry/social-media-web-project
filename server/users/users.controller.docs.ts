@@ -228,6 +228,9 @@
  *                   description: URL of the user's profile picture
  *                 birthDate:
  *                   type: string
+ *                 bannerColor:
+ *                   type: string
+ *                   description: Palette key ("1"–"9") or a hex color code
  *                 createdAt:
  *                   type: string
  *                 updatedAt:

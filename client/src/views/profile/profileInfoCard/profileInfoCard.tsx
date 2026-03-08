@@ -19,19 +19,18 @@ import {
   MetaText,
   UserInfoBox,
 } from "./profileInfoCard.styled";
-import { avatarImageSlotProps } from "../profile.utils";
+import { avatarImageSlotProps, resolveBannerColor } from "../profile.utils";
 
 interface ProfileInfoCardProps {
   user: User;
   onEditClick: () => void;
 }
 
-const BANNER_COLOR = "#8497eeff";
-
 export const ProfileInfoCard = ({
   user,
   onEditClick,
 }: ProfileInfoCardProps) => {
+  const bannerColor = resolveBannerColor(user.bannerColor);
   const uniqueUsername = `@${user.username.toLowerCase().replace(/\s+/g, "")}`;
   const birthDateParsed = user.birthDate ? new Date(user.birthDate) : null;
   const birthDate =
@@ -45,7 +44,7 @@ export const ProfileInfoCard = ({
 
   return (
     <ProfileCard elevation={3}>
-      <ProfileBanner bannercolor={BANNER_COLOR} />
+      <ProfileBanner bannercolor={bannerColor} />
 
       <AvatarRow>
         <ProfileAvatar
