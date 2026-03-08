@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import PaletteIcon from "@mui/icons-material/Palette";
 import { BannerColorHexInput, BannerColorPreview, BannerColorSwitchBox } from "./colorPicker.styled";
 
 interface BannerColorSwitchProps {
@@ -30,6 +31,9 @@ export const BannerColorSwitch = ({ color, onChange }: BannerColorSwitchProps) =
         title="Click to open colour picker"
         onClick={() => inputRef.current?.click()}
       >
+        <div className="color-preview-overlay">
+          <PaletteIcon />
+        </div>
         <input
           ref={inputRef}
           type="color"

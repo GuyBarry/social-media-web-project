@@ -62,6 +62,31 @@ export const BannerColorPreview = styled(Box)<{ color: string }>(({ color, theme
     border: "none",
     padding: 0,
   },
+  "& .color-preview-overlay": {
+    position: "absolute",
+    inset: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backdropFilter: "blur(0px)",
+    backgroundColor: "transparent",
+    transition: "backdrop-filter 0.2s ease, background-color 0.2s ease",
+    pointerEvents: "none",
+    "& svg": {
+      opacity: 0,
+      transition: "opacity 0.2s ease",
+      color: theme.palette.common.white,
+      filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.5))",
+      fontSize: 28,
+    },
+  },
+  "&:hover .color-preview-overlay": {
+    backdropFilter: "blur(4px)",
+    backgroundColor: "rgba(0,0,0,0.25)",
+    "& svg": {
+      opacity: 1,
+    },
+  },
 }));
 
 export const BannerColorHexInput = styled("input")(({ theme }) => ({
