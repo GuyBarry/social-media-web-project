@@ -1,28 +1,30 @@
 import { useRef, useState } from "react";
-import { Box, TextField } from "@mui/material";
+import { Box, Stack, TextField } from "@mui/material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useAuth } from "../../context/authContext";
 import {
   AvatarCameraOverlay,
+  AvatarColumnBox,
   AvatarDeleteButton,
   AvatarRow,
   AvatarWrapper,
   CancelButton,
   EditActionsRow,
+  EditColorColumn,
+  EditContentRow,
   EditFieldItem,
-  EditFieldRow,
-  EditFieldWide,
   EditFormBox,
-  FieldLabel,
+  EditFormColumn,
   ProfileBanner,
   ProfileCard,
   ProfilePage,
   SaveButton,
 } from "./profile.styled";
-import { ProfileAvatar } from "../../components/shared.styled";
+import { FieldLabel, ProfileAvatar } from "../../components/shared.styled";
 import { avatarImageSlotProps } from "./profile.utils";
 import { updateUser } from "./profileApi";
+import { BannerColorPicker } from "../../components/colorPicker/BannerColorPicker";
 
 interface EditProfileScreenProps {
   onCancel: () => void;
@@ -49,9 +51,12 @@ export const EditProfileScreen = ({
   const [deleteImage, setDeleteImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [bannerColor, setBannerColor] = useState(
+    user?.bannerColor ?? "#8497eeff",
+  );
+
   if (!user) return null;
 
-  const bannerColor = "#8497eeff";;
   const displayName = user.username;
 
   const handleSave = async () => {
@@ -83,7 +88,7 @@ export const EditProfileScreen = ({
         <ProfileBanner bannercolor={bannerColor} />
 
         <AvatarRow>
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <AvatarColumnBox>
             <AvatarWrapper onClick={() => fileInputRef.current?.click()}>
               <ProfileAvatar
                 className="avatar-img"
@@ -123,46 +128,57 @@ export const EditProfileScreen = ({
                 Remove image
               </AvatarDeleteButton>
             )}
-          </Box>
+          </AvatarColumnBox>
         </AvatarRow>
 
         <EditFormBox>
-          <EditFieldRow direction="row" spacing={2}>
-            <EditFieldItem>
-              <FieldLabel>Username</FieldLabel>
-              <TextField
-                fullWidth
-                size="small"
-                placeholder="Username"
-                value={editUsername}
-                onChange={(e) => setEditUsername(e.target.value)}
-              />
-            </EditFieldItem>
+          <EditContentRow>
+            <EditFormColumn>
+              <Stack direction="row" spacing={2}>
+                <EditFieldItem>
+                  <FieldLabel>Username</FieldLabel>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="Username"
+                    value={editUsername}
+                    onChange={(e) => setEditUsername(e.target.value)}
+                  />
+                </EditFieldItem>
 
-            <EditFieldItem>
-              <FieldLabel>Birth Date</FieldLabel>
-              <TextField
-                fullWidth
-                size="small"
-                type="date"
-                value={editBirthDate}
-                onChange={(e) => setEditBirthDate(e.target.value)}
-              />
-            </EditFieldItem>
-          </EditFieldRow>
+                <EditFieldItem>
+                  <FieldLabel>Birth Date</FieldLabel>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    type="date"
+                    value={editBirthDate}
+                    onChange={(e) => setEditBirthDate(e.target.value)}
+                  />
+                </EditFieldItem>
+              </Stack>
 
-          <EditFieldWide>
-            <FieldLabel>Description</FieldLabel>
-            <TextField
-              fullWidth
-              size="small"
-              multiline
-              minRows={3}
-              placeholder="Tell something about yourself..."
-              value={editBio}
-              onChange={(e) => setEditBio(e.target.value)}
-            />
-          </EditFieldWide>
+              <Box>
+                <FieldLabel>Description</FieldLabel>
+                <TextField
+                  fullWidth
+                  size="small"
+                  multiline
+                  minRows={3}
+                  placeholder="Tell something about yourself..."
+                  value={editBio}
+                  onChange={(e) => setEditBio(e.target.value)}
+                />
+              </Box>
+            </EditFormColumn>
+
+            <EditColorColumn>
+              <BannerColorPicker
+                color={bannerColor}
+                onChange={setBannerColor}
+              />
+            </EditColorColumn>
+          </EditContentRow>
 
           <EditActionsRow>
             <SaveButton

@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  Card,
-  Divider,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Card, Divider, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 const BANNER_HEIGHT = 140;
@@ -159,15 +152,6 @@ export const EditFormBox = styled(Box)({
   gap: 20,
 });
 
-export const FieldLabel = styled(Typography)(({ theme }) => ({
-  fontWeight: 600,
-  color: theme.palette.text.secondary,
-  marginBottom: 4,
-  fontSize: "0.8rem",
-  textTransform: "uppercase",
-  letterSpacing: 0.5,
-}));
-
 export const SaveButton = styled(Button)({
   borderRadius: 20,
   textTransform: "none",
@@ -190,16 +174,8 @@ export const CancelButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-export const EditFieldRow = styled(Stack)({
-  width: "60%",
-});
-
 export const EditFieldItem = styled(Box)({
   flex: 1,
-});
-
-export const EditFieldWide = styled(Box)({
-  width: "60%",
 });
 
 export const MetaText = styled(Typography)({
@@ -211,6 +187,29 @@ export const MetaText = styled(Typography)({
 export const EditActionsRow = styled(Stack)({
   flexDirection: "row",
   gap: 12,
+});
+
+export const AvatarColumnBox = styled(Box)({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+});
+
+export const EditContentRow = styled(Box)({
+  display: "flex",
+  gap: 24,
+  alignItems: "stretch",
+});
+
+export const EditFormColumn = styled(Box)({
+  flex: 2,
+  display: "flex",
+  flexDirection: "column",
+  gap: 20,
+});
+
+export const EditColorColumn = styled(Box)({
+  flex: 1,
 });
 
 export const AvatarDeleteButton = styled(Button)(({ theme }) => ({
