@@ -1,6 +1,6 @@
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { Box, TextField } from "@mui/material";
+import { Box } from "@mui/material";
 import { useRef, useState } from "react";
 import { CostumButton, ProfileAvatar } from "../../../components/shared.styled";
 import type { User } from "../../../entities/User";
@@ -18,8 +18,8 @@ import {
   EditActionsRow,
   EditFieldItem,
   EditFieldRow,
-  EditFieldWide,
   EditFormBox,
+  FieldInput,
   FieldLabel
 } from "./editProfile.styled";
 
@@ -136,7 +136,7 @@ export const EditProfileScreen = ({
           <EditFieldRow direction="row" spacing={2}>
             <EditFieldItem>
               <FieldLabel>Username</FieldLabel>
-              <TextField
+              <FieldInput
                 fullWidth
                 size="small"
                 placeholder="Username"
@@ -147,7 +147,7 @@ export const EditProfileScreen = ({
 
             <EditFieldItem>
               <FieldLabel>Birth Date</FieldLabel>
-              <TextField
+              <FieldInput
                 fullWidth
                 size="small"
                 type="date"
@@ -157,9 +157,9 @@ export const EditProfileScreen = ({
             </EditFieldItem>
           </EditFieldRow>
 
-          <EditFieldWide>
+          <EditFieldRow>
             <FieldLabel>Description</FieldLabel>
-            <TextField
+            <FieldInput
               fullWidth
               size="small"
               multiline
@@ -168,7 +168,7 @@ export const EditProfileScreen = ({
               value={editBio}
               onChange={(e) => setEditBio(e.target.value)}
             />
-          </EditFieldWide>
+          </EditFieldRow>
 
           <EditActionsRow>
             <CostumButton

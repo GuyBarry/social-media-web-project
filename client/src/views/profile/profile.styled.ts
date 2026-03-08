@@ -12,8 +12,7 @@ export const ProfilePage = styled(Box)({
   alignItems: "center",
   minHeight: "100vh",
   paddingTop: 32,
-  paddingLeft: "5vw",
-  paddingRight: "5vw",
+  paddingInline: "7vw",
   gap: 20,
 });
 
@@ -41,9 +40,7 @@ export const AvatarRow = styled(Stack)({
 });
 
 export const ProfileDivider = styled(Divider)({
-  marginLeft: 24,
-  marginRight: 24,
+  marginInline: 24,
   marginTop: 16,
   marginBottom: 10,
 });
-

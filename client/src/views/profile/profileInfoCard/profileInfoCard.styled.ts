@@ -3,8 +3,7 @@ import { styled } from "@mui/material/styles";
 import { Stack } from "@mui/material";
 
 export const UserInfoBox = styled(Box)({
-  paddingLeft: 24,
-  paddingRight: 24,
+  paddingInline: 24,
   paddingTop: 12,
   paddingBottom: 0,
 });
@@ -23,8 +22,7 @@ export const BioText = styled(Typography)({
 });
 
 export const MetaStack = styled(Stack)({
-  paddingLeft: 24,
-  paddingRight: 24,
+  paddingInline: 24,
   flexWrap: "wrap",
   marginTop: 12,
 });

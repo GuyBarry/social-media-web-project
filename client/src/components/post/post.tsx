@@ -60,7 +60,7 @@ export const PostComponent = ({
     <PostCard>
       {/* Header */}
       <PostHeader>
-        <ProfileAvatar size={40} src={post.sender.imageUrl ?? undefined} />
+        <ProfileAvatar size={40} src={post.sender.imageUrl} />
         <PostUserInfo>
           <PostUsername>{post.sender.username}</PostUsername>
           <PostTimestamp>{formatTimestamp(post.createdAt)}</PostTimestamp>

@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Stack, TextField, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 const AVATAR_SIZE = 88;
@@ -33,10 +33,7 @@ export const AvatarCameraOverlay = styled(Box)({
 });
 
 export const EditFormBox = styled(Box)({
-  paddingLeft: 24,
-  paddingRight: 24,
-  paddingTop: 12,
-  paddingBottom: 24,
+  padding: "12px 24px",
   display: "flex",
   flexDirection: "column",
   gap: 20,
@@ -47,8 +44,19 @@ export const FieldLabel = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary,
   marginBottom: 4,
   fontSize: "0.8rem",
-  textTransform: "uppercase",
-  letterSpacing: 0.5,
+}));
+
+export const FieldInput = styled(TextField)(({ theme }) => ({
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 12,
+    fontSize: "0.875rem",
+    "& fieldset": {
+      borderColor: theme.palette.grey[300],
+    },
+    "&:hover fieldset": {
+      borderColor: theme.palette.grey[400],
+    },
+  },
 }));
 
 export const EditFieldRow = styled(Stack)({
@@ -57,10 +65,6 @@ export const EditFieldRow = styled(Stack)({
 
 export const EditFieldItem = styled(Box)({
   flex: 1,
-});
-
-export const EditFieldWide = styled(Box)({
-  width: "60%",
 });
 
 export const EditActionsRow = styled(Stack)({
