@@ -1,4 +1,7 @@
 .navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -7,6 +10,7 @@
   background-color: var(--background-paper, #ffffff);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
+  height: var(--navbar-height);
 }
 
 .navbar-logo {

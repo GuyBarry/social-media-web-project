@@ -12,7 +12,9 @@
 }
 
 .home-sidebar {
-  /* left / right column — 1/4 of screen each */
+  position: sticky;
+  top: var(--navbar-height);
+  align-self: start;
 }
 
 .home-main {
