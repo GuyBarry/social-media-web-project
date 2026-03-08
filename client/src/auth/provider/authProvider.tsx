@@ -14,6 +14,7 @@ import { authApi } from "../api/authApi";
 import { selfAuthApi } from "../api/selfAuthApi";
 import type { UserLogin } from "../types/userLogin";
 import type { UserRegistration } from "../types/userRegistration";
+import { usersApi } from "../../api/usersApi";
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [user, setUser] = useState<User | null>(null);
@@ -49,6 +50,16 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       setIsLoadingUserAuth(false);
     }
   }, [saveUser]);
+
+  const refreshUser = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data } = await usersApi.get<User>(`/${user._id}`);
+      saveUser(data);
+    } catch (error) {
+      console.error("Refresh user went wrong", error);
+    }
+  }, [user, saveUser]);
 
   useEffect(() => {
     if (!user) {
@@ -109,7 +120,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, isLoadingUserAuth }}
+      value={{ user, login, register, logout, refreshUser, isLoadingUserAuth }}
     >
       {children}
     </AuthContext.Provider>

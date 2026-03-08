@@ -1,15 +1,20 @@
 import { Express } from "express";
+import fs from "fs/promises";
 import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
+import path from "path";
 import request from "supertest";
+import { UPLOAD_DIR } from "../pictures/pictures.config";
 import { initApp } from "../app";
 import { authService } from "../auth/auth.service";
 import { User } from "../entities/dto/user.dto";
 import { UserModel } from "../entities/mongodb/user.module";
-import { exampleUser, getAuthCookies, loginUser } from "./testUtils";
+import { cleanupTestPictures, exampleUser, getAuthCookies, loginUser } from "./testUtils";
 
 let app: Express;
 let authCookies: string[];
+
+const TEST_PNG = path.resolve(__dirname, "resources/test.png");
 
 beforeAll(async () => {
   await initApp().then(async (appInstance) => {
@@ -31,6 +36,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  await cleanupTestPictures();
   await mongoose.connection.close();
 });
 
@@ -195,10 +201,8 @@ describe("PUT /users/:id", () => {
     const response = await request(app)
       .put(`/users/${exampleUser._id}`)
       .set("Cookie", authCookies)
-      .send({
-        username: "Updated User",
-        bio: "This is an updated bio",
-      });
+      .field("username", "Updated User")
+      .field("bio", "This is an updated bio");
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
 
@@ -213,20 +217,17 @@ describe("PUT /users/:id", () => {
     const response = await request(app)
       .put(`/users/${nonExistentId}`)
       .set("Cookie", authCookies)
-      .send({ bio: "This user does not exist" });
+      .field("bio", "This user does not exist");
 
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("User does not exist");
   });
 
   test("Should return 400 for invalid update data", async () => {
-    const invalidUpdateData = {
-      username: "",
-    };
     const response = await request(app)
       .put(`/users/${exampleUser._id}`)
       .set("Cookie", authCookies)
-      .send(invalidUpdateData);
+      .field("username", "");
 
     expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
     expect(response.body.message).toBe("Invalid request body");
@@ -247,7 +248,7 @@ describe("PUT /users/:id", () => {
     const response = await request(app)
       .put(`/users/${exampleUser._id}`)
       .set("Cookie", authCookies)
-      .send({ email: anotherUser.email });
+      .field("email", anotherUser.email);
 
     expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
     expect(response.body.message).toBe("User already exists");
@@ -269,12 +270,74 @@ describe("PUT /users/:id", () => {
     const response = await request(app)
       .put(`/users/${exampleUser._id}`)
       .set("Cookie", authCookies)
-      .send({ username: anotherUser.username });
+      .field("username", anotherUser.username);
 
     expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
     expect(response.body.message).toBe("User already exists");
     expect(response.body.details.field).toBe("username");
     expect(response.body.details.value).toBe(uniqueUsername);
+  });
+
+  describe("picture update", () => {
+    const OLD_PICTURE_FILENAME = "old-user-picture.png";
+    const oldPicturePath = path.join(UPLOAD_DIR, OLD_PICTURE_FILENAME);
+
+    beforeEach(async () => {
+      // Place a real file on disk so deleteFile can unlink it
+      await fs.copyFile(TEST_PNG, oldPicturePath);
+      // Point the seeded user's image at that file
+      await UserModel.findByIdAndUpdate(exampleUser._id, {
+        imageUrl: `http://localhost/public/${OLD_PICTURE_FILENAME}`,
+      });
+    });
+
+    afterEach(async () => {
+      // Clean up in case the test did not delete it
+      await fs.unlink(oldPicturePath).catch(() => undefined);
+    });
+
+    test("Should update the picture of an existing user", async () => {
+      const response = await request(app)
+        .put(`/users/${exampleUser._id}`)
+        .set("Cookie", authCookies)
+        .attach("image", TEST_PNG);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+
+      // Old file should have been removed from disk
+      await expect(fs.access(oldPicturePath)).rejects.toThrow();
+
+      // Persisted image URL should now point at the newly uploaded file
+      const updatedUser = await UserModel.findById(exampleUser._id);
+      expect(updatedUser?.imageUrl).not.toBe(
+        `http://localhost/public/${OLD_PICTURE_FILENAME}`,
+      );
+      expect(updatedUser?.imageUrl).toMatch(/\/public\/.+\.png$/);
+    });
+
+    test("Should update both bio and picture", async () => {
+      const response = await request(app)
+        .put(`/users/${exampleUser._id}`)
+        .set("Cookie", authCookies)
+        .field("bio", "Updated bio with new picture")
+        .attach("image", TEST_PNG);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+
+      const updatedUser = await UserModel.findById(exampleUser._id);
+      expect(updatedUser?.bio).toBe("Updated bio with new picture");
+      expect(updatedUser?.imageUrl).toMatch(/\/public\/.+\.png$/);
+    });
+
+    test("Should return 404 when updating picture of a non-existent user", async () => {
+      const response = await request(app)
+        .put(`/users/nonexistentid`)
+        .set("Cookie", authCookies)
+        .attach("image", TEST_PNG);
+
+      expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
+      expect(response.body.message).toBe("User does not exist");
+    });
   });
 });
 

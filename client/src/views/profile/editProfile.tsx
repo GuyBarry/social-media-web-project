@@ -1,9 +1,11 @@
 import { useRef, useState } from "react";
-import { TextField } from "@mui/material";
+import { Box, TextField } from "@mui/material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useAuth } from "../../context/authContext";
 import {
   AvatarCameraOverlay,
+  AvatarDeleteButton,
   AvatarRow,
   AvatarWrapper,
   CancelButton,
@@ -13,36 +15,65 @@ import {
   EditFieldWide,
   EditFormBox,
   FieldLabel,
-  ProfileAvatar,
   ProfileBanner,
   ProfileCard,
   ProfilePage,
   SaveButton,
 } from "./profile.styled";
+import { ProfileAvatar } from "../../components/shared.styled";
+import { avatarImageSlotProps } from "./profile.utils";
+import { updateUser } from "./profileApi";
 
 interface EditProfileScreenProps {
   onCancel: () => void;
   onSave: () => void;
 }
 
-export const EditProfileScreen = ({ onCancel, onSave }: EditProfileScreenProps) => {
-  const { user } = useAuth();
+export const EditProfileScreen = ({
+  onCancel,
+  onSave,
+}: EditProfileScreenProps) => {
+  const { user, refreshUser } = useAuth();
   const [editUsername, setEditUsername] = useState(user?.username ?? "");
   const [editBio, setEditBio] = useState(user?.bio ?? "");
   const [editBirthDate, setEditBirthDate] = useState(() => {
     const parsed = user?.birthDate ? new Date(user.birthDate) : null;
-    return parsed && !isNaN(parsed.getTime()) ? parsed.toISOString().split("T")[0] : "";
+    return parsed && !isNaN(parsed.getTime())
+      ? parsed.toISOString().split("T")[0]
+      : "";
   });
-  const [editAvatarPreview, setEditAvatarPreview] = useState<string | null>(null);
+  const [editAvatarPreview, setEditAvatarPreview] = useState<string | null>(
+    user?.imageUrl ?? null,
+  );
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [deleteImage, setDeleteImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!user) return null;
 
-  const bannerColor = user.bannerColor ?? "#667eea";
+  const bannerColor = "#8497eeff";;
   const displayName = user.username;
 
-  const handleSave = () => {
-    // TODO: wire up save API call
+  const handleSave = async () => {
+    const formData = new FormData();
+
+    if (editUsername !== user.username)
+      formData.append("username", editUsername);
+    if (editBio !== (user.bio ?? "")) formData.append("bio", editBio);
+    if (editBirthDate) {
+      const existingDate =
+        user.birthDate instanceof Date && !isNaN(user.birthDate.getTime())
+          ? user.birthDate.toISOString().split("T")[0]
+          : "";
+      if (editBirthDate !== existingDate) {
+        formData.append("birthDate", editBirthDate);
+      }
+    }
+    if (selectedFile) formData.append("image", selectedFile);
+    if (deleteImage) formData.append("imageUrl", "");
+
+    await updateUser(user._id, formData);
+    await refreshUser();
     onSave();
   };
 
@@ -52,26 +83,47 @@ export const EditProfileScreen = ({ onCancel, onSave }: EditProfileScreenProps) 
         <ProfileBanner bannercolor={bannerColor} />
 
         <AvatarRow>
-          <AvatarWrapper onClick={() => fileInputRef.current?.click()}>
-            <ProfileAvatar className="avatar-img" src={editAvatarPreview ?? undefined}>
-              {!editAvatarPreview && displayName.charAt(0).toUpperCase()}
-            </ProfileAvatar>
-            <AvatarCameraOverlay className="avatar-overlay">
-              <CameraAltIcon fontSize="medium" />
-            </AvatarCameraOverlay>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              hidden
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                const url = URL.createObjectURL(file);
-                setEditAvatarPreview(url);
-              }}
-            />
-          </AvatarWrapper>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <AvatarWrapper onClick={() => fileInputRef.current?.click()}>
+              <ProfileAvatar
+                className="avatar-img"
+                src={editAvatarPreview ?? undefined}
+                slotProps={avatarImageSlotProps}
+              >
+                {!editAvatarPreview && displayName.charAt(0).toUpperCase()}
+              </ProfileAvatar>
+              <AvatarCameraOverlay className="avatar-overlay">
+                <CameraAltIcon fontSize="medium" />
+              </AvatarCameraOverlay>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const url = URL.createObjectURL(file);
+                  setEditAvatarPreview(url);
+                  setSelectedFile(file);
+                }}
+              />
+            </AvatarWrapper>
+            {editAvatarPreview && (
+              <AvatarDeleteButton
+                variant="outlined"
+                size="small"
+                startIcon={<DeleteOutlineIcon fontSize="small" />}
+                onClick={() => {
+                  setEditAvatarPreview(null);
+                  setSelectedFile(null);
+                  setDeleteImage(true);
+                }}
+              >
+                Remove image
+              </AvatarDeleteButton>
+            )}
+          </Box>
         </AvatarRow>
 
         <EditFormBox>
@@ -113,7 +165,11 @@ export const EditProfileScreen = ({ onCancel, onSave }: EditProfileScreenProps) 
           </EditFieldWide>
 
           <EditActionsRow>
-            <SaveButton variant="contained" color="primary" onClick={handleSave}>
+            <SaveButton
+              variant="contained"
+              color="primary"
+              onClick={handleSave}
+            >
               Save Changes
             </SaveButton>
             <CancelButton variant="outlined" onClick={onCancel}>

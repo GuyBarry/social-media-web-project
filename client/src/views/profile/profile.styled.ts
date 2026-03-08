@@ -1,4 +1,11 @@
-import { Avatar, Box, Button, Card, Divider, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  Divider,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 const BANNER_HEIGHT = 140;
@@ -22,11 +29,13 @@ export const ProfileCard = styled(Card)({
   overflow: "visible",
 });
 
-export const ProfileBanner = styled(Box)<{ bannercolor: string }>(({ bannercolor }) => ({
-  height: BANNER_HEIGHT,
-  backgroundColor: bannercolor,
-  borderRadius: "16px 16px 0 0",
-}));
+export const ProfileBanner = styled(Box)<{ bannercolor: string }>(
+  ({ bannercolor }) => ({
+    height: BANNER_HEIGHT,
+    backgroundColor: bannercolor,
+    borderRadius: "16px 16px 0 0",
+  }),
+);
 
 export const AvatarRow = styled(Box)({
   display: "flex",
@@ -66,16 +75,6 @@ export const AvatarCameraOverlay = styled(Box)({
   color: "#fff",
 });
 
-export const ProfileAvatar = styled(Avatar)(({ theme }) => ({
-  width: AVATAR_SIZE,
-  height: AVATAR_SIZE,
-  backgroundColor: theme.palette.secondary.main,
-  fontSize: "2rem",
-  fontWeight: 700,
-  boxShadow: theme.shadows[2],
-  transition: "filter 0.2s ease",
-}));
-
 export const EditProfileButton = styled(Button)(({ theme }) => ({
   borderRadius: 4,
   borderColor: theme.palette.grey[300],
@@ -113,11 +112,13 @@ export const MetaStack = styled(Stack)({
   paddingLeft: 24,
   paddingRight: 24,
   flexWrap: "wrap",
+  marginTop: 12,
 });
 
 export const MetaItem = styled(Stack)({
   flexDirection: "row",
   alignItems: "center",
+  gap: 6,
 });
 
 export const ProfileDivider = styled(Divider)({
@@ -211,3 +212,19 @@ export const EditActionsRow = styled(Stack)({
   flexDirection: "row",
   gap: 12,
 });
+
+export const AvatarDeleteButton = styled(Button)(({ theme }) => ({
+  marginTop: 8,
+  borderRadius: 20,
+  textTransform: "none",
+  fontWeight: 600,
+  fontSize: "0.75rem",
+  color: theme.palette.error.main,
+  borderColor: theme.palette.error.main,
+  paddingLeft: 12,
+  paddingRight: 12,
+  "&:hover": {
+    backgroundColor: theme.palette.error.light + "22",
+    borderColor: theme.palette.error.dark,
+  },
+}));

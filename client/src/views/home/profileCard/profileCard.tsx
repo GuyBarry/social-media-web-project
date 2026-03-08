@@ -1,18 +1,25 @@
-import { Avatar, Button, Divider, Typography } from "@mui/material";
+import { Button, Divider, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/authContext";
+import { ProfileAvatar } from "../../../components/shared.styled";
+import { avatarImageSlotProps } from "../../profile/profile.utils";
 import "./profileCard.css";
 
 export const ProfileCard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  if (!user) return null;
+
   return (
     <div className="profile-card">
-      <Avatar className="profile-card-avatar" sx={{ bgcolor: "primary.main" }}>
-        {user?.username?.[0]?.toUpperCase() ?? "U"}
-      </Avatar>
-
+      <ProfileAvatar
+        src={user.imageUrl ?? undefined}
+        slotProps={avatarImageSlotProps}
+      >
+        {user.username.charAt(0).toUpperCase()}
+      </ProfileAvatar>
+      
       <Typography
         variant="subtitle1"
         fontWeight={600}

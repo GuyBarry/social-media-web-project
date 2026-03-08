@@ -6,8 +6,8 @@ export interface User {
   email: string;
   password: string;
   bio?: string;
+  imageUrl?: string;
   birthDate: Date;
-  bannerColor?: string;
   postsCount?: number;
   likesCount?: number;
 }

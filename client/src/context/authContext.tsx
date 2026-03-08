@@ -19,6 +19,7 @@ interface AuthContextValue {
     authHandlers?: AuthResultHandlers,
   ) => Promise<void>;
   logout: (authHandlers?: AuthResultHandlers) => Promise<void>;
+  refreshUser: () => Promise<void>;
   isLoadingUserAuth: boolean;
 }
 export const AuthContext = createContext<AuthContextValue>(

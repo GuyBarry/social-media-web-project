@@ -191,9 +191,16 @@
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/UpdateUser'
+ *             allOf:
+ *               - $ref: '#/components/schemas/UpdateUser'
+ *               - type: object
+ *                 properties:
+ *                   picture:
+ *                     type: string
+ *                     format: binary
+ *                     description: Optional profile picture file
  *     responses:
  *       200:
  *         description: Updated user
@@ -210,6 +217,9 @@
  *                   type: string
  *                 bio:
  *                   type: string
+ *                 imageUrl:
+ *                   type: string
+ *                   description: URL of the user's profile picture
  *                 birthDate:
  *                   type: string
  *                 createdAt:
