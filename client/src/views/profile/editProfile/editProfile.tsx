@@ -1,39 +1,40 @@
-import { useRef, useState } from "react";
-import { Box, TextField } from "@mui/material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { useAuth } from "../../auth/context/authContext";
+import { Box, TextField } from "@mui/material";
+import { useRef, useState } from "react";
+import { CostumButton, ProfileAvatar } from "../../../components/shared.styled";
+import type { User } from "../../../entities/User";
+import { useUpdateUser } from "../../../react/hooks/useUsers";
+import {
+  AvatarRow,
+  ProfileBanner,
+  ProfileCard,
+  ProfilePage,
+} from "../profile.styled";
+import { avatarImageSlotProps } from "../profile.utils";
 import {
   AvatarCameraOverlay,
-  AvatarDeleteButton,
-  AvatarRow,
   AvatarWrapper,
-  CancelButton,
   EditActionsRow,
   EditFieldItem,
   EditFieldRow,
   EditFieldWide,
   EditFormBox,
-  FieldLabel,
-  ProfileBanner,
-  ProfileCard,
-  ProfilePage,
-  SaveButton,
-} from "./profile.styled";
-import { ProfileAvatar } from "../../components/shared.styled";
-import { avatarImageSlotProps } from "./profile.utils";
-import { updateUser } from "./profileApi";
+  FieldLabel
+} from "./editProfile.styled";
 
 interface EditProfileScreenProps {
+  user: User;
   onCancel: () => void;
   onSave: () => void;
 }
 
 export const EditProfileScreen = ({
+  user,
   onCancel,
   onSave,
 }: EditProfileScreenProps) => {
-  const { user, refreshUser } = useAuth();
+  const { mutateAsync: updateUser } = useUpdateUser();
   const [editUsername, setEditUsername] = useState(user?.username ?? "");
   const [editBio, setEditBio] = useState(user?.bio ?? "");
   const [editBirthDate, setEditBirthDate] = useState(() => {
@@ -49,9 +50,7 @@ export const EditProfileScreen = ({
   const [deleteImage, setDeleteImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  if (!user) return null;
-
-  const bannerColor = "#8497eeff";;
+  const bannerColor = "#8497eeff";
   const displayName = user.username;
 
   const handleSave = async () => {
@@ -72,8 +71,7 @@ export const EditProfileScreen = ({
     if (selectedFile) formData.append("image", selectedFile);
     if (deleteImage) formData.append("imageUrl", "");
 
-    await updateUser(user._id, formData);
-    await refreshUser();
+    await updateUser({ userId: user._id, formData });
     onSave();
   };
 
@@ -83,7 +81,14 @@ export const EditProfileScreen = ({
         <ProfileBanner bannercolor={bannerColor} />
 
         <AvatarRow>
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
             <AvatarWrapper onClick={() => fileInputRef.current?.click()}>
               <ProfileAvatar
                 className="avatar-img"
@@ -110,9 +115,10 @@ export const EditProfileScreen = ({
               />
             </AvatarWrapper>
             {editAvatarPreview && (
-              <AvatarDeleteButton
+              <CostumButton
                 variant="outlined"
                 size="small"
+                color="error"
                 startIcon={<DeleteOutlineIcon fontSize="small" />}
                 onClick={() => {
                   setEditAvatarPreview(null);
@@ -121,7 +127,7 @@ export const EditProfileScreen = ({
                 }}
               >
                 Remove image
-              </AvatarDeleteButton>
+              </CostumButton>
             )}
           </Box>
         </AvatarRow>
@@ -165,16 +171,16 @@ export const EditProfileScreen = ({
           </EditFieldWide>
 
           <EditActionsRow>
-            <SaveButton
+            <CostumButton
               variant="contained"
               color="primary"
               onClick={handleSave}
             >
               Save Changes
-            </SaveButton>
-            <CancelButton variant="outlined" onClick={onCancel}>
+            </CostumButton>
+            <CostumButton variant="outlined" onClick={onCancel}>
               Cancel
-            </CancelButton>
+            </CostumButton>
           </EditActionsRow>
         </EditFormBox>
       </ProfileCard>

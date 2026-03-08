@@ -49,11 +49,7 @@ export const Navbar = () => {
           onClick={handleLogout}
           title="Logout"
           size="small"
-          sx={{
-            color: "error.main",
-            borderRadius: "6px",
-            "&:hover": { backgroundColor: "rgba(211, 47, 47, 0.1)" },
-          }}
+          color="error"
         >
           <LogoutIcon fontSize="small" />
         </IconButton>

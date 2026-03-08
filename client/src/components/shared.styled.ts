@@ -1,4 +1,4 @@
-import { Avatar, IconButton } from "@mui/material";
+import { Avatar, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 export const ProfileAvatar = styled(Avatar)<{ size?: number }>(
@@ -13,19 +13,16 @@ export const ProfileAvatar = styled(Avatar)<{ size?: number }>(
   }),
 );
 
-export const IconButton2 = styled(IconButton)({
+export const CostumButton = styled(Button)(() => ({
+  borderRadius: 12,
+  textTransform: "none",
+  fontWeight: 600,
+  paddingLeft: 20,
+  paddingRight: 20,
   "&:focus": {
     outline: "none",
-    boxShadow: "none",
   },
   "&.Mui-focusVisible": {
-    outline: "none",
     boxShadow: "none",
   },
-  ":hover": {
-    backgroundColor: "transparent",
-  },
-  "&:active": {
-    backgroundColor: "transparent",
-  },
-});
+}));

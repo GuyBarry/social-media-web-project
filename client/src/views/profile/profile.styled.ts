@@ -1,4 +1,4 @@
-import { Box, Button, Card, Divider, Stack, Typography } from "@mui/material";
+import { Box, Card, Divider, Stack } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 const BANNER_HEIGHT = 100;
@@ -31,8 +31,8 @@ export const ProfileBanner = styled(Box)<{ bannercolor: string }>(
   }),
 );
 
-export const AvatarRow = styled(Box)({
-  display: "flex",
+export const AvatarRow = styled(Stack)({
+  flexDirection: "row",
   alignItems: "flex-end",
   justifyContent: "space-between",
   paddingLeft: 24,
@@ -40,185 +40,10 @@ export const AvatarRow = styled(Box)({
   marginTop: -AVATAR_OVERLAP,
 });
 
-export const AvatarWrapper = styled(Box)({
-  position: "relative",
-  width: AVATAR_SIZE,
-  height: AVATAR_SIZE,
-  cursor: "pointer",
-  borderRadius: "50%",
-  "& .avatar-overlay": {
-    opacity: 0,
-    transition: "opacity 0.2s ease",
-  },
-  "&:hover .avatar-img": {
-    filter: "blur(2px) brightness(0.65)",
-  },
-  "&:hover .avatar-overlay": {
-    opacity: 1,
-  },
-});
-
-export const AvatarCameraOverlay = styled(Box)({
-  position: "absolute",
-  inset: 0,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  borderRadius: "50%",
-  pointerEvents: "none",
-  color: "#fff",
-});
-
-export const EditProfileButton = styled(Button)(({ theme }) => ({
-  borderRadius: 4,
-  borderColor: theme.palette.grey[300],
-  color: theme.palette.text.primary,
-  backgroundColor: theme.palette.grey[100],
-  textTransform: "none",
-  fontWeight: 600,
-  "&:hover": {
-    backgroundColor: theme.palette.grey[200],
-    borderColor: theme.palette.grey[400],
-  },
-}));
-
-export const UserInfoBox = styled(Box)({
-  paddingLeft: 24,
-  paddingRight: 24,
-  paddingTop: 12,
-  paddingBottom: 0,
-});
-
-export const DisplayName = styled(Typography)({
-  fontWeight: 700,
-  lineHeight: 1.2,
-});
-
-export const HandleText = styled(Typography)({
-  marginTop: 2,
-});
-
-export const BioText = styled(Typography)({
-  marginTop: 10,
-});
-
-export const MetaStack = styled(Stack)({
-  paddingLeft: 24,
-  paddingRight: 24,
-  flexWrap: "wrap",
-  marginTop: 12,
-});
-
-export const MetaItem = styled(Stack)({
-  flexDirection: "row",
-  alignItems: "center",
-  gap: 6,
-});
-
 export const ProfileDivider = styled(Divider)({
   marginLeft: 24,
   marginRight: 24,
   marginTop: 16,
-  marginBottom: 16,
+  marginBottom: 10,
 });
 
-export const StatsStack = styled(Stack)({
-  paddingLeft: 24,
-  paddingRight: 24,
-  paddingBottom: 24,
-});
-
-export const StatItem = styled(Stack)({
-  alignItems: "center",
-});
-
-export const StatValue = styled(Typography)({
-  fontWeight: 700,
-  lineHeight: 1.1,
-});
-
-export const StatLabel = styled(Typography)(({ theme }) => ({
-  textTransform: "uppercase",
-  letterSpacing: 0.5,
-  color: theme.palette.text.secondary,
-}));
-
-export const EditFormBox = styled(Box)({
-  paddingLeft: 24,
-  paddingRight: 24,
-  paddingTop: 12,
-  paddingBottom: 24,
-  display: "flex",
-  flexDirection: "column",
-  gap: 20,
-});
-
-export const FieldLabel = styled(Typography)(({ theme }) => ({
-  fontWeight: 600,
-  color: theme.palette.text.secondary,
-  marginBottom: 4,
-  fontSize: "0.8rem",
-  textTransform: "uppercase",
-  letterSpacing: 0.5,
-}));
-
-export const SaveButton = styled(Button)({
-  borderRadius: 20,
-  textTransform: "none",
-  fontWeight: 600,
-  paddingLeft: 20,
-  paddingRight: 20,
-});
-
-export const CancelButton = styled(Button)(({ theme }) => ({
-  borderRadius: 20,
-  textTransform: "none",
-  fontWeight: 600,
-  paddingLeft: 20,
-  paddingRight: 20,
-  borderColor: theme.palette.grey[300],
-  color: theme.palette.text.secondary,
-  "&:hover": {
-    backgroundColor: theme.palette.grey[100],
-    borderColor: theme.palette.grey[400],
-  },
-}));
-
-export const EditFieldRow = styled(Stack)({
-  width: "60%",
-});
-
-export const EditFieldItem = styled(Box)({
-  flex: 1,
-});
-
-export const EditFieldWide = styled(Box)({
-  width: "60%",
-});
-
-export const MetaText = styled(Typography)({
-  margin: 0,
-  display: "flex",
-  alignItems: "center",
-});
-
-export const EditActionsRow = styled(Stack)({
-  flexDirection: "row",
-  gap: 12,
-});
-
-export const AvatarDeleteButton = styled(Button)(({ theme }) => ({
-  marginTop: 8,
-  borderRadius: 20,
-  textTransform: "none",
-  fontWeight: 600,
-  fontSize: "0.75rem",
-  color: theme.palette.error.main,
-  borderColor: theme.palette.error.main,
-  paddingLeft: 12,
-  paddingRight: 12,
-  "&:hover": {
-    backgroundColor: theme.palette.error.light + "22",
-    borderColor: theme.palette.error.dark,
-  },
-}));
