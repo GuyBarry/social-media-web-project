@@ -20,6 +20,7 @@ export const ProfileCard = styled(Card)({
   width: "100%",
   borderRadius: 16,
   overflow: "visible",
+  boxShadow: "0 1px 4px rgba(0, 0, 0, 0.05)",
 });
 
 export const ProfileBanner = styled(Box)<{ bannercolor: string }>(

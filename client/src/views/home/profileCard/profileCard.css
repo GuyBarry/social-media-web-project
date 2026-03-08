@@ -6,7 +6,7 @@
   padding: 30px 16px;
   background-color: var(--background-paper, #ffffff);
   border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   width: 100%;
   box-sizing: border-box;
 }

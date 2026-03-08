@@ -1,16 +1,20 @@
 import { Box, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-export const PostCard = styled(Box)(({ theme }) => ({
+export const PostCard = styled(Box)({
   backgroundColor: "#fff",
   borderRadius: 12,
-  border: `1px solid ${theme.palette.divider}`,
-  boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
+  boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
   overflow: "hidden",
   display: "flex",
   flexDirection: "column",
   width: "100%",
-}));
+
+  transition: "box-shadow 0.2s ease-in-out",
+  "&:hover": {
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+  },
+});
 
 export const PostHeader = styled(Box)({
   display: "flex",
@@ -48,7 +52,7 @@ export const PostCaption = styled(Typography)({
 export const PostImageContainer = styled(Box)({
   width: "100%",
   aspectRatio: 3 / 2,
-  backgroundColor: "#f0f0f0",
+  backgroundColor: "var(--background-default)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
