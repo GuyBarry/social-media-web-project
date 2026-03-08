@@ -65,21 +65,23 @@ export const EditProfileScreen = ({
     if (editUsername !== user.username)
       formData.append("username", editUsername);
     if (editBio !== (user.bio ?? "")) formData.append("bio", editBio);
-    if (editBirthDate) {
-      const existingDate =
-        user.birthDate instanceof Date && !isNaN(user.birthDate.getTime())
-          ? user.birthDate.toISOString().split("T")[0]
-          : "";
-      if (editBirthDate !== existingDate) {
-        formData.append("birthDate", editBirthDate);
-      }
-    }
+    const existingDate =
+      user.birthDate instanceof Date && !isNaN(user.birthDate.getTime())
+        ? user.birthDate.toISOString().split("T")[0]
+        : "";
+    if (editBirthDate && editBirthDate !== existingDate)
+      formData.append("birthDate", editBirthDate);
     if (selectedFile) formData.append("image", selectedFile);
     if (deleteImage) formData.append("imageUrl", "");
 
     const originalBanner = user.bannerColor ?? "1";
     if (bannerColor !== resolveBannerColor(originalBanner))
       formData.append("bannerColor", bannerColor);
+
+    if ([...formData.keys()].length === 0) {
+      onSave();
+      return;
+    }
 
     await updateUser(user._id, formData);
     await refreshUser();
