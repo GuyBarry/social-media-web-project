@@ -26,9 +26,19 @@ a:hover {
   color: var(--mui-palette-primary-dark);
 }
 
+html,
+body {
+  width: 100%;
+}
+
+#root {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
 body {
   margin: 0;
-  min-width: 320px;
   min-height: 100vh;
 }
 
