@@ -22,6 +22,7 @@ import {
 } from "./profile.styled";
 import { ProfileAvatar } from "../../components/shared.styled";
 import { avatarImageSlotProps } from "./profile.utils";
+import { updateUser } from "./profileApi";
 
 interface EditProfileScreenProps {
   onCancel: () => void;
@@ -32,7 +33,7 @@ export const EditProfileScreen = ({
   onCancel,
   onSave,
 }: EditProfileScreenProps) => {
-  const { user, updateUser } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [editUsername, setEditUsername] = useState(user?.username ?? "");
   const [editBio, setEditBio] = useState(user?.bio ?? "");
   const [editBirthDate, setEditBirthDate] = useState(() => {
@@ -42,7 +43,7 @@ export const EditProfileScreen = ({
       : "";
   });
   const [editAvatarPreview, setEditAvatarPreview] = useState<string | null>(
-    user?.image ?? null,
+    user?.imageUrl ?? null,
   );
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [deleteImage, setDeleteImage] = useState(false);
@@ -68,10 +69,11 @@ export const EditProfileScreen = ({
         formData.append("birthDate", editBirthDate);
       }
     }
-    if (selectedFile) formData.append("picture", selectedFile);
-    if (deleteImage) formData.append("image", "");
+    if (selectedFile) formData.append("image", selectedFile);
+    if (deleteImage) formData.append("imageUrl", "");
 
-    await updateUser(formData);
+    await updateUser(user._id, formData);
+    await refreshUser();
     onSave();
   };
 

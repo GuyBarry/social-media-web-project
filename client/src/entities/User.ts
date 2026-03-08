@@ -6,7 +6,7 @@ export interface User {
   email: string;
   password: string;
   bio?: string;
-  image?: string;
+  imageUrl?: string;
   birthDate: Date;
   postsCount?: number;
   likesCount?: number;

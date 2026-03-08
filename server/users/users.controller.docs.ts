@@ -217,7 +217,7 @@
  *                   type: string
  *                 bio:
  *                   type: string
- *                 image:
+ *                 imageUrl:
  *                   type: string
  *                   description: URL of the user's profile picture
  *                 birthDate:
