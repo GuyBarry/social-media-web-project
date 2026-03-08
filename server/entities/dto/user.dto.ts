@@ -12,7 +12,10 @@ export const userSchema = baseModule.extend({
   googleId: z.string().optional(),
 });
 export type User = z.infer<typeof userSchema>;
-export type UserPreview = Omit<User, "password" | "googleId">;
+export type UserPreview = Omit<User, "password" | "googleId"> & {
+  postsCount?: number;
+  likesCount?: number;
+};
 
 /**
  * @swagger

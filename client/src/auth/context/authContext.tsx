@@ -9,7 +9,7 @@ export interface AuthResultHandlers {
 }
 
 interface AuthContextValue {
-  user: User | null;
+  userId: string | null;
   login: (
     userCredentials: UserLogin,
     authResultHandlers?: AuthResultHandlers,
@@ -19,7 +19,6 @@ interface AuthContextValue {
     authHandlers?: AuthResultHandlers,
   ) => Promise<void>;
   logout: (authHandlers?: AuthResultHandlers) => Promise<void>;
-  refreshUser: () => Promise<void>;
   isLoadingUserAuth: boolean;
 }
 export const AuthContext = createContext<AuthContextValue>(

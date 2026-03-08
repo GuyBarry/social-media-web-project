@@ -13,6 +13,8 @@ import type {
   PaginatedPosts,
 } from "../../entities/Post";
 import type { User } from "../../entities/User";
+import { useAuth } from "../../auth/context/authContext";
+import { userKeys } from "./useUsers";
 
 // ─── Query Keys ────────────────────────────────────────────────────────────────
 
@@ -86,8 +88,9 @@ export function useCreatePost() {
       });
       return data as { message: string; postId: string; createdAt: string };
     },
-    onSuccess: () => {
+    onSuccess: (_data, postData) => {
       queryClient.invalidateQueries({ queryKey: postKeys.infinite() });
+      queryClient.invalidateQueries({ queryKey: userKeys.detail(postData.sender) });
     },
   });
 }
@@ -127,20 +130,23 @@ export function useLikePost() {
       method,
     }: {
       id: Post["_id"];
+      senderId: User["_id"];
       method: LikeMethod;
     }) => {
       const { data } = await postsApi.patch(`/${id}/like`, { method });
       return data as { message: string };
     },
-    onSuccess: (_data, { id }) => {
+    onSuccess: (_data, { id, senderId }) => {
       queryClient.invalidateQueries({ queryKey: postKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: postKeys.infinite() });
+      queryClient.invalidateQueries({ queryKey: userKeys.detail(senderId) });
     },
   });
 }
 
 export function useDeletePost() {
   const queryClient = useQueryClient();
+  const { userId } = useAuth();
 
   return useMutation({
     mutationFn: async (id: Post["_id"]) => {
@@ -150,6 +156,7 @@ export function useDeletePost() {
     onSuccess: (_data, id) => {
       queryClient.removeQueries({ queryKey: postKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: postKeys.all });
+      if (userId) queryClient.invalidateQueries({ queryKey: userKeys.detail(userId) });
     },
   });
 }

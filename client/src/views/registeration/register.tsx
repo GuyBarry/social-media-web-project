@@ -15,14 +15,14 @@ import { useAuth } from "../../auth/context/authContext";
 import "./register.css";
 
 export const RegisterScreen = () => {
-  const { user, register } = useAuth();
+  const { userId, register } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
+    if (userId) {
       navigate("/");
     }
-  }, [user, navigate]);
+  }, [userId, navigate]);
 
   const [formData, setFormData] = useState({
     email: "",

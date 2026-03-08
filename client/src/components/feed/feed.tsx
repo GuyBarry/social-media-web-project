@@ -69,8 +69,8 @@ export const FeedComponent: FC<FeedProps> = ({ queryResult, columns = 1 }) => {
           <PostComponent
             key={post._id}
             post={post}
-            onLike={(id) => likePost({ id, method: "like" })}
-            onDislike={(id) => likePost({ id, method: "dislike" })}
+            onLike={(id) => likePost({ id, senderId: post.sender._id, method: "like" })}
+            onDislike={(id) => likePost({ id, senderId: post.sender._id, method: "dislike" })}
           />
         ))}
       </FeedGrid>

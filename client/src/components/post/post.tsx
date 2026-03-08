@@ -1,7 +1,7 @@
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import { useAuth } from "../../auth/context/authContext";
+import { useGetUserById } from "../../react/hooks/useUsers";
 import type { Post } from "../../entities/Post";
 import { ProfileAvatar } from "../shared.styled";
 import { avatarImageSlotProps } from "../../views/profile/profile.utils";
@@ -45,7 +45,7 @@ export const PostComponent = ({
   onDislike,
   onComment,
 }: PostProps) => {
-  const { user } = useAuth();
+  const { data: user } = useGetUserById();
 
   const isLiked = !!user && post.likes.includes(user._id);
 

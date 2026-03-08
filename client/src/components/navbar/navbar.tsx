@@ -3,12 +3,14 @@ import { Box, IconButton, Typography } from "@mui/material";
 import { Share2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/context/authContext";
+import { useGetUserById } from "../../react/hooks/useUsers";
 import { avatarImageSlotProps } from "../../views/profile/profile.utils";
 import { ProfileAvatar } from "../shared.styled";
 import "./navbar.css";
 
 export const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { userId, logout } = useAuth();
+  const { data: user } = useGetUserById();
   const navigate = useNavigate();
 
   const handleProfileClick = () => {
@@ -21,7 +23,7 @@ export const Navbar = () => {
     });
   };
 
-  if (!user) return null;
+  if (!userId) return null;
 
   return (
     <Box className="navbar">
@@ -39,10 +41,10 @@ export const Navbar = () => {
           </Typography>
           <ProfileAvatar
             size={44}
-            src={user.imageUrl ?? undefined}
+            src={user?.imageUrl ?? undefined}
             slotProps={avatarImageSlotProps}
           >
-            {user.username.charAt(0).toUpperCase()}
+            {user?.username?.charAt(0).toUpperCase()}
           </ProfileAvatar>
         </div>
         <IconButton

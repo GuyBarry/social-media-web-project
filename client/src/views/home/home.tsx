@@ -2,13 +2,13 @@ import { Typography } from "@mui/material";
 import { FeedComponent } from "../../components/feed/feed";
 import { ProfileCard } from "./profileCard/profileCard";
 import { useGetAllPostsInfinite } from "../../react/hooks/usePosts";
-import { useAuth } from "../../auth/context/authContext";
+import { useGetUserById } from "../../react/hooks/useUsers";
 import "./home.css";
 
 const HOME_POSTS_PER_PAGE = 3;
 
 export const HomeScreen = () => {
-  const { user } = useAuth();
+  const { data: user } = useGetUserById();
   const queryResult = useGetAllPostsInfinite(HOME_POSTS_PER_PAGE);
 
   return (

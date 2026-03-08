@@ -81,6 +81,12 @@
  *                  type: string
  *                updatedAt:
  *                  type: string
+ *                postsCount:
+ *                  type: integer
+ *                  description: Total number of posts by this user
+ *                likesCount:
+ *                  type: integer
+ *                  description: Total number of likes across all posts by this user
  *       401:
  *         description: Unauthorized
  *         content:

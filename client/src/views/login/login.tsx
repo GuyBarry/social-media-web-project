@@ -14,17 +14,17 @@ import { useAuth } from "../../auth/context/authContext";
 import "./login.css";
 
 export const LoginScreen = () => {
-  const { user, login } = useAuth();
+  const { userId, login } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user) {
+    if (userId) {
       navigate("/");
     }
-  }, [user, navigate]);
+  }, [userId, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -14,58 +14,32 @@ import { authApi } from "../api/authApi";
 import { selfAuthApi } from "../api/selfAuthApi";
 import type { UserLogin } from "../types/userLogin";
 import type { UserRegistration } from "../types/userRegistration";
-import { usersApi } from "../../api/usersApi";
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [userId, setUserId] = useState<User['_id'] | null>(null);
   const [isLoadingUserAuth, setIsLoadingUserAuth] = useState(true);
 
   const navigate = useNavigate();
 
-  const saveUser = useCallback((rawUser: User | null) => {
-    if (!rawUser) {
-      setUser(null);
-
-      return;
-    }
-
-    const { birthDate, updatedAt, createdAt, ...otherFields } = rawUser;
-
-    setUser({
-      ...otherFields,
-      updatedAt: new Date(updatedAt),
-      createdAt: new Date(createdAt),
-      birthDate: new Date(birthDate),
-    });
+  const saveUserId = useCallback((id: User['_id'] | null) => {
+    setUserId(id);
   }, []);
 
   const getUserMe = useCallback(async () => {
     try {
       const { data } = await selfAuthApi.post<{ user: User | null }>("/me");
-
-      saveUser(data.user);
+      saveUserId(data.user?._id ?? null);
     } catch (error) {
       console.error("Get User Me went wrong", error);
     } finally {
       setIsLoadingUserAuth(false);
     }
-  }, [saveUser]);
-
-  const refreshUser = useCallback(async () => {
-    if (!user) return;
-    try {
-      const { data } = await usersApi.get<User>(`/${user._id}`);
-      saveUser(data);
-    } catch (error) {
-      console.error("Refresh user went wrong", error);
-    }
-  }, [user, saveUser]);
+  }, [saveUserId]);
 
   useEffect(() => {
-    if (!user) {
-      getUserMe();
-    }
-  }, [getUserMe, user]);
+    if (!isLoadingUserAuth) return;
+    getUserMe();
+  }, []);
 
   const logout = useCallback(async () => {
     try {
@@ -73,17 +47,17 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     } catch (error) {
       console.error("Logout went wrong", error);
     } finally {
-      saveUser(null);
+      saveUserId(null);
       navigate("/login");
     }
-  }, [navigate, saveUser]);
+  }, [navigate, saveUserId]);
 
   const onAuthenticationSuccess = useCallback(
-    (rawUser: User) => {
-      saveUser(rawUser);
+    (id: User['_id']) => {
+      saveUserId(id);
       navigate("/");
     },
-    [navigate, saveUser],
+    [navigate, saveUserId],
   );
 
   const login = useCallback(
@@ -95,7 +69,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         .post<{ user: User }>("/login", userLoginData)
         .then(({ data: { user } }) => {
           authResultHandlers?.onSuccess?.(user);
-          onAuthenticationSuccess(user);
+          onAuthenticationSuccess(user._id);
         })
         .catch((error) => authResultHandlers?.onError?.(error as Error));
     },
@@ -111,7 +85,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         .post<{ user: User }>("/registration", registrationDTO)
         .then(({ data: { user } }) => {
           authResultHandlers?.onSuccess?.(user);
-          onAuthenticationSuccess(user);
+          onAuthenticationSuccess(user._id);
         })
         .catch((error) => authResultHandlers?.onError?.(error as Error));
     },
@@ -120,7 +94,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, refreshUser, isLoadingUserAuth }}
+      value={{ userId, login, register, logout, isLoadingUserAuth }}
     >
       {children}
     </AuthContext.Provider>

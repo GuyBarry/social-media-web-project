@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "../../auth/context/authContext";
 import { FeedComponent } from "../../components/feed/feed";
 import { useGetPostsBySender } from "../../react/hooks/usePosts";
+import { useGetUserById } from "../../react/hooks/useUsers";
 import { EditProfileScreen } from "./editProfile/editProfile";
 import { ProfilePage } from "./profile.styled";
 import { ProfileInfoCard } from "./profileInfoCard/profileInfoCard";
@@ -11,14 +12,15 @@ import { ProfileInfoCard } from "./profileInfoCard/profileInfoCard";
 const PROFILE_POSTS_PER_PAGE = 6;
 
 export const ProfileScreen = () => {
-  const { user } = useAuth();
+  const { userId } = useAuth();
+  const { data: user } = useGetUserById();
   const [isEditing, setIsEditing] = useState(false);
   const queryResult = useGetPostsBySender(
-    user?._id ?? "",
+    userId ?? "",
     PROFILE_POSTS_PER_PAGE,
   );
 
-  if (!user) return null;
+  if (!userId || !user) return null;
 
   if (isEditing) {
     return (
