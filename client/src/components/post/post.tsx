@@ -4,6 +4,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useAuth } from "../../auth/context/authContext";
 import type { Post } from "../../entities/Post";
 import { ProfileAvatar } from "../shared.styled";
+import { avatarImageSlotProps } from "../../views/profile/profile.utils";
 import {
   CommentButton,
   EngagementItem,
@@ -60,7 +61,11 @@ export const PostComponent = ({
     <PostCard>
       {/* Header */}
       <PostHeader>
-        <ProfileAvatar size={40} src={post.sender.imageUrl} />
+        <ProfileAvatar
+          size={40}
+          src={post.sender.imageUrl}
+          slotProps={avatarImageSlotProps}
+        />
         <PostUserInfo>
           <PostUsername>{post.sender.username}</PostUsername>
           <PostTimestamp>{formatTimestamp(post.createdAt)}</PostTimestamp>
