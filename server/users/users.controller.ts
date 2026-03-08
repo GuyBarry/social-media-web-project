@@ -65,16 +65,21 @@ router.post(
 // Update user
 router.put(
   "/:id",
-  upload.single("picture"),
-  injectUploadedUrl("image"),
+  upload.single("image"),
+  injectUploadedUrl("imageUrl"),
   validateRequestBody(updateUserSchema),
   async (req: Request<{ id: User["_id"] }, {}, UpdateUser>, res: Response) => {
     const { id } = req.params;
     try {
       if (req.file) {
         const existingUser = await usersService.getUserById(id);
-        if (existingUser.image) {
-          await deleteFile(existingUser.image);
+        if (existingUser.imageUrl) {
+          await deleteFile(existingUser.imageUrl);
+        }
+      } else if (req.body.imageUrl === "") {
+        const existingUser = await usersService.getUserById(id);
+        if (existingUser.imageUrl) {
+          await deleteFile(existingUser.imageUrl);
         }
       }
 

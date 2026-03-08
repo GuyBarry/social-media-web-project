@@ -7,7 +7,7 @@ export const userSchema = baseModule.extend({
   email: z.string().email().min(1),
   birthDate: z.string().date().optional(),
   bio: z.string().optional(),
-  image: z.string().optional(),
+  imageUrl: z.string().optional(),
   password: z.string(),
   googleId: z.string().optional(),
 });
@@ -69,7 +69,7 @@ export type CreateGoogleUser = z.infer<typeof createGoogleUserSchema>;
  *           type: string
  *         bio:
  *           type: string
- *         image:
+ *         imageUrl:
  *           type: string
  *           description: URL of the user's profile picture (set automatically from uploaded file)
  *         birthDate:
@@ -81,7 +81,7 @@ export const updateUserSchema = z
     email: userSchema.shape.email,
     birthDate: userSchema.shape.birthDate,
     bio: userSchema.shape.bio,
-    image: userSchema.shape.image,
+    imageUrl: userSchema.shape.imageUrl,
   })
   .partial()
   .refine((data) => Object.keys(data).length > 0, {

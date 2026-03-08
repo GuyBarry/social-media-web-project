@@ -287,7 +287,7 @@ describe("PUT /users/:id", () => {
       await fs.copyFile(TEST_PNG, oldPicturePath);
       // Point the seeded user's image at that file
       await UserModel.findByIdAndUpdate(exampleUser._id, {
-        image: `http://localhost/public/${OLD_PICTURE_FILENAME}`,
+        imageUrl: `http://localhost/public/${OLD_PICTURE_FILENAME}`,
       });
     });
 
@@ -300,7 +300,7 @@ describe("PUT /users/:id", () => {
       const response = await request(app)
         .put(`/users/${exampleUser._id}`)
         .set("Cookie", authCookies)
-        .attach("picture", TEST_PNG);
+        .attach("image", TEST_PNG);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
 
@@ -309,10 +309,10 @@ describe("PUT /users/:id", () => {
 
       // Persisted image URL should now point at the newly uploaded file
       const updatedUser = await UserModel.findById(exampleUser._id);
-      expect(updatedUser?.image).not.toBe(
+      expect(updatedUser?.imageUrl).not.toBe(
         `http://localhost/public/${OLD_PICTURE_FILENAME}`,
       );
-      expect(updatedUser?.image).toMatch(/\/public\/.+\.png$/);
+      expect(updatedUser?.imageUrl).toMatch(/\/public\/.+\.png$/);
     });
 
     test("Should update both bio and picture", async () => {
@@ -320,20 +320,20 @@ describe("PUT /users/:id", () => {
         .put(`/users/${exampleUser._id}`)
         .set("Cookie", authCookies)
         .field("bio", "Updated bio with new picture")
-        .attach("picture", TEST_PNG);
+        .attach("image", TEST_PNG);
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
 
       const updatedUser = await UserModel.findById(exampleUser._id);
       expect(updatedUser?.bio).toBe("Updated bio with new picture");
-      expect(updatedUser?.image).toMatch(/\/public\/.+\.png$/);
+      expect(updatedUser?.imageUrl).toMatch(/\/public\/.+\.png$/);
     });
 
     test("Should return 404 when updating picture of a non-existent user", async () => {
       const response = await request(app)
         .put(`/users/nonexistentid`)
         .set("Cookie", authCookies)
-        .attach("picture", TEST_PNG);
+        .attach("image", TEST_PNG);
 
       expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
       expect(response.body.message).toBe("User does not exist");
