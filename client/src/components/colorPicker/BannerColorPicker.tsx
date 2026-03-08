@@ -5,17 +5,18 @@ import {
 } from "./colorPicker.styled";
 import { BannerColorSwitch } from "./BannerColorSwitch";
 import { FieldLabel } from "../shared.styled";
+import { theme } from "../../themes";
 
 const PRESET_SWATCHES: { hex: string; label: string }[] = [
-  { hex: "#a8d1e7", label: "Light Blue" },
-  { hex: "#6b8cba", label: "Muted Blue" },
-  { hex: "#7a8b9a", label: "Slate Gray" },
-  { hex: "#3d4f5c", label: "Dark Slate" },
-  { hex: "#1a1a1a", label: "Black" },
-  { hex: "#ffffff", label: "White" },
-  { hex: "#8b3a3a", label: "Dark Red" },
-  { hex: "#c8c8d0", label: "Light Silver" },
-  { hex: "#6b8f71", label: "Muted Green" },
+  { hex: theme.banner[1], label: "Banner 1" },
+  { hex: theme.banner[2], label: "Banner 2" },
+  { hex: theme.banner[3], label: "Banner 3" },
+  { hex: theme.banner[4], label: "Banner 4" },
+  { hex: theme.banner[5], label: "Banner 5" },
+  { hex: theme.banner[6], label: "Banner 6" },
+  { hex: theme.banner[7], label: "Banner 7" },
+  { hex: theme.banner[8], label: "Banner 8" },
+  { hex: theme.banner[9], label: "Banner 9" },
 ];
 
 interface BannerColorPickerProps {
