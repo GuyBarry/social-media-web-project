@@ -22,7 +22,7 @@ import {
   SaveButton,
 } from "./profile.styled";
 import { FieldLabel, ProfileAvatar } from "../../components/shared.styled";
-import { avatarImageSlotProps } from "./profile.utils";
+import { avatarImageSlotProps, resolveBannerColor } from "./profile.utils";
 import { updateUser } from "./profileApi";
 import { BannerColorPicker } from "../../components/colorPicker/BannerColorPicker";
 
@@ -52,7 +52,7 @@ export const EditProfileScreen = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [bannerColor, setBannerColor] = useState(
-    user?.bannerColor ?? "#8497eeff",
+    resolveBannerColor(user?.bannerColor),
   );
 
   if (!user) return null;

@@ -24,7 +24,7 @@ import {
 } from "./profile.styled";
 import { ProfileAvatar } from "../../components/shared.styled";
 import { EditProfileScreen } from "./editProfile";
-import { avatarImageSlotProps } from "./profile.utils";
+import { avatarImageSlotProps, resolveBannerColor } from "./profile.utils";
 
 export const ProfileScreen = () => {
   const { user } = useAuth();
@@ -41,7 +41,7 @@ export const ProfileScreen = () => {
     );
   }
 
-  const bannerColor = "#8497eeff";
+  const bannerColor = resolveBannerColor(user.bannerColor);
   const displayName = user.username;
   const handle = `@${user.username.toLowerCase().replace(/\s+/g, "")}`;
   const bio = user.bio ?? "No bio yet.";
