@@ -42,13 +42,48 @@ const userSchema = new Schema(
       default: "1",
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
+
+userSchema.virtual("postsCount", {
+  ref: "Post",
+  localField: "_id",
+  foreignField: "sender",
+  count: true,
+});
+
+userSchema.virtual("likesCount", {
+  ref: "Post",
+  localField: "_id",
+  foreignField: "sender",
+  pipeline: [
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "postId",
+        as: "postLikes",
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        total: { $sum: { $size: "$postLikes" } },
+      },
+    },
+  ],
+});
 
 export const USER_POPULATE_FIELDS = {
   field: "sender",
-  subFields: ["username"],
+  subFields: ["username", "imageUrl"],
 } as const;
+
+export const USER_STATS_POPULATE = { path: "postsCount" };
 
 export const USER_FIELDS_EXCEPT_AUTH = ["-password", "-googleId"] as const;
 

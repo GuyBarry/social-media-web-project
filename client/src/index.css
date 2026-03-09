@@ -1,5 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --navbar-height: 65px;
+
+  font-family: "Rubik", system-ui, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -22,9 +26,19 @@ a:hover {
   color: var(--mui-palette-primary-dark);
 }
 
+html,
+body {
+  width: 100%;
+  overflow-x: clip;
+}
+
+#root {
+  width: 100%;
+  margin: 0 auto;
+}
+
 body {
   margin: 0;
-  min-width: 320px;
   min-height: 100vh;
 }
 

@@ -1,11 +1,11 @@
+import { theme } from "../../themes";
+import { FieldLabel } from "../fieldLabel/FieldLabel.styled";
+import { BannerColorSwitch } from "./BannerColorSwitch";
 import {
   BannerColorPickerCard,
   SwatchButton,
   SwatchGrid,
 } from "./colorPicker.styled";
-import { BannerColorSwitch } from "./BannerColorSwitch";
-import { FieldLabel } from "../shared.styled";
-import { theme } from "../../themes";
 
 const PRESET_SWATCHES: { hex: string; label: string }[] = [
   { hex: theme.banner[1], label: "Banner 1" },
@@ -24,7 +24,10 @@ interface BannerColorPickerProps {
   onChange: (color: string) => void;
 }
 
-export const BannerColorPicker = ({ color, onChange }: BannerColorPickerProps) => {
+export const BannerColorPicker = ({
+  color,
+  onChange,
+}: BannerColorPickerProps) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <FieldLabel sx={{ mb: 1 }}>Banner Color</FieldLabel>

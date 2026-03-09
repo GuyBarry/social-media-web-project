@@ -8,8 +8,10 @@ import { UPLOAD_DIR } from "../pictures/pictures.config";
 import { initApp } from "../app";
 import { authService } from "../auth/auth.service";
 import { User } from "../entities/dto/user.dto";
+import { LikeModel } from "../entities/mongodb/like.module";
+import { PostModel } from "../entities/mongodb/post.module";
 import { UserModel } from "../entities/mongodb/user.module";
-import { cleanupTestPictures, exampleUser, getAuthCookies, loginUser } from "./testUtils";
+import { cleanupTestPictures, exampleLike, examplePost, exampleUser, getAuthCookies, loginUser } from "./testUtils";
 
 let app: Express;
 let authCookies: string[];
@@ -64,6 +66,31 @@ describe("GET /:id", () => {
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(response.body._id).toBe(exampleUser._id);
+  });
+
+  test("Should return postsCount and likesCount for a user with posts and likes", async () => {
+    await PostModel.deleteMany();
+    await LikeModel.deleteMany();
+    await PostModel.create(examplePost);
+    await LikeModel.create(exampleLike);
+
+    const response = await request(app)
+      .get(`/users/${loginUser._id}`)
+      .set("Cookie", authCookies);
+
+    expect(response.statusCode).toEqual(StatusCodes.OK);
+    expect(response.body.postsCount).toBe(1);
+    expect(response.body.likesCount).toBe(1);
+  });
+
+  test("Should return postsCount 0 and likesCount 0 for a user with no posts", async () => {
+    const response = await request(app)
+      .get(`/users/${exampleUser._id}`)
+      .set("Cookie", authCookies);
+
+    expect(response.statusCode).toEqual(StatusCodes.OK);
+    expect(response.body.postsCount).toBe(0);
+    expect(response.body.likesCount).toBe(0);
   });
 
   test("Should return 404 when user does not exist", async () => {

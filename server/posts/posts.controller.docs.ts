@@ -45,7 +45,18 @@
  *                       message:
  *                         type: string
  *                       sender:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                           username:
+ *                             type: string
+ *                           imageUrl:
+ *                             type: string
+ *                             description: URL of the sender's profile picture
+ *                       imageUrl:
  *                         type: string
+ *                         description: URL of the post image
  *                       likes:
  *                         type: array
  *                         items:
@@ -111,7 +122,18 @@
  *                message:
  *                  type: string
  *                sender:
+ *                  type: object
+ *                  properties:
+ *                    _id:
+ *                      type: string
+ *                    username:
+ *                      type: string
+ *                    imageUrl:
+ *                      type: string
+ *                      description: URL of the sender's profile picture
+ *                imageUrl:
  *                  type: string
+ *                  description: URL of the post image
  *                likes:
  *                  type: array
  *                  items:
@@ -164,7 +186,7 @@
  *             required:
  *               - sender
  *               - message
- *               - picture
+ *               - image
  *             properties:
  *               sender:
  *                 type: string
@@ -172,10 +194,10 @@
  *               message:
  *                 type: string
  *                 description: The post message content
- *               picture:
+ *               image:
  *                 type: string
  *                 format: binary
- *                 description: The post picture file (jpeg, png, gif, webp — max 5MB)
+ *                 description: The image file to upload (jpeg, png, gif, webp — max 5MB). Stored as imageUrl.
  *     responses:
  *       201:
  *         description: Returns the created post id
@@ -256,11 +278,11 @@
  *               message:
  *                 type: string
  *                 description: The updated post message content
- *               picture:
+ *               image:
  *                 type: string
  *                 format: binary
- *                 description: The updated post picture file (jpeg, png, gif, webp — max 5MB)
- *           description: At least one of message or picture must be provided
+ *                 description: The image file to upload (jpeg, png, gif, webp — max 5MB). Stored as imageUrl.
+ *           description: At least one of message or image must be provided
  *     responses:
  *       200:
  *         description: Updated
@@ -386,4 +408,54 @@
  *                 message:
  *                   type: string
  *                   example: Like already exists
+ */
+
+/**
+ * @openapi
+ * /posts/{id}:
+ *   delete:
+ *     tags:
+ *      - Posts
+ *     summary: Delete a post
+ *     description: Deletes the post and its associated picture file.
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The id of the post to delete
+ *     responses:
+ *       200:
+ *         description: Post deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Post deleted
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User is unauthorized
+ *       404:
+ *         description: Post not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Post does not exist
  */

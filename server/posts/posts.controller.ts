@@ -11,7 +11,7 @@ import {
 import { injectUploadedUrl } from "../middlewares/pictureMiddleware";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { validateExistingSender } from "../middlewares/validateExistingUser";
-import { deleteFile, getFileUrl, upload } from "../pictures/pictures.service";
+import { deleteFile, upload } from "../pictures/pictures.service";
 import {
   PaginationParams,
   parsePaginationParams,
@@ -55,7 +55,8 @@ router.get("/:id", async (req: Request<{ id: Post["_id"] }>, res: Response) => {
 // Create post
 router.post(
   "/",
-  upload.single("picture"),
+  upload.single("image"),
+  injectUploadedUrl("imageUrl"),
   validateRequestBody(createPostSchema),
   validateExistingSender,
   async (req: Request<{}, {}, CreatePost>, res: Response) => {
@@ -64,11 +65,9 @@ router.post(
     if (!req.file) {
       res
         .status(StatusCodes.BAD_REQUEST)
-        .send({ message: "Picture file is required" });
+        .send({ message: "Image file is required" });
       return;
     }
-
-    postData.picture = getFileUrl(req.file.filename);
 
     const { _id, createdAt } = await postService.createPost(postData);
 
@@ -83,8 +82,8 @@ router.post(
 // Update post
 router.put(
   "/:id",
-  upload.single("picture"),
-  injectUploadedUrl("picture"),
+  upload.single("image"),
+  injectUploadedUrl("imageUrl"),
   validateRequestBody(updatePostSchema),
   async (req: Request<{ id: Post["_id"] }, {}, UpdatePost>, res: Response) => {
     const id = req.params.id;
@@ -92,7 +91,7 @@ router.put(
 
     if (req.file) {
       const existingPost = await postService.getPostById(id);
-      await deleteFile(existingPost.picture);
+      await deleteFile(existingPost.imageUrl);
     }
 
     const { _id, updatedAt } = await postService.updatePost(id, postData);
@@ -119,6 +118,20 @@ router.patch(
     res.status(StatusCodes.OK).send({
       message: method === "like" ? "Post liked" : "Post disliked",
     });
+  },
+);
+
+// Delete post
+router.delete(
+  "/:id",
+  async (req: Request<{ id: Post["_id"] }>, res: Response) => {
+    const id = req.params.id;
+
+    const existingPost = await postService.getPostById(id);
+    await deleteFile(existingPost.imageUrl);
+    await postService.deletePost(id);
+
+    res.status(StatusCodes.OK).send({ message: "Post deleted" });
   },
 );
 

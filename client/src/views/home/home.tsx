@@ -1,20 +1,23 @@
 import { Typography } from "@mui/material";
-import { useAuth } from "../../context/authContext";
+import { FeedComponent } from "../../components/feed/feed";
 import { ProfileCard } from "./profileCard/profileCard";
+import { useGetAllPostsInfinite } from "../../react/hooks/usePosts";
+import { useGetUserById } from "../../react/hooks/useUsers";
 import "./home.css";
 
+const HOME_POSTS_PER_PAGE = 3;
+
 export const HomeScreen = () => {
-  const { user } = useAuth();
+  const { data: user } = useGetUserById();
+  const queryResult = useGetAllPostsInfinite(HOME_POSTS_PER_PAGE);
 
   return (
     <div className="home-container">
       <aside className="home-sidebar">
-        <ProfileCard />
+        {user && <ProfileCard user={user} />}
       </aside>
       <main className="home-main">
-        <Typography variant="h5" fontWeight={600}>
-          Home Screen, {user?.username}
-        </Typography>
+        <FeedComponent queryResult={queryResult} />
       </main>
       <aside className="home-sidebar">
         <Typography variant="h5" fontWeight={600}>

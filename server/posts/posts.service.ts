@@ -36,10 +36,19 @@ export const updatePost = async (
   return post;
 };
 
+export const deletePost = async (id: Post["_id"]): Promise<void> => {
+  const post = await postRepository.deletePost(id);
+
+  if (!post) {
+    throw new NotFoundException("Post", { postId: id });
+  }
+};
+
 export const postService = {
   getAllPosts,
   getPostById,
   getPostsBySender,
   createPost,
   updatePost,
+  deletePost,
 };

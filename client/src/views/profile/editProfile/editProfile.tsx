@@ -1,41 +1,45 @@
-import { useRef, useState } from "react";
-import { Box, Stack, TextField } from "@mui/material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { useAuth } from "../../context/authContext";
+import { useRef, useState } from "react";
+import { BannerColorPicker } from "../../../components/colorPicker/BannerColorPicker";
+import { CostumButton } from "../../../components/button/CostumButton.styled";
+import { FieldLabel } from "../../../components/fieldLabel/FieldLabel.styled";
+import { ProfileAvatar } from "../../../components/profileAvatar/ProfileAvatar.styled";
+import type { User } from "../../../entities/User";
+import { useUpdateUser } from "../../../react/hooks/useUsers";
+import {
+  AvatarRow,
+  ProfileBanner,
+  ProfileCard,
+  ProfilePage,
+} from "../profile.styled";
+import { avatarImageSlotProps, resolveBannerColor } from "../profile.utils";
 import {
   AvatarCameraOverlay,
   AvatarColumnBox,
-  AvatarDeleteButton,
-  AvatarRow,
   AvatarWrapper,
-  CancelButton,
   EditActionsRow,
   EditColorColumn,
   EditContentRow,
   EditFieldItem,
+  EditFieldRow,
   EditFormBox,
   EditFormColumn,
-  ProfileBanner,
-  ProfileCard,
-  ProfilePage,
-  SaveButton,
-} from "./profile.styled";
-import { FieldLabel, ProfileAvatar } from "../../components/shared.styled";
-import { avatarImageSlotProps, resolveBannerColor } from "./profile.utils";
-import { updateUser } from "./profileApi";
-import { BannerColorPicker } from "../../components/colorPicker/BannerColorPicker";
+  FieldInput,
+} from "./editProfile.styled";
 
 interface EditProfileScreenProps {
+  user: User;
   onCancel: () => void;
   onSave: () => void;
 }
 
 export const EditProfileScreen = ({
+  user,
   onCancel,
   onSave,
 }: EditProfileScreenProps) => {
-  const { user, refreshUser } = useAuth();
+  const { mutateAsync: updateUser } = useUpdateUser();
   const [editUsername, setEditUsername] = useState(user?.username ?? "");
   const [editBio, setEditBio] = useState(user?.bio ?? "");
   const [editBirthDate, setEditBirthDate] = useState(() => {
@@ -54,8 +58,6 @@ export const EditProfileScreen = ({
   const [bannerColor, setBannerColor] = useState(
     resolveBannerColor(user?.bannerColor),
   );
-
-  if (!user) return null;
 
   const displayName = user.username;
 
@@ -83,8 +85,8 @@ export const EditProfileScreen = ({
       return;
     }
 
-    await updateUser(user._id, formData);
-    await refreshUser();
+    await updateUser({ userId: user._id, formData });
+
     onSave();
   };
 
@@ -121,9 +123,10 @@ export const EditProfileScreen = ({
               />
             </AvatarWrapper>
             {editAvatarPreview && (
-              <AvatarDeleteButton
+              <CostumButton
                 variant="outlined"
                 size="small"
+                color="error"
                 startIcon={<DeleteOutlineIcon fontSize="small" />}
                 onClick={() => {
                   setEditAvatarPreview(null);
@@ -132,7 +135,7 @@ export const EditProfileScreen = ({
                 }}
               >
                 Remove image
-              </AvatarDeleteButton>
+              </CostumButton>
             )}
           </AvatarColumnBox>
         </AvatarRow>
@@ -140,10 +143,10 @@ export const EditProfileScreen = ({
         <EditFormBox>
           <EditContentRow>
             <EditFormColumn>
-              <Stack direction="row" spacing={2}>
+              <EditFieldRow direction="row" spacing={2}>
                 <EditFieldItem>
                   <FieldLabel>Username</FieldLabel>
-                  <TextField
+                  <FieldInput
                     fullWidth
                     size="small"
                     placeholder="Username"
@@ -154,19 +157,24 @@ export const EditProfileScreen = ({
 
                 <EditFieldItem>
                   <FieldLabel>Birth Date</FieldLabel>
-                  <TextField
+                  <FieldInput
                     fullWidth
                     size="small"
                     type="date"
                     value={editBirthDate}
+                    slotProps={{
+                      htmlInput: {
+                        max: new Date().toISOString().split("T")[0],
+                      },
+                    }}
                     onChange={(e) => setEditBirthDate(e.target.value)}
                   />
                 </EditFieldItem>
-              </Stack>
+              </EditFieldRow>
 
-              <Box>
+              <EditFieldItem>
                 <FieldLabel>Description</FieldLabel>
-                <TextField
+                <FieldInput
                   fullWidth
                   size="small"
                   multiline
@@ -175,7 +183,7 @@ export const EditProfileScreen = ({
                   value={editBio}
                   onChange={(e) => setEditBio(e.target.value)}
                 />
-              </Box>
+              </EditFieldItem>
             </EditFormColumn>
 
             <EditColorColumn>
@@ -187,16 +195,16 @@ export const EditProfileScreen = ({
           </EditContentRow>
 
           <EditActionsRow>
-            <SaveButton
+            <CostumButton
               variant="contained"
               color="primary"
               onClick={handleSave}
             >
               Save Changes
-            </SaveButton>
-            <CancelButton variant="outlined" onClick={onCancel}>
+            </CostumButton>
+            <CostumButton variant="outlined" onClick={onCancel}>
               Cancel
-            </CancelButton>
+            </CostumButton>
           </EditActionsRow>
         </EditFormBox>
       </ProfileCard>

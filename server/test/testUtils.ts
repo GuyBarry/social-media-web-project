@@ -19,6 +19,7 @@ export const loginUser = {
   email: "loginuser@example.com",
   birthDate: "2002-10-13",
   bio: "I am the best loginuser ever",
+  imageUrl: "http://localhost/public/loginuser-avatar.png",
   password: hashSync("loginuserpassword", PASSWORD_SALT_ROUNDS),
 };
 
@@ -26,7 +27,7 @@ export const examplePost: CreatePost = {
   _id: "1234",
   sender: loginUser._id,
   message: "Hello, world!",
-  picture: "http://localhost/public/example.png",
+  imageUrl: "http://localhost/public/example.png",
 };
 
 export const exampleLike = {

@@ -1,15 +1,18 @@
-import { Button, Divider, Typography } from "@mui/material";
+import { Divider, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../context/authContext";
-import { ProfileAvatar } from "../../../components/shared.styled";
+import { CostumButton } from "../../../components/button/CostumButton.styled";
+import { ProfileAvatar } from "../../../components/profileAvatar/ProfileAvatar.styled";
+import { UserStats } from "../../../components/userStats/userStats";
+import type { User } from "../../../entities/User";
 import { avatarImageSlotProps } from "../../profile/profile.utils";
 import "./profileCard.css";
 
-export const ProfileCard = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+interface ProfileCardProps {
+  user: User;
+}
 
-  if (!user) return null;
+export const ProfileCard = ({ user }: ProfileCardProps) => {
+  const navigate = useNavigate();
 
   return (
     <div className="profile-card">
@@ -19,7 +22,7 @@ export const ProfileCard = () => {
       >
         {user.username.charAt(0).toUpperCase()}
       </ProfileAvatar>
-      
+
       <Typography
         variant="subtitle1"
         fontWeight={600}
@@ -38,23 +41,15 @@ export const ProfileCard = () => {
 
       <Divider className="profile-card-divider" />
 
-      <div className="profile-card-stats">
-        <Typography variant="h6" fontWeight={700}>
-          0
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          Posts
-        </Typography>
-      </div>
+      <UserStats postsCount={user.postsCount} likesCount={user.likesCount} />
 
-      <Button
-        variant="contained"
+      <CostumButton
+        variant="outlined"
         fullWidth
         onClick={() => navigate("/profile")}
-        className="profile-card-btn"
       >
         View Profile
-      </Button>
+      </CostumButton>
     </div>
   );
 };

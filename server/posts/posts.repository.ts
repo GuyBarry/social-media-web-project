@@ -2,14 +2,18 @@ import { CreatePost, Post, UpdatePost } from "../entities/dto/post.dto";
 import { COMMENTS_POPULATE_FIELD } from "../entities/mongodb/comment.module";
 import { LIKES_POPULATE_FIELD } from "../entities/mongodb/like.module";
 import { PopulatedLike, PostModel } from "../entities/mongodb/post.module";
-import { USER_POPULATE_FIELDS } from "../entities/mongodb/user.module";
+import { USER_POPULATE_FIELDS, USER_STATS_POPULATE } from "../entities/mongodb/user.module";
 import { handleDuplicateKeyException } from "../exceptions/mongoException";
 import { PaginateResult, PopulateOptions } from "mongoose";
 import { PAGINATE_SORT, PaginationParams } from "../config/pagination.config";
 
 
 const POPULATE_OPTIONS: PopulateOptions[] = [
-  { path: USER_POPULATE_FIELDS.field, select: USER_POPULATE_FIELDS.subFields },
+  {
+    path: USER_POPULATE_FIELDS.field,
+    select: USER_POPULATE_FIELDS.subFields,
+    populate: USER_STATS_POPULATE,
+  },
   LIKES_POPULATE_FIELD,
   COMMENTS_POPULATE_FIELD,
 ];
@@ -34,7 +38,11 @@ export const getAllPosts = async (
 
 export const getPostById = async (id: Post["_id"]): Promise<Post | null> => {
   const post = await PostModel.findById(id)
-    .populate(USER_POPULATE_FIELDS.field, USER_POPULATE_FIELDS.subFields)
+    .populate({
+      path: USER_POPULATE_FIELDS.field,
+      select: USER_POPULATE_FIELDS.subFields,
+      populate: USER_STATS_POPULATE,
+    })
     .populate(LIKES_POPULATE_FIELD)
     .populate(COMMENTS_POPULATE_FIELD)
     .exec();
@@ -63,10 +71,14 @@ export const updatePost = async (
 ): Promise<Post | null> =>
   await PostModel.findByIdAndUpdate(id, postData, { new: true }).exec();
 
+export const deletePost = async (id: Post["_id"]): Promise<Post | null> =>
+  await PostModel.findByIdAndDelete(id).exec();
+
 export const postRepository = {
   getAllPosts,
   getPostById,
   getPostsBySender,
   createPost,
   updatePost,
+  deletePost,
 };

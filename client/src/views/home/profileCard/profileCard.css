@@ -6,7 +6,7 @@
   padding: 30px 16px;
   background-color: var(--background-paper, #ffffff);
   border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   width: 100%;
   box-sizing: border-box;
 }
@@ -28,28 +28,7 @@
   padding: 10px 0;
 }
 
-.profile-card-stats {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-  padding: 20px 0;
-  padding: 10px 0;
-}
-
-.profile-card-btn {
-  margin-top: 2px;
-  border-radius: 8px !important;
-  text-transform: none !important;
-  background-color: var(--mui-palette-background-default) !important;
-  color: var(--mui-palette-text-primary) !important;
-  box-shadow: none !important;
-  font-weight: 700 !important;
-  padding: 10px 0;
-}
-
 .profile-card-btn:hover {
   background-color: rgb(234, 233, 233) !important;
   box-shadow: none !important;
-  padding: 10px 0;
 }
