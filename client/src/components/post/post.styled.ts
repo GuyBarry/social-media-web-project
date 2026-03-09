@@ -49,15 +49,15 @@ export const PostCaption = styled(Typography)({
   wordBreak: "break-word",
 });
 
-export const PostImageContainer = styled(Box)({
+export const PostImageContainer = styled(Box)(({ theme }) => ({
   width: "100%",
   aspectRatio: 3 / 2,
-  backgroundColor: "var(--background-default)",
+  backgroundColor: theme.palette.background.default,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   overflow: "hidden",
-});
+}));
 
 export const PostImage = styled("img")({
   maxWidth: "100%",
