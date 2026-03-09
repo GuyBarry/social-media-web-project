@@ -164,6 +164,11 @@ export const EditProfileScreen = ({
                     size="small"
                     type="date"
                     value={editBirthDate}
+                    slotProps={{
+                      htmlInput: {
+                        max: new Date().toISOString().split("T")[0],
+                      },
+                    }}
                     onChange={(e) => setEditBirthDate(e.target.value)}
                   />
                 </EditFieldItem>
