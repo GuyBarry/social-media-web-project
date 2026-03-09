@@ -1,10 +1,14 @@
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import { useGetUserById } from "../../react/hooks/useUsers";
+import { useState, type FC } from "react";
 import type { Post } from "../../entities/Post";
-import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
+import { useDeletePost } from "../../react/hooks/usePosts";
+import { useGetUserById } from "../../react/hooks/useUsers";
 import { avatarImageSlotProps } from "../../views/profile/profile.utils";
+import { ConfirmationDialog } from "../dialog/ConfirmationDialog";
+import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import {
   CommentButton,
   EngagementItem,
@@ -12,6 +16,7 @@ import {
   LikeButton,
   PostCaption,
   PostCard,
+  PostDeleteButton,
   PostEngagementBar,
   PostHeader,
   PostImage,
@@ -39,15 +44,18 @@ const formatTimestamp = (date: Date | string): string => {
   });
 };
 
-export const PostComponent = ({
+export const PostComponent: FC<PostProps> = ({
   post,
   onLike,
   onDislike,
   onComment,
-}: PostProps) => {
+}) => {
   const { data: user } = useGetUserById();
+  const { mutate: deletePost } = useDeletePost();
+  const [isDeleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
 
   const isLiked = !!user && post.likes.includes(user._id);
+  const isOwner = !!user && user._id === post.sender._id;
 
   const handleLikeClick = () => {
     if (isLiked) {
@@ -57,9 +65,13 @@ export const PostComponent = ({
     }
   };
 
+  const handleDeleteConfirm = () => {
+    deletePost(post._id);
+    setDeleteConfirmationOpen(false);
+  };
+
   return (
     <PostCard>
-      {/* Header */}
       <PostHeader>
         <ProfileAvatar
           size={40}
@@ -70,17 +82,22 @@ export const PostComponent = ({
           <PostUsername>{post.sender.username}</PostUsername>
           <PostTimestamp>{formatTimestamp(post.createdAt)}</PostTimestamp>
         </PostUserInfo>
+        {isOwner && (
+          <PostDeleteButton
+            aria-label="Delete post"
+            onClick={() => setDeleteConfirmationOpen(true)}
+          >
+            <DeleteOutlineIcon fontSize="small" />
+          </PostDeleteButton>
+        )}
       </PostHeader>
 
-      {/* Caption */}
       {post.message && <PostCaption>{post.message}</PostCaption>}
 
-      {/* Image */}
       <PostImageContainer>
         <PostImage src={post.imageUrl} alt="post" />
       </PostImageContainer>
 
-      {/* Engagement bar */}
       <PostEngagementBar>
         <EngagementItem onClick={handleLikeClick}>
           <LikeButton isLiked={isLiked}>
@@ -103,6 +120,15 @@ export const PostComponent = ({
           </CommentButton>
         </EngagementItem>
       </PostEngagementBar>
+
+      <ConfirmationDialog
+        open={isDeleteConfirmationOpen}
+        title="Delete post?"
+        message="Are you sure you want to delete this post? This action cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteConfirmationOpen(false)}
+      />
     </PostCard>
   );
 };
