@@ -61,3 +61,19 @@ export function useCreateComment() {
     },
   });
 }
+
+export function useDeleteComment(postId: Post["_id"]) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (commentId: Comment["_id"]) => {
+      const { data } = await commentsApi.delete(`/${commentId}`);
+      return data as { message: string; commentId: string };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: commentKeys.byPost(postId) });
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) });
+      queryClient.invalidateQueries({ queryKey: postKeys.infinite() });
+    },
+  });
+}

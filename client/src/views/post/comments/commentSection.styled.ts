@@ -34,6 +34,29 @@ export const CommentItem = styled(Box)({
   gap: 10,
 });
 
+export const CommentDeleteButton = styled("button")(({ theme }) => ({
+  marginLeft: "auto",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "none",
+  border: "none",
+  borderRadius: "50%",
+  padding: 4,
+  cursor: "pointer",
+  color: theme.palette.text.disabled,
+  transition: "color 0.2s ease, background-color 0.2s ease",
+  outline: "none",
+  flexShrink: 0,
+
+  "&:focus": { outline: "none" },
+
+  "&:hover": {
+    color: theme.palette.error.main,
+    backgroundColor: "rgba(211, 47, 47, 0.08)",
+  },
+}));
+
 export const CommentContent = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",

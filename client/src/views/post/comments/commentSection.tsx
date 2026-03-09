@@ -1,9 +1,11 @@
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import SendIcon from "@mui/icons-material/Send";
 import { CircularProgress } from "@mui/material";
 import { type FC, type KeyboardEvent, useRef, useState } from "react";
 import { ProfileAvatar } from "../../../components/profileAvatar/ProfileAvatar.styled";
 import {
   useCreateComment,
+  useDeleteComment,
   useGetCommentsByPostId,
 } from "../../../react/hooks/useComments";
 import { useGetUserById } from "../../../react/hooks/useUsers";
@@ -12,6 +14,7 @@ import { formatTimestamp } from "../../../utils/time.utils";
 import {
   AddCommentBox,
   CommentContent,
+  CommentDeleteButton,
   CommentItem,
   CommentSenderRow,
   CommentsList,
@@ -32,7 +35,6 @@ interface CommentsSectionProps {
   numComments: number;
 }
 
-
 export const PostCommentsSection: FC<CommentsSectionProps> = ({
   postId,
   numComments,
@@ -48,6 +50,7 @@ export const PostCommentsSection: FC<CommentsSectionProps> = ({
   } = useGetCommentsByPostId(postId);
 
   const { mutate: createComment, isPending: isSubmitting } = useCreateComment();
+  const { mutate: deleteComment } = useDeleteComment(postId);
 
   const [commentText, setCommentText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -134,6 +137,14 @@ export const PostCommentsSection: FC<CommentsSectionProps> = ({
                   <CommentTimestamp>
                     {formatTimestamp(comment.createdAt)}
                   </CommentTimestamp>
+                  {currentUser?._id === comment.sender._id && (
+                    <CommentDeleteButton
+                      aria-label="Delete comment"
+                      onClick={() => deleteComment(comment._id)}
+                    >
+                      <DeleteOutlineIcon fontSize="small" />
+                    </CommentDeleteButton>
+                  )}
                 </CommentSenderRow>
                 <CommentText>{comment.message}</CommentText>
               </CommentContent>
@@ -145,7 +156,11 @@ export const PostCommentsSection: FC<CommentsSectionProps> = ({
               onClick={() => fetchNextPage()}
               disabled={isFetchingNextPage}
             >
-              {isFetchingNextPage ? "Loading..." : "Load more comments"}
+              {isFetchingNextPage ? (
+                <CircularProgress size={16} />
+              ) : (
+                "Load more comments"
+              )}
             </LoadMoreButton>
           )}
         </CommentsList>
