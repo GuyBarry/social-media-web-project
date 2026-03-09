@@ -16,13 +16,3 @@
   top: var(--navbar-height);
   align-self: start;
 }
-
-@media (min-resolution: 1.875dppx) {
-  .home-container {
-    grid-template-columns: 1fr;
-  }
-
-  .home-sidebar {
-    display: none;
-  }
-}

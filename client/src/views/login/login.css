@@ -13,13 +13,3 @@
   padding: 40px;
   overflow-y: auto;
 }
-
-@media (min-resolution: 1.875dppx) {
-  .login-form-panel {
-    width: 100vw;
-  }
-
-  .login-container > *:first-child {
-    display: none;
-  }
-}
