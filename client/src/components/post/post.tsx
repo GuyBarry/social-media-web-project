@@ -3,7 +3,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useGetUserById } from "../../react/hooks/useUsers";
 import type { Post } from "../../entities/Post";
-import { ProfileAvatar } from "../shared.styled";
+import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import { avatarImageSlotProps } from "../../views/profile/profile.utils";
 import {
   CommentButton,

@@ -3,12 +3,11 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-export const BannerColorSwatch = styled(Box)(({ theme }) => ({
+export const BannerColorSwatch = styled(Box)({
   width: 36,
   height: 36,
   borderRadius: 8,
   overflow: "hidden",
-  border: `2px solid ${theme.palette.divider}`,
   cursor: "pointer",
   flexShrink: 0,
   "& input[type='color']": {
@@ -22,7 +21,7 @@ export const BannerColorSwatch = styled(Box)(({ theme }) => ({
     WebkitAppearance: "none",
     background: "none",
   },
-}));
+});
 
 export const BannerColorPickerCard = styled(Box)(({ theme }) => ({
   borderRadius: 12,

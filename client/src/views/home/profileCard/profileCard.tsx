@@ -1,6 +1,7 @@
 import { Divider, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { CostumButton, ProfileAvatar } from "../../../components/shared.styled";
+import { CostumButton } from "../../../components/button/CostumButton.styled";
+import { ProfileAvatar } from "../../../components/profileAvatar/ProfileAvatar.styled";
 import { UserStats } from "../../../components/userStats/userStats";
 import type { User } from "../../../entities/User";
 import { avatarImageSlotProps } from "../../profile/profile.utils";

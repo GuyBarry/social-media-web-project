@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/context/authContext";
 import { useGetUserById } from "../../react/hooks/useUsers";
 import { avatarImageSlotProps } from "../../views/profile/profile.utils";
-import { ProfileAvatar } from "../shared.styled";
+import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import "./navbar.css";
 
 export const Navbar = () => {

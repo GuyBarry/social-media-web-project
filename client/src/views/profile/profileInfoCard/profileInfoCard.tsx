@@ -1,7 +1,8 @@
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EditIcon from "@mui/icons-material/Edit";
 import EmailIcon from "@mui/icons-material/Email";
-import { CostumButton, ProfileAvatar } from "../../../components/shared.styled";
+import { CostumButton } from "../../../components/button/CostumButton.styled";
+import { ProfileAvatar } from "../../../components/profileAvatar/ProfileAvatar.styled";
 import { UserStats } from "../../../components/userStats/userStats";
 import type { User } from "../../../entities/User";
 import {

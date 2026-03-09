@@ -1,4 +1,4 @@
-import { Box, Stack, TextField, Typography } from "@mui/material";
+import { Box, Stack, TextField } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 const AVATAR_SIZE = 88;
@@ -66,13 +66,6 @@ export const EditFieldRow = styled(Stack)({
 export const EditFieldItem = styled(Box)({
   flex: 1,
 });
-
-export const FieldLabel = styled(Typography)(({ theme }) => ({
-  fontWeight: 600,
-  color: theme.palette.text.secondary,
-  marginBottom: 4,
-  fontSize: "0.8rem",
-}));
 
 export const FieldInput = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {

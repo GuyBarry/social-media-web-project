@@ -2,7 +2,9 @@ import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useRef, useState } from "react";
 import { BannerColorPicker } from "../../../components/colorPicker/BannerColorPicker";
-import { CostumButton, ProfileAvatar } from "../../../components/shared.styled";
+import { CostumButton } from "../../../components/button/CostumButton.styled";
+import { FieldLabel } from "../../../components/fieldLabel/FieldLabel.styled";
+import { ProfileAvatar } from "../../../components/profileAvatar/ProfileAvatar.styled";
 import type { User } from "../../../entities/User";
 import { useUpdateUser } from "../../../react/hooks/useUsers";
 import {
@@ -24,7 +26,6 @@ import {
   EditFormBox,
   EditFormColumn,
   FieldInput,
-  FieldLabel,
 } from "./editProfile.styled";
 
 interface EditProfileScreenProps {
