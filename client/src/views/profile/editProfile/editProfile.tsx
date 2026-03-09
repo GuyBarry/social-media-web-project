@@ -59,8 +59,6 @@ export const EditProfileScreen = ({
     resolveBannerColor(user?.bannerColor),
   );
 
-  // if (!user) return null;
-
   const displayName = user.username;
 
   const handleSave = async () => {

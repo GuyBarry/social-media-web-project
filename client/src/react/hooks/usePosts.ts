@@ -16,8 +16,6 @@ import type { User } from "../../entities/User";
 import { useAuth } from "../../auth/context/authContext";
 import { userKeys } from "./useUsers";
 
-// ─── Query Keys ────────────────────────────────────────────────────────────────
-
 export const postKeys = {
   all: ["posts"] as const,
   infinite: () => [...postKeys.all, "infinite"] as const,
@@ -26,8 +24,6 @@ export const postKeys = {
     [...postKeys.infinite(), "sender", senderId, limit] as const,
   detail: (id: Post["_id"]) => [...postKeys.all, "detail", id] as const,
 };
-
-// ─── Queries ────────────────────────────────────────────────────────────────
 
 export function useGetAllPostsInfinite(limit = 10) {
   return useInfiniteQuery<PaginatedPosts>({
@@ -70,8 +66,6 @@ export function useGetPostById(id: Post["_id"]) {
     enabled: !!id,
   });
 }
-
-// ─── Mutations ───────────────────────────────────────────────────────────────
 
 export function useCreatePost() {
   const queryClient = useQueryClient();

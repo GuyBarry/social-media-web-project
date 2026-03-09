@@ -3,14 +3,10 @@ import { usersApi } from "../../api/usersApi";
 import { useAuth } from "../../auth/context/authContext";
 import type { User } from "../../entities/User";
 
-// ─── Query Keys ────────────────────────────────────────────────────────────────
-
 export const userKeys = {
   all: ["users"] as const,
   detail: (id: User["_id"]) => [...userKeys.all, "detail", id] as const,
 };
-
-// ─── Queries ─────────────────────────────────────────────────────────────────
 
 export function useGetUserById(userId?: User["_id"]) {
   const { userId: authUserId } = useAuth();
@@ -25,8 +21,6 @@ export function useGetUserById(userId?: User["_id"]) {
     enabled: !!id,
   });
 }
-
-// ─── Mutations ───────────────────────────────────────────────────────────────
 
 export function useUpdateUser() {
   const queryClient = useQueryClient();
