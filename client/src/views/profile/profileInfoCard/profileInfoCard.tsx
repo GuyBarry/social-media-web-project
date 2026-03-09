@@ -20,7 +20,8 @@ import {
   MetaText,
   UserInfoBox,
 } from "./profileInfoCard.styled";
-import { avatarImageSlotProps, resolveBannerColor } from "../profile.utils";
+import { resolveBannerColor } from "../profile.utils";
+import { avatarImageSlotProps } from "../../../utils/avatar.utils";
 
 interface ProfileInfoCardProps {
   user: User;

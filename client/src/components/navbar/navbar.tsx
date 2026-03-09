@@ -4,7 +4,7 @@ import { Share2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/context/authContext";
 import { useGetUserById } from "../../react/hooks/useUsers";
-import { avatarImageSlotProps } from "../../views/profile/profile.utils";
+import { avatarImageSlotProps } from "../../utils/avatar.utils";
 import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import "./navbar.css";
 

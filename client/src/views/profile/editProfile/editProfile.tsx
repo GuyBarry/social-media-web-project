@@ -13,7 +13,8 @@ import {
   ProfileCard,
   ProfilePage,
 } from "../profile.styled";
-import { avatarImageSlotProps, resolveBannerColor } from "../profile.utils";
+import { resolveBannerColor } from "../profile.utils";
+import { avatarImageSlotProps } from "../../../utils/avatar.utils";
 import {
   AvatarCameraOverlay,
   AvatarColumnBox,

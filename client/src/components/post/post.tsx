@@ -3,10 +3,12 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useState, type FC } from "react";
+import { useNavigate } from "react-router-dom";
 import type { Post } from "../../entities/Post";
 import { useDeletePost } from "../../react/hooks/usePosts";
 import { useGetUserById } from "../../react/hooks/useUsers";
-import { avatarImageSlotProps } from "../../views/profile/profile.utils";
+import { avatarImageSlotProps } from "../../utils/avatar.utils";
+import { formatTimestamp } from "../../utils/time.utils";
 import { ConfirmationDialog } from "../dialog/ConfirmationDialog";
 import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import {
@@ -33,17 +35,6 @@ interface PostProps {
   onComment?: (id: string) => void;
 }
 
-const formatTimestamp = (date: Date | string): string => {
-  const d = new Date(date);
-  return d.toLocaleString("en-US", {
-    month: "numeric",
-    day: "numeric",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
-
 export const PostComponent: FC<PostProps> = ({
   post,
   onLike,
@@ -52,6 +43,7 @@ export const PostComponent: FC<PostProps> = ({
 }) => {
   const { data: user } = useGetUserById();
   const { mutate: deletePost } = useDeletePost();
+  const navigate = useNavigate();
   const [isDeleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
 
   const isLiked = !!user && post.likes.includes(user._id);
@@ -68,6 +60,14 @@ export const PostComponent: FC<PostProps> = ({
   const handleDeleteConfirm = () => {
     deletePost(post._id);
     setDeleteConfirmationOpen(false);
+  };
+
+  const handleCommentClick = () => {
+    if (onComment) {
+      onComment(post._id);
+    } else {
+      navigate(`/post/${post._id}`);
+    }
   };
 
   return (
@@ -110,7 +110,7 @@ export const PostComponent: FC<PostProps> = ({
           </LikeButton>
         </EngagementItem>
 
-        <EngagementItem onClick={() => onComment?.(post._id)}>
+        <EngagementItem onClick={handleCommentClick}>
           <CommentButton>
             <ChatBubbleOutlineIcon fontSize="small" />
             <EngagementText>
