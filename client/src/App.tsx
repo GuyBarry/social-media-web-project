@@ -9,6 +9,7 @@ import { HomeScreen } from "./views/home/home";
 import { LoginScreen } from "./views/login/login";
 import { RegisterScreen } from "./views/registeration/register";
 import { ProfileScreen } from "./views/profile/profile";
+import { PostDetailScreen } from "./views/post/postDetail";
 
 function App() {
   return (
@@ -33,6 +34,16 @@ function App() {
                   <ProtectedRoute>
                     <AppLayout>
                       <ProfileScreen />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/post/:postId"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <PostDetailScreen />
                     </AppLayout>
                   </ProtectedRoute>
                 }

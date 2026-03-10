@@ -1,3 +1,4 @@
+import type { Paginated } from "./Pagination";
 import type { User } from "./User";
 
 export interface Post {
@@ -26,14 +27,4 @@ export interface LikeRequest {
   method: LikeMethod;
 }
 
-export interface PaginatedPosts {
-  docs: Post[];
-  totalDocs: number;
-  limit: number;
-  totalPages: number;
-  page: number;
-  hasPrevPage: boolean;
-  hasNextPage: boolean;
-  prevPage: number | null;
-  nextPage: number | null;
-}
+export type PaginatedPosts = Paginated<Post>;
