@@ -76,6 +76,7 @@ export const PhotoButton = styled(Box)(({ theme }) => ({
 export const ImagePreviewWrapper = styled(Box)({
   position: "relative",
   width: "100%",
+  aspectRatio: "1 / 1",
   borderRadius: "12px",
   overflow: "hidden",
   lineHeight: 0,
@@ -83,7 +84,7 @@ export const ImagePreviewWrapper = styled(Box)({
 
 export const ImagePreview = styled("img")({
   width: "100%",
-  height: "auto",
+  height: "100%",
   objectFit: "cover",
   display: "block",
   borderRadius: "12px",

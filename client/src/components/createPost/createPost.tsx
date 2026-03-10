@@ -7,6 +7,7 @@ import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import { avatarImageSlotProps } from "../../utils/avatar.utils";
 import type { User } from "../../entities/User";
 import { useCreatePost } from "../../react/hooks/usePosts";
+import { ImageCropSelector } from "../imageCropSelector/ImageCropSelector";
 import {
   CreatePostActionsRow,
   CreatePostContainer,
@@ -35,6 +36,9 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
   const [contentError, setContentError] = useState(false);
   const [photoError, setPhotoError] = useState(false);
 
+  const [pendingCropFile, setPendingCropFile] = useState<File | null>(null);
+  const [pendingCropUrl, setPendingCropUrl] = useState<string | null>(null);
+
   useEffect(() => {
     if (!selectedPhoto) {
       setPreviewUrl(null);
@@ -45,6 +49,16 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
     return () => URL.revokeObjectURL(url);
   }, [selectedPhoto]);
 
+  useEffect(() => {
+    if (!pendingCropFile) {
+      setPendingCropUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(pendingCropFile);
+    setPendingCropUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [pendingCropFile]);
+
   const handlePhotoClick = () => {
     fileInputRef.current?.click();
   };
@@ -52,9 +66,20 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setSelectedPhoto(file);
+      setPendingCropFile(file);
       setPhotoError(false);
     }
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleCropConfirm = (croppedFile: File) => {
+    setSelectedPhoto(croppedFile);
+    setPendingCropFile(null);
+    setPhotoError(false);
+  };
+
+  const handleCropCancel = () => {
+    setPendingCropFile(null);
   };
 
   const handleRemovePhoto = () => {
@@ -110,7 +135,14 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
         </ContentErrorText>
       )}
 
-      {previewUrl && (
+      {pendingCropUrl && pendingCropFile ? (
+        <ImageCropSelector
+          previewUrl={pendingCropUrl}
+          originalFile={pendingCropFile}
+          onConfirm={handleCropConfirm}
+          onCancel={handleCropCancel}
+        />
+      ) : previewUrl && (
         <ImagePreviewWrapper>
           <ImagePreview src={previewUrl} alt="Selected photo preview" />
           <ImagePreviewRemoveButton size="small" onClick={handleRemovePhoto}>
@@ -145,7 +177,7 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
 
         <CostumButton
           variant="contained"
-          disabled={!content.trim() && !selectedPhoto}
+          disabled={!content.trim() || !selectedPhoto || !!pendingCropFile}
           onClick={handlePost}
         >
           Post

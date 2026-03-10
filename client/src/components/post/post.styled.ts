@@ -50,20 +50,16 @@ export const PostCaption = styled(Typography)({
   wordBreak: "break-word",
 });
 
-export const PostImageContainer = styled(Box)(({ theme }) => ({
+export const PostImageContainer = styled(Box)({
   width: "100%",
-  aspectRatio: 3 / 2,
-  backgroundColor: theme.palette.background.default,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
+  aspectRatio: "1 / 1",
   overflow: "hidden",
-}));
+});
 
 export const PostImage = styled("img")({
-  maxWidth: "100%",
-  maxHeight: "100%",
-  objectFit: "contain",
+  width: "100%",
+  height: "100%",
+  objectFit: "cover",
   display: "block",
 });
 
