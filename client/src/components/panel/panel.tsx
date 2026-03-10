@@ -1,7 +1,14 @@
 import { Share as ShareIcon } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 import type { FC } from "react";
-import "./panel.css";
+import {
+  PanelBubbleBottom,
+  PanelBubbleTop,
+  PanelContent,
+  PanelIcon,
+  PanelRoot,
+  PanelSubtitle,
+} from "./panel.styled";
 
 interface PanelProps {
   title: string;
@@ -9,22 +16,19 @@ interface PanelProps {
 }
 export const Panel: FC<PanelProps> = ({ title, subTitle }) => {
   return (
-    <div className="panel">
-      <div className="panel-content">
-        <div className="panel-icon">
+    <PanelRoot>
+      <PanelContent>
+        <PanelIcon>
           <ShareIcon sx={{ fontSize: 40 }} />
-        </div>
+        </PanelIcon>
         <Typography variant="h3" fontWeight="bold" mb={2}>
           {title}
         </Typography>
-        <Typography variant="h6" sx={{ opacity: 0.9 }}>
-          {subTitle}
-        </Typography>
-      </div>
+        <PanelSubtitle variant="h6">{subTitle}</PanelSubtitle>
+      </PanelContent>
 
-      <div className="panel-bubble-top" />
-      <div className="panel-bubble-bottom" />
-    </div>
+      <PanelBubbleTop />
+      <PanelBubbleBottom />
+    </PanelRoot>
   );
 };
-
