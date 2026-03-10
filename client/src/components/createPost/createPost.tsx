@@ -1,16 +1,24 @@
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
+import CloseIcon from "@mui/icons-material/Close";
 import { Typography } from "@mui/material";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CostumButton } from "../button/CostumButton.styled";
 import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import { avatarImageSlotProps } from "../../utils/avatar.utils";
 import type { User } from "../../entities/User";
+import { useCreatePost } from "../../react/hooks/usePosts";
 import {
   CreatePostActionsRow,
   CreatePostContainer,
   CreatePostInput,
   CreatePostInputRow,
+  ContentErrorText,
+  ImagePreview,
+  ImagePreviewRemoveButton,
+  ImagePreviewWrapper,
   PhotoButton,
+  PhotoButtonGroup,
+  PhotoErrorText,
 } from "./createPost.styled";
 
 interface CreatePostProps {
@@ -19,9 +27,23 @@ interface CreatePostProps {
 }
 
 export const CreatePost = ({ user, onPost }: CreatePostProps) => {
+  const { mutateAsync: createPost } = useCreatePost();
   const [content, setContent] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [contentError, setContentError] = useState(false);
+  const [photoError, setPhotoError] = useState(false);
+
+  useEffect(() => {
+    if (!selectedPhoto) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(selectedPhoto);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [selectedPhoto]);
 
   const handlePhotoClick = () => {
     fileInputRef.current?.click();
@@ -29,11 +51,31 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setSelectedPhoto(file);
+    if (file) {
+      setSelectedPhoto(file);
+      setPhotoError(false);
+    }
   };
 
-  const handlePost = () => {
-    if (!content.trim() && !selectedPhoto) return;
+  const handleRemovePhoto = () => {
+    setSelectedPhoto(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handlePost = async () => {
+    const hasContent = content.trim().length > 0;
+    const hasPhoto = !!selectedPhoto;
+
+    if (!hasContent) setContentError(true);
+    if (!hasPhoto) setPhotoError(true);
+    if (!hasContent || !hasPhoto) return;
+
+    await createPost({
+      sender: user._id,
+      message: content,
+      ...(selectedPhoto && { image: selectedPhoto }),
+    } as Parameters<typeof createPost>[0]);
+
     onPost?.(content, selectedPhoto ?? undefined);
     setContent("");
     setSelectedPhoto(null);
@@ -55,18 +97,43 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
           multiline
           minRows={3}
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          error={contentError}
+          onChange={(e) => {
+            setContent(e.target.value);
+            if (e.target.value.trim()) setContentError(false);
+          }}
         />
       </CreatePostInputRow>
+      {contentError && (
+        <ContentErrorText>
+          Please add a description to your post.
+        </ContentErrorText>
+      )}
+
+      {previewUrl && (
+        <ImagePreviewWrapper>
+          <ImagePreview src={previewUrl} alt="Selected photo preview" />
+          <ImagePreviewRemoveButton size="small" onClick={handleRemovePhoto}>
+            <CloseIcon fontSize="small" />
+          </ImagePreviewRemoveButton>
+        </ImagePreviewWrapper>
+      )}
 
       <CreatePostActionsRow>
-        <PhotoButton onClick={handlePhotoClick} role="button">
-          <ImageOutlinedIcon fontSize="small" />
-          <Typography variant="body2" fontWeight={600} component="span">
-            Photo
-            {selectedPhoto && ` · ${selectedPhoto.name}`}
-          </Typography>
-        </PhotoButton>
+        <PhotoButtonGroup>
+          <PhotoButton onClick={handlePhotoClick} role="button">
+            <ImageOutlinedIcon fontSize="small" />
+            <Typography variant="body2" fontWeight={600} component="span">
+              Photo
+              {selectedPhoto && ` · ${selectedPhoto.name}`}
+            </Typography>
+          </PhotoButton>
+          {photoError && (
+            <PhotoErrorText>
+              Please add a photo to your post.
+            </PhotoErrorText>
+          )}
+        </PhotoButtonGroup>
 
         <input
           ref={fileInputRef}
