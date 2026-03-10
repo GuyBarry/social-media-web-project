@@ -1,18 +1,22 @@
 import { Google as GoogleIcon } from "@mui/icons-material";
-import {
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  Divider,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { CircularProgress, TextField, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Panel } from "../../components/panel/panel";
 import { useAuth } from "../../auth/context/authContext";
-import "./register.css";
+import {
+  RegisterAlert,
+  RegisterContainer,
+  RegisterDivider,
+  RegisterFooterText,
+  RegisterFormPanel,
+  RegisterGoogleButton,
+  RegisterLink,
+  RegisterPasswordRow,
+  RegisterSubmitButton,
+  RegisterSubtitle,
+  RegisterTitle,
+} from "./register.styled";
 
 export const RegisterScreen = () => {
   const { userId, register } = useAuth();
@@ -67,28 +71,20 @@ export const RegisterScreen = () => {
   };
 
   return (
-    <div className="register-container">
-      {/* Left Panel - Desktop Visuals */}
+    <RegisterContainer>
       <Panel
         title="Join Us"
         subTitle="Create an account and start sharing your journey."
       />
 
-      {/* Right Panel - Form */}
-      <div className="register-form-panel">
+      <RegisterFormPanel>
         <div>
-          <Typography variant="h5" fontWeight="bold" textAlign="center" mb={1}>
-            Create Account
-          </Typography>
-          <Typography color="text.secondary" textAlign="center" mb={2}>
+          <RegisterTitle variant="h5">Create Account</RegisterTitle>
+          <RegisterSubtitle color="text.secondary">
             Start your journey with us today
-          </Typography>
+          </RegisterSubtitle>
 
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
+          {error && <RegisterAlert severity="error">{error}</RegisterAlert>}
 
           <form onSubmit={handleSubmit}>
             <TextField
@@ -113,7 +109,7 @@ export const RegisterScreen = () => {
               required
             />
 
-            <Box sx={{ display: "flex", gap: 2 }}>
+            <RegisterPasswordRow>
               <TextField
                 fullWidth
                 label="Password"
@@ -140,7 +136,7 @@ export const RegisterScreen = () => {
                 margin="dense"
                 required
               />
-            </Box>
+            </RegisterPasswordRow>
 
             <TextField
               fullWidth
@@ -150,7 +146,10 @@ export const RegisterScreen = () => {
               onChange={(e) =>
                 setFormData({ ...formData, birthdate: e.target.value })
               }
-              InputLabelProps={{ shrink: true }}
+              slotProps={{
+                inputLabel: { shrink: true },
+                htmlInput: { max: new Date().toISOString().split("T")[0] },
+              }}
               margin="dense"
             />
             <TextField
@@ -164,49 +163,44 @@ export const RegisterScreen = () => {
               margin="dense"
             />
 
-            <Button
+            <RegisterSubmitButton
               type="submit"
               fullWidth
               variant="contained"
               size="large"
               disabled={loading}
-              sx={{ mt: 3, mb: 2, py: 1.5 }}
             >
               {loading ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
                 "Sign Up"
               )}
-            </Button>
+            </RegisterSubmitButton>
           </form>
 
-          <Divider sx={{ my: 3 }}>
+          <RegisterDivider>
             <Typography variant="body2" color="text.secondary">
               Or continue with
             </Typography>
-          </Divider>
+          </RegisterDivider>
 
-          <Button
+          <RegisterGoogleButton
             fullWidth
             variant="outlined"
             startIcon={<GoogleIcon />}
             onClick={handleGoogleSignup}
-            sx={{ py: 1.5 }}
           >
             Google
-          </Button>
+          </RegisterGoogleButton>
 
-          <Typography textAlign="center" mt={3}>
+          <RegisterFooterText>
             Already have an account?{" "}
-            <Link
-              to="/login"
-              style={{ color: "primary.main", fontWeight: 600 }}
-            >
+            <RegisterLink component={Link} to="/login">
               Sign in
-            </Link>
-          </Typography>
+            </RegisterLink>
+          </RegisterFooterText>
         </div>
-      </div>
-    </div>
+      </RegisterFormPanel>
+    </RegisterContainer>
   );
 };
