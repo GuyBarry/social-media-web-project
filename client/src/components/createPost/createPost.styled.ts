@@ -30,7 +30,9 @@ export const CreatePostInput = styled(InputBase)<{ error?: boolean }>(
         : "rgba(0,0,0,0.05)",
     fontSize: "0.95rem",
     alignItems: "flex-start",
-    border: error ? `1.5px solid ${theme.palette.error.main}` : "1.5px solid transparent",
+    border: error
+      ? `1.5px solid ${theme.palette.error.main}`
+      : "1.5px solid transparent",
     "& textarea": {
       padding: 0,
       resize: "none",
@@ -95,16 +97,12 @@ export const ImagePreviewRemoveButton = styled(IconButton)(({ theme }) => ({
   top: "8px",
   right: "8px",
   backgroundColor:
-    theme.palette.mode === "dark"
-      ? "rgba(0,0,0,0.6)"
-      : "rgba(0,0,0,0.45)",
+    theme.palette.mode === "dark" ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.45)",
   color: "#fff",
   padding: "4px",
   "&:hover": {
     backgroundColor:
-      theme.palette.mode === "dark"
-        ? "rgba(0,0,0,0.8)"
-        : "rgba(0,0,0,0.65)",
+      theme.palette.mode === "dark" ? "rgba(0,0,0,0.8)" : "rgba(0,0,0,0.65)",
   },
 }));
 

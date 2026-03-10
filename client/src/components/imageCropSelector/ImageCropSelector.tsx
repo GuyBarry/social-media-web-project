@@ -19,7 +19,13 @@ interface Rect {
 type DragMode =
   | { type: "idle" }
   | { type: "drawing"; startX: number; startY: number }
-  | { type: "moving"; startX: number; startY: number; origX: number; origY: number }
+  | {
+      type: "moving";
+      startX: number;
+      startY: number;
+      origX: number;
+      origY: number;
+    }
   | { type: "resizing"; startX: number; startY: number; origRect: Rect };
 
 interface Props {
@@ -143,10 +149,7 @@ export const ImageCropSelector = ({
     const mode = dragRef.current;
     if (mode.type !== "resizing" || !rect) return;
     const { w, h } = imgSize();
-    const delta = Math.max(
-      e.clientX - mode.startX,
-      e.clientY - mode.startY,
-    );
+    const delta = Math.max(e.clientX - mode.startX, e.clientY - mode.startY);
     const newSize = clamp(
       mode.origRect.size + delta,
       MIN_SIZE,
@@ -169,7 +172,10 @@ export const ImageCropSelector = ({
     const img = new Image();
     img.src = previewUrl;
     await new Promise<void>((res) => {
-      if (img.complete) { res(); return; }
+      if (img.complete) {
+        res();
+        return;
+      }
       img.onload = () => res();
     });
 
@@ -193,16 +199,20 @@ export const ImageCropSelector = ({
       size,
     );
 
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      const ext = originalFile.name.split(".").pop() ?? "jpg";
-      const croppedFile = new File(
-        [blob],
-        `${originalFile.name.replace(/\.[^.]+$/, "")}_cropped.${ext}`,
-        { type: blob.type },
-      );
-      onConfirm(croppedFile);
-    }, "image/jpeg", 0.92);
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) return;
+        const ext = originalFile.name.split(".").pop() ?? "jpg";
+        const croppedFile = new File(
+          [blob],
+          `${originalFile.name.replace(/\.[^.]+$/, "")}_cropped.${ext}`,
+          { type: blob.type },
+        );
+        onConfirm(croppedFile);
+      },
+      "image/jpeg",
+      0.92,
+    );
   }, [rect, previewUrl, originalFile, onConfirm]);
 
   useEffect(() => {
@@ -235,7 +245,12 @@ export const ImageCropSelector = ({
         {rect && rect.size >= MIN_SIZE && (
           <CropSelection
             data-crop-selection
-            style={{ left: rect.x, top: rect.y, width: rect.size, height: rect.size }}
+            style={{
+              left: rect.x,
+              top: rect.y,
+              width: rect.size,
+              height: rect.size,
+            }}
             onPointerDown={onSelectionPointerDown}
             onPointerMove={onSelectionPointerMove}
             onPointerUp={onSelectionPointerUp}

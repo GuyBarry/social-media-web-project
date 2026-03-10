@@ -142,13 +142,15 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
           onConfirm={handleCropConfirm}
           onCancel={handleCropCancel}
         />
-      ) : previewUrl && (
-        <ImagePreviewWrapper>
-          <ImagePreview src={previewUrl} alt="Selected photo preview" />
-          <ImagePreviewRemoveButton size="small" onClick={handleRemovePhoto}>
-            <CloseIcon fontSize="small" />
-          </ImagePreviewRemoveButton>
-        </ImagePreviewWrapper>
+      ) : (
+        previewUrl && (
+          <ImagePreviewWrapper>
+            <ImagePreview src={previewUrl} alt="Selected photo preview" />
+            <ImagePreviewRemoveButton size="small" onClick={handleRemovePhoto}>
+              <CloseIcon fontSize="small" />
+            </ImagePreviewRemoveButton>
+          </ImagePreviewWrapper>
+        )
       )}
 
       <CreatePostActionsRow>
@@ -161,9 +163,7 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
             </Typography>
           </PhotoButton>
           {photoError && (
-            <PhotoErrorText>
-              Please add a photo to your post.
-            </PhotoErrorText>
+            <PhotoErrorText>Please add a photo to your post.</PhotoErrorText>
           )}
         </PhotoButtonGroup>
 
