@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usersApi } from "../../api/usersApi";
 import { useAuth } from "../../auth/context/authContext";
 import type { User } from "../../entities/User";
+import { postKeys } from "./usePosts";
 
 export const userKeys = {
   all: ["users"] as const,
@@ -38,6 +39,7 @@ export function useUpdateUser() {
     },
     onSuccess: (_data, { userId }) => {
       queryClient.invalidateQueries({ queryKey: userKeys.detail(userId) });
+      queryClient.invalidateQueries({ queryKey: postKeys.infinite() });
     },
   });
 }
