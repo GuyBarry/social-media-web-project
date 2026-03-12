@@ -18,6 +18,7 @@ import {
   CommentItem,
   CommentSenderRow,
   CommentsList,
+  CommentsScrollableList,
   CommentsSection,
   CommentsSectionHeader,
   CommentsSectionTitle,
@@ -117,13 +118,15 @@ export const PostCommentsSection: FC<CommentsSectionProps> = ({
       )}
 
       {isCommentsLoading ? (
-        <CircularProgress size={24} sx={{ margin: "16px auto" }} />
-      ) : comments.length === 0 ? (
-        <EmptyCommentsText>
-          No comments yet. Be the first to comment!
-        </EmptyCommentsText>
+        <CircularProgress size={24} sx={{ margin: "16px auto", display: "block" }} />
       ) : (
-        <CommentsList>
+        <CommentsScrollableList>
+          {comments.length === 0 ? (
+            <EmptyCommentsText>
+              No comments yet. Be the first to comment!
+            </EmptyCommentsText>
+          ) : (
+            <CommentsList>
           {comments.map((comment) => (
             <CommentItem key={comment._id}>
               <ProfileAvatar
@@ -163,7 +166,9 @@ export const PostCommentsSection: FC<CommentsSectionProps> = ({
               )}
             </LoadMoreButton>
           )}
-        </CommentsList>
+            </CommentsList>
+          )}
+        </CommentsScrollableList>
       )}
     </CommentsSection>
   );

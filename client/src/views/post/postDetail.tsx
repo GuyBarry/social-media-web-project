@@ -7,9 +7,11 @@ import { useGetPostById, useLikePost } from "../../react/hooks/usePosts";
 import { PostCommentsSection } from "./comments/commentSection";
 import {
   BackButton,
+  CommentsColumn,
   PostDetailContent,
   PostDetailHeader,
   PostDetailPage,
+  PostStickyColumn,
 } from "./postDetail.styled";
 
 export const PostDetailScreen: FC = () => {
@@ -53,21 +55,25 @@ export const PostDetailScreen: FC = () => {
       </PostDetailHeader>
 
       <PostDetailContent>
-        <PostComponent
-          post={post}
-          onLike={(id) =>
-            likePost({ id, senderId: post.sender._id, method: "like" })
-          }
-          onDislike={(id) =>
-            likePost({ id, senderId: post.sender._id, method: "dislike" })
-          }
-          onComment={() => {}}
-        />
+        <PostStickyColumn>
+          <PostComponent
+            post={post}
+            onLike={(id) =>
+              likePost({ id, senderId: post.sender._id, method: "like" })
+            }
+            onDislike={(id) =>
+              likePost({ id, senderId: post.sender._id, method: "dislike" })
+            }
+            onComment={() => {}}
+          />
+        </PostStickyColumn>
 
-        <PostCommentsSection
-          postId={post._id}
-          numComments={post.numComments}
-        />
+        <CommentsColumn>
+          <PostCommentsSection
+            postId={post._id}
+            numComments={post.numComments}
+          />
+        </CommentsColumn>
       </PostDetailContent>
     </PostDetailPage>
   );

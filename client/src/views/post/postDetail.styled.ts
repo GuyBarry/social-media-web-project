@@ -11,8 +11,7 @@ export const PostDetailPage = styled(Box)({
 });
 
 export const PostDetailHeader = styled(Box)({
-  width: "100%",
-  maxWidth: 620,
+  width: "85%",
   display: "flex",
   alignItems: "center",
   padding: "16px 0 8px",
@@ -44,10 +43,23 @@ export const BackButton = styled("button")(({ theme }) => ({
 }));
 
 export const PostDetailContent = styled(Box)({
-  width: "100%",
-  maxWidth: 620,
+  width: "85%",
+  display: "flex",
+  flexDirection: "row",
+  gap: 24,
+  alignItems: "flex-start",
+});
+
+export const PostStickyColumn = styled(Box)({
+  flex: "0 0 520px",
+  position: "sticky",
+  top: 20,
+});
+
+export const CommentsColumn = styled(Box)({
+  flex: 1,
+  minWidth: 0,
   display: "flex",
   flexDirection: "column",
-  gap: 16,
 });
 
