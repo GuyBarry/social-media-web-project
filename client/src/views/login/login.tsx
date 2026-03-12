@@ -11,7 +11,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Panel } from "../../components/panel/panel";
 import { useAuth } from "../../auth/context/authContext";
-import "./login.css";
+import { LoginContainer, LoginFormPanel } from "./login.styled";
 
 export const LoginScreen = () => {
   const { userId, login } = useAuth();
@@ -49,15 +49,13 @@ export const LoginScreen = () => {
   };
 
   return (
-    <div className="login-container">
-      {/* Left Panel - Desktop Visuals */}
+    <LoginContainer>
       <Panel
         title="Welcome Back"
         subTitle="Sign in to continue your journey with us."
       />
 
-      {/* Right Panel - Form */}
-      <div className="login-form-panel">
+      <LoginFormPanel>
         <div>
           <Typography variant="h5" fontWeight="bold" textAlign="center" mb={1}>
             Sign In
@@ -138,7 +136,7 @@ export const LoginScreen = () => {
             </Link>
           </Typography>
         </div>
-      </div>
-    </div>
+      </LoginFormPanel>
+    </LoginContainer>
   );
 };

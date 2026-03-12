@@ -6,7 +6,7 @@ import { useAuth } from "../../auth/context/authContext";
 import { useGetUserById } from "../../react/hooks/useUsers";
 import { avatarImageSlotProps } from "../../utils/avatar.utils";
 import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
-import "./navbar.css";
+import { NavbarLogo, NavbarProfile, NavbarRoot } from "./navbar.styled";
 
 export const Navbar = () => {
   const { userId, logout } = useAuth();
@@ -26,16 +26,16 @@ export const Navbar = () => {
   if (!userId) return null;
 
   return (
-    <Box className="navbar">
-      <div className="navbar-logo" onClick={() => navigate("/")}>
+    <NavbarRoot>
+      <NavbarLogo onClick={() => navigate("/")}>
         <Share2 size={22} color="var(--mui-palette-primary-main, #1976d2)" />
         <Typography variant="h6" fontWeight={700} color="primary.main">
           SocialApp
         </Typography>
-      </div>
+      </NavbarLogo>
 
       <Box display="flex" alignItems="center" gap={2}>
-        <div className="navbar-profile" onClick={handleProfileClick}>
+        <NavbarProfile onClick={handleProfileClick}>
           <Typography variant="body2" color="text.secondary">
             {user?.username}
           </Typography>
@@ -46,7 +46,7 @@ export const Navbar = () => {
           >
             {user?.username?.charAt(0).toUpperCase()}
           </ProfileAvatar>
-        </div>
+        </NavbarProfile>
         <IconButton
           onClick={handleLogout}
           title="Logout"
@@ -56,6 +56,6 @@ export const Navbar = () => {
           <LogoutIcon fontSize="small" />
         </IconButton>
       </Box>
-    </Box>
+    </NavbarRoot>
   );
 };

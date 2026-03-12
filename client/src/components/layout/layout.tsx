@@ -1,10 +1,11 @@
 import { Navbar } from "../navbar/navbar";
+import { AppContainer } from "./layout.styled";
 
 export const AppLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="app-container">
+    <AppContainer>
       <Navbar />
       <main>{children}</main>
-    </div>
+    </AppContainer>
   );
 };
