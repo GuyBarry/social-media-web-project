@@ -69,6 +69,7 @@ export const FeedComponent: FC<FeedProps> = ({ queryResult, columns = 1 }) => {
           <PostComponent
             key={post._id}
             post={post}
+            truncateCaption
             onLike={(id) => likePost({ id, senderId: post.sender._id, method: "like" })}
             onDislike={(id) => likePost({ id, senderId: post.sender._id, method: "dislike" })}
           />
