@@ -14,13 +14,10 @@ import {
   CreateEditPostContainer,
   CreateEditPostInput,
   CreateEditPostInputRow,
-  ContentErrorText,
   ImagePreview,
   ImagePreviewRemoveButton,
   ImagePreviewWrapper,
   PhotoButton,
-  PhotoButtonGroup,
-  PhotoErrorText,
 } from "./createEditPost.styled";
 
 interface CreateEditPostProps {
@@ -39,9 +36,6 @@ const CreateEditPost = ({ user, initialPost, onSave }: CreateEditPostProps) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(
     initialPost?.imageUrl ?? null,
   );
-  const [contentError, setContentError] = useState(false);
-  const [photoError, setPhotoError] = useState(false);
-
   const [pendingCropFile, setPendingCropFile] = useState<File | null>(null);
   const [pendingCropUrl, setPendingCropUrl] = useState<string | null>(null);
 
@@ -70,7 +64,6 @@ const CreateEditPost = ({ user, initialPost, onSave }: CreateEditPostProps) => {
     const file = e.target.files?.[0];
     if (file) {
       setPendingCropFile(file);
-      setPhotoError(false);
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -78,7 +71,6 @@ const CreateEditPost = ({ user, initialPost, onSave }: CreateEditPostProps) => {
   const handleCropConfirm = (croppedFile: File) => {
     setSelectedPhoto(croppedFile);
     setPendingCropFile(null);
-    setPhotoError(false);
   };
 
   const handleCropCancel = () => {
@@ -91,16 +83,10 @@ const CreateEditPost = ({ user, initialPost, onSave }: CreateEditPostProps) => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const hasImage = !!previewUrl;
+  const isSubmitDisabled = !content.trim() || !previewUrl || !!pendingCropFile;
 
   const handleSubmit = async () => {
-    const hasContent = content.trim().length > 0;
-
-    if (!hasContent) setContentError(true);
-    if (!hasImage) setPhotoError(true);
-    if (!hasContent || !hasImage) return;
-
-    if (isEditMode && initialPost) {
+    if (isEditMode) {
       await updatePost({
         id: initialPost._id,
         message: content,
@@ -136,18 +122,11 @@ const CreateEditPost = ({ user, initialPost, onSave }: CreateEditPostProps) => {
           multiline
           minRows={3}
           value={content}
-          error={contentError}
           onChange={(e) => {
             setContent(e.target.value);
-            if (e.target.value.trim()) setContentError(false);
           }}
         />
       </CreateEditPostInputRow>
-      {contentError && (
-        <ContentErrorText>
-          Please add a description to your post.
-        </ContentErrorText>
-      )}
 
       {pendingCropUrl && pendingCropFile ? (
         <ImageCropSelector
@@ -168,17 +147,12 @@ const CreateEditPost = ({ user, initialPost, onSave }: CreateEditPostProps) => {
       )}
 
       <CreateEditPostActionsRow>
-        <PhotoButtonGroup>
-          <PhotoButton onClick={handlePhotoClick} role="button">
-            <ImageOutlinedIcon fontSize="small" />
-            <Typography variant="body2" fontWeight={600} component="span">
-              {previewUrl ? "Change Photo" : "Photo"}
-            </Typography>
-          </PhotoButton>
-          {photoError && (
-            <PhotoErrorText>Please add a photo to your post.</PhotoErrorText>
-          )}
-        </PhotoButtonGroup>
+        <PhotoButton onClick={handlePhotoClick} role="button">
+          <ImageOutlinedIcon fontSize="small" />
+          <Typography variant="body2" fontWeight={600} component="span">
+            {previewUrl ? "Change Photo" : "Photo"}
+          </Typography>
+        </PhotoButton>
 
         <input
           ref={fileInputRef}
@@ -190,7 +164,7 @@ const CreateEditPost = ({ user, initialPost, onSave }: CreateEditPostProps) => {
 
         <CostumButton
           variant="contained"
-          disabled={!content.trim() || !hasImage || !!pendingCropFile}
+          disabled={isSubmitDisabled}
           onClick={handleSubmit}
         >
           {isEditMode ? "Save" : "Post"}
