@@ -12,7 +12,7 @@ import { useGetUserById } from "../../react/hooks/useUsers";
 import { avatarImageSlotProps } from "../../utils/avatar.utils";
 import { formatTimestamp } from "../../utils/time.utils";
 import { ConfirmationDialog } from "../dialog/ConfirmationDialog";
-import { EditPost } from "../createEditPost/createEditPost";
+import { EditPost } from "../createEditPost/editPost";
 import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import {
   CommentButton,

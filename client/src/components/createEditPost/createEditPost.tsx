@@ -20,13 +20,17 @@ import {
   PhotoButton,
 } from "./createEditPost.styled";
 
-interface CreateEditPostProps {
+export interface CreateEditPostProps {
   user: User;
   initialPost?: Post;
   onSave?: () => void;
 }
 
-const CreateEditPost = ({ user, initialPost, onSave }: CreateEditPostProps) => {
+export const CreateEditPost = ({
+  user,
+  initialPost,
+  onSave,
+}: CreateEditPostProps) => {
   const isEditMode = !!initialPost;
   const { mutateAsync: createPost } = useCreatePost();
   const { mutateAsync: updatePost } = useUpdatePost();
@@ -89,7 +93,7 @@ const CreateEditPost = ({ user, initialPost, onSave }: CreateEditPostProps) => {
     if (isEditMode) {
       await updatePost({
         id: initialPost._id,
-        message: content,
+        ...(content !== initialPost.message && { message: content }),
         ...(selectedPhoto && { image: selectedPhoto }),
       });
       onSave?.();
@@ -97,8 +101,8 @@ const CreateEditPost = ({ user, initialPost, onSave }: CreateEditPostProps) => {
       await createPost({
         sender: user._id,
         message: content,
-        ...(selectedPhoto && { image: selectedPhoto }),
-      } as Parameters<typeof createPost>[0]);
+        image: selectedPhoto!,
+      });
 
       setContent("");
       setSelectedPhoto(null);
@@ -173,18 +177,3 @@ const CreateEditPost = ({ user, initialPost, onSave }: CreateEditPostProps) => {
     </CreateEditPostContainer>
   );
 };
-
-export const CreatePost = ({
-  user,
-  onSave,
-}: Pick<CreateEditPostProps, "user" | "onSave">) => (
-  <CreateEditPost user={user} onSave={onSave} />
-);
-
-export const EditPost = ({
-  user,
-  initialPost,
-  onSave,
-}: Required<CreateEditPostProps>) => (
-  <CreateEditPost user={user} initialPost={initialPost} onSave={onSave} />
-);
