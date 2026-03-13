@@ -87,7 +87,10 @@ export const CreateEditPost = ({
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const isSubmitDisabled = !content.trim() || !previewUrl || !!pendingCropFile;
+  const isEditWithoutChanges =
+    isEditMode && content === initialPost?.message && !selectedPhoto;
+  const isPostUnvalid = !(content.trim() && previewUrl && !pendingCropFile);
+  const isSubmitDisabled = isPostUnvalid || isEditWithoutChanges;
 
   const handleSubmit = async () => {
     if (isEditMode) {
