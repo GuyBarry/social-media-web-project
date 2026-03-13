@@ -18,14 +18,10 @@ export const HomeScreen = () => {
         {user && <ProfileCard user={user} />}
       </HomeSidebar>
       <main>
-<<<<<<< create-post
         <Box display="flex" flexDirection="column" gap="16px">
           {user && <CreatePost user={user} />}
           <FeedComponent queryResult={queryResult} />
         </Box>
-=======
-        <FeedComponent queryResult={queryResult} />
->>>>>>> main
       </main>
       <HomeSidebar>
         <Typography variant="h5" fontWeight={600}>
