@@ -6,13 +6,14 @@ import { CostumButton } from "../button/CostumButton.styled";
 import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import { avatarImageSlotProps } from "../../utils/avatar.utils";
 import type { User } from "../../entities/User";
-import { useCreatePost } from "../../react/hooks/usePosts";
+import type { Post } from "../../entities/Post";
+import { useCreatePost, useUpdatePost } from "../../react/hooks/usePosts";
 import { ImageCropSelector } from "../imageCropSelector/ImageCropSelector";
 import {
-  CreatePostActionsRow,
-  CreatePostContainer,
-  CreatePostInput,
-  CreatePostInputRow,
+  CreateEditPostActionsRow,
+  CreateEditPostContainer,
+  CreateEditPostInput,
+  CreateEditPostInputRow,
   ContentErrorText,
   ImagePreview,
   ImagePreviewRemoveButton,
@@ -20,19 +21,24 @@ import {
   PhotoButton,
   PhotoButtonGroup,
   PhotoErrorText,
-} from "./createPost.styled";
+} from "./createEditPost.styled";
 
-interface CreatePostProps {
+interface CreateEditPostProps {
   user: User;
-  onPost?: (content: string, photo?: File) => void;
+  initialPost?: Post;
+  onSave?: () => void;
 }
 
-export const CreatePost = ({ user, onPost }: CreatePostProps) => {
+const CreateEditPost = ({ user, initialPost, onSave }: CreateEditPostProps) => {
+  const isEditMode = !!initialPost;
   const { mutateAsync: createPost } = useCreatePost();
-  const [content, setContent] = useState("");
+  const { mutateAsync: updatePost } = useUpdatePost();
+  const [content, setContent] = useState(initialPost?.message ?? "");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    initialPost?.imageUrl ?? null,
+  );
   const [contentError, setContentError] = useState(false);
   const [photoError, setPhotoError] = useState(false);
 
@@ -40,10 +46,7 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
   const [pendingCropUrl, setPendingCropUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!selectedPhoto) {
-      setPreviewUrl(null);
-      return;
-    }
+    if (!selectedPhoto) return;
     const url = URL.createObjectURL(selectedPhoto);
     setPreviewUrl(url);
     return () => URL.revokeObjectURL(url);
@@ -84,32 +87,43 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
 
   const handleRemovePhoto = () => {
     setSelectedPhoto(null);
+    setPreviewUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handlePost = async () => {
+  const hasImage = !!previewUrl;
+
+  const handleSubmit = async () => {
     const hasContent = content.trim().length > 0;
-    const hasPhoto = !!selectedPhoto;
 
     if (!hasContent) setContentError(true);
-    if (!hasPhoto) setPhotoError(true);
-    if (!hasContent || !hasPhoto) return;
+    if (!hasImage) setPhotoError(true);
+    if (!hasContent || !hasImage) return;
 
-    await createPost({
-      sender: user._id,
-      message: content,
-      ...(selectedPhoto && { image: selectedPhoto }),
-    } as Parameters<typeof createPost>[0]);
+    if (isEditMode && initialPost) {
+      await updatePost({
+        id: initialPost._id,
+        message: content,
+        ...(selectedPhoto && { image: selectedPhoto }),
+      });
+      onSave?.();
+    } else {
+      await createPost({
+        sender: user._id,
+        message: content,
+        ...(selectedPhoto && { image: selectedPhoto }),
+      } as Parameters<typeof createPost>[0]);
 
-    onPost?.(content, selectedPhoto ?? undefined);
-    setContent("");
-    setSelectedPhoto(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+      setContent("");
+      setSelectedPhoto(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      onSave?.();
+    }
   };
 
   return (
-    <CreatePostContainer>
-      <CreatePostInputRow>
+    <CreateEditPostContainer>
+      <CreateEditPostInputRow>
         <ProfileAvatar
           size={42}
           src={user.imageUrl ?? undefined}
@@ -117,7 +131,7 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
         >
           {user.username.charAt(0).toUpperCase()}
         </ProfileAvatar>
-        <CreatePostInput
+        <CreateEditPostInput
           placeholder="What's on your mind?"
           multiline
           minRows={3}
@@ -128,7 +142,7 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
             if (e.target.value.trim()) setContentError(false);
           }}
         />
-      </CreatePostInputRow>
+      </CreateEditPostInputRow>
       {contentError && (
         <ContentErrorText>
           Please add a description to your post.
@@ -153,13 +167,12 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
         )
       )}
 
-      <CreatePostActionsRow>
+      <CreateEditPostActionsRow>
         <PhotoButtonGroup>
           <PhotoButton onClick={handlePhotoClick} role="button">
             <ImageOutlinedIcon fontSize="small" />
             <Typography variant="body2" fontWeight={600} component="span">
-              Photo
-              {selectedPhoto && ` · ${selectedPhoto.name}`}
+              {previewUrl ? "Change Photo" : "Photo"}
             </Typography>
           </PhotoButton>
           {photoError && (
@@ -177,12 +190,27 @@ export const CreatePost = ({ user, onPost }: CreatePostProps) => {
 
         <CostumButton
           variant="contained"
-          disabled={!content.trim() || !selectedPhoto || !!pendingCropFile}
-          onClick={handlePost}
+          disabled={!content.trim() || !hasImage || !!pendingCropFile}
+          onClick={handleSubmit}
         >
-          Post
+          {isEditMode ? "Save" : "Post"}
         </CostumButton>
-      </CreatePostActionsRow>
-    </CreatePostContainer>
+      </CreateEditPostActionsRow>
+    </CreateEditPostContainer>
   );
 };
+
+export const CreatePost = ({
+  user,
+  onSave,
+}: Pick<CreateEditPostProps, "user" | "onSave">) => (
+  <CreateEditPost user={user} onSave={onSave} />
+);
+
+export const EditPost = ({
+  user,
+  initialPost,
+  onSave,
+}: Required<CreateEditPostProps>) => (
+  <CreateEditPost user={user} initialPost={initialPost} onSave={onSave} />
+);

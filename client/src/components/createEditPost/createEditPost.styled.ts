@@ -1,6 +1,6 @@
 import { Box, IconButton, InputBase, styled } from "@mui/material";
 
-export const CreatePostContainer = styled(Box)(() => ({
+export const CreateEditPostContainer = styled(Box)(() => ({
   display: "flex",
   flexDirection: "column",
   gap: "12px",
@@ -12,22 +12,20 @@ export const CreatePostContainer = styled(Box)(() => ({
   boxSizing: "border-box",
 }));
 
-export const CreatePostInputRow = styled(Box)({
+export const CreateEditPostInputRow = styled(Box)({
   display: "flex",
   alignItems: "flex-start",
   gap: "12px",
   width: "100%",
 });
 
-export const CreatePostInput = styled(InputBase)<{ error?: boolean }>(
+export const CreateEditPostInput = styled(InputBase)<{ error?: boolean }>(
   ({ theme, error }) => ({
     flex: 1,
     padding: "10px 16px",
     borderRadius: "16px",
-    backgroundColor:
-      theme.palette.mode === "dark"
-        ? "rgba(255,255,255,0.06)"
-        : "rgba(0,0,0,0.05)",
+    borderTopLeftRadius: 0,
+    backgroundColor: theme.palette.background.default,
     fontSize: "0.95rem",
     alignItems: "flex-start",
     border: error
@@ -38,15 +36,12 @@ export const CreatePostInput = styled(InputBase)<{ error?: boolean }>(
       resize: "none",
     },
     "&:hover": {
-      backgroundColor:
-        theme.palette.mode === "dark"
-          ? "rgba(255,255,255,0.1)"
-          : "rgba(0,0,0,0.08)",
+      backgroundColor: "rgba(0,0,0,0.05)",
     },
   }),
 );
 
-export const CreatePostActionsRow = styled(Box)({
+export const CreateEditPostActionsRow = styled(Box)({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
@@ -71,7 +66,7 @@ export const PhotoButton = styled(Box)(({ theme }) => ({
       theme.palette.mode === "dark"
         ? "rgba(255,255,255,0.1)"
         : "rgba(0,0,0,0.06)",
-    color: theme.palette.success.main,
+    color: theme.palette.primary.main,
   },
 }));
 
