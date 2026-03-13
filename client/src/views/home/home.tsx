@@ -1,5 +1,6 @@
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { FeedComponent } from "../../components/feed/feed";
+import { CreatePost } from "../../components/createPost/createPost";
 import { ProfileCard } from "./profileCard/profileCard";
 import { useGetAllPostsInfinite } from "../../react/hooks/usePosts";
 import { useGetUserById } from "../../react/hooks/useUsers";
@@ -17,7 +18,10 @@ export const HomeScreen = () => {
         {user && <ProfileCard user={user} />}
       </HomeSidebar>
       <main>
-        <FeedComponent queryResult={queryResult} />
+        <Box display="flex" flexDirection="column" gap="16px">
+          {user && <CreatePost user={user} />}
+          <FeedComponent queryResult={queryResult} />
+        </Box>
       </main>
       <HomeSidebar>
         <Typography variant="h5" fontWeight={600}>

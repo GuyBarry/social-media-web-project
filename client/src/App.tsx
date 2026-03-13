@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth/provider/authProvider";
 import { AppLayout } from "./components/layout/layout";
 import { ProtectedRoute } from "./components/protectedRoute/protectedRoute";
+import { ScrollToTop } from "./components/scrollToTop/ScrollToTop";
 import { HomeScreen } from "./views/home/home";
 import { LoginScreen } from "./views/login/login";
 import { RegisterScreen } from "./views/registeration/register";
@@ -16,6 +17,7 @@ function App() {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Stack width={"100%"} minHeight={"100vh"}>
         <BrowserRouter>
+          <ScrollToTop />
           <AuthProvider>
             <Routes>
               <Route
