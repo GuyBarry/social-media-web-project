@@ -1,16 +1,17 @@
-import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import CloseIcon from "@mui/icons-material/Close";
+import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import { Typography } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
-import { CostumButton } from "../button/CostumButton.styled";
-import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
-import { avatarImageSlotProps } from "../../utils/avatar.utils";
-import type { User } from "../../entities/User";
+import { useEffect, useRef, useState, type FC } from "react";
 import type { Post } from "../../entities/Post";
+import type { User } from "../../entities/User";
 import { useCreatePost, useUpdatePost } from "../../react/hooks/usePosts";
+import { avatarImageSlotProps } from "../../utils/avatar.utils";
+import { CostumButton } from "../button/CostumButton.styled";
 import { ImageCropSelector } from "../imageCropSelector/ImageCropSelector";
+import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import {
-  CreateEditPostActionsRow,
+  ActionButtonsContainer,
+  CreateEditPostButtonsRow,
   CreateEditPostContainer,
   CreateEditPostInput,
   CreateEditPostInputRow,
@@ -26,11 +27,11 @@ export interface CreateEditPostProps {
   onSave?: () => void;
 }
 
-export const CreateEditPost = ({
+export const CreateEditPost: FC<CreateEditPostProps> = ({
   user,
   initialPost,
   onSave,
-}: CreateEditPostProps) => {
+}) => {
   const isEditMode = !!initialPost;
   const { mutateAsync: createPost } = useCreatePost();
   const { mutateAsync: updatePost } = useUpdatePost();
@@ -114,6 +115,19 @@ export const CreateEditPost = ({
     }
   };
 
+  const handleCancel = () => {
+    if (isEditMode) {
+      setContent(initialPost.message);
+      setSelectedPhoto(null);
+      setPreviewUrl(initialPost.imageUrl);
+    } else {
+      setContent("");
+      setSelectedPhoto(null);
+      setPreviewUrl(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <CreateEditPostContainer>
       <CreateEditPostInputRow>
@@ -153,7 +167,7 @@ export const CreateEditPost = ({
         )
       )}
 
-      <CreateEditPostActionsRow>
+      <CreateEditPostButtonsRow>
         <PhotoButton onClick={handlePhotoClick} role="button">
           <ImageOutlinedIcon fontSize="small" />
           <Typography variant="body2" fontWeight={600} component="span">
@@ -169,14 +183,20 @@ export const CreateEditPost = ({
           onChange={handleFileChange}
         />
 
-        <CostumButton
-          variant="contained"
-          disabled={isSubmitDisabled}
-          onClick={handleSubmit}
-        >
-          {isEditMode ? "Save" : "Post"}
-        </CostumButton>
-      </CreateEditPostActionsRow>
+        <ActionButtonsContainer>
+          <CostumButton variant="outlined" onClick={handleCancel}>
+            {isEditMode ? "Discard Changes" : "Discard"}
+          </CostumButton>
+
+          <CostumButton
+            variant="contained"
+            disabled={isSubmitDisabled}
+            onClick={handleSubmit}
+          >
+            {isEditMode ? "Save" : "Post"}
+          </CostumButton>
+        </ActionButtonsContainer>
+      </CreateEditPostButtonsRow>
     </CreateEditPostContainer>
   );
 };
