@@ -14,7 +14,7 @@ const POPULATE_OPTIONS = [
   { path: USER_POPULATE_FIELDS.field, select: USER_POPULATE_FIELDS.subFields },
 ];
 
-export const getAllComments = async (
+const getAllComments = async (
   pagination: PaginationParams,
 ): Promise<PaginateResult<Comment>> => {
   const result = await CommentModel.paginate(
@@ -24,7 +24,7 @@ export const getAllComments = async (
   return result;
 };
 
-export const getAllCommentsByPostId = async (
+const getAllCommentsByPostId = async (
   postId: Post["_id"],
   pagination: PaginationParams,
 ): Promise<PaginateResult<Comment>> => {
@@ -35,28 +35,32 @@ export const getAllCommentsByPostId = async (
   return result;
 };
 
-export const getCommentById = async (
+const getCommentById = async (
   id: Comment["_id"]
 ): Promise<Comment | null> =>
   await CommentModel.findById(id)
     .populate(USER_POPULATE_FIELDS.field, USER_POPULATE_FIELDS.subFields)
     .exec();
 
-export const updateComment = async (
+const updateComment = async (
   id: Comment["_id"],
   commentData: UpdateComment
 ): Promise<Comment | null> =>
   await CommentModel.findByIdAndUpdate(id, commentData, { new: true }).exec();
 
-export const createComment = async (
+const createComment = async (
   commentData: CreateComment
 ): Promise<Comment> => {
   const comment = new CommentModel(commentData);
   return await comment.save().catch((err) => handleDuplicateKeyException(err));
 };
 
-export const deleteComment = async (id: Comment["_id"]): Promise<boolean> =>
+const deleteComment = async (id: Comment["_id"]): Promise<boolean> =>
   (await CommentModel.deleteOne({ _id: id }).exec()).deletedCount > 0;
+
+const deleteCommentsByPostId = async (postId: Post["_id"]): Promise<void> => {
+  await CommentModel.deleteMany({ postId }).exec();
+};
 
 export const commentsRepository = {
   getAllComments,
@@ -65,4 +69,5 @@ export const commentsRepository = {
   getCommentById,
   createComment,
   updateComment,
+  deleteCommentsByPostId,
 };

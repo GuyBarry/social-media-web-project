@@ -1,5 +1,10 @@
 import { Request, Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
+import { commentsService } from "../comments/comments.service";
+import {
+  PaginationParams,
+  parsePaginationParams,
+} from "../config/pagination.config";
 import { LikeRequest, likeRequestSchema } from "../entities/dto/like.dto";
 import {
   CreatePost,
@@ -11,11 +16,7 @@ import {
 import { injectUploadedUrl } from "../middlewares/pictureMiddleware";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
 import { validateExistingSender } from "../middlewares/validateExistingUser";
-import { deleteFile, upload } from "../pictures/pictures.service";
-import {
-  PaginationParams,
-  parsePaginationParams,
-} from "../config/pagination.config";
+import { pictureService } from "../pictures/pictures.service";
 import { likesService } from "./likes/likes.service";
 import { postService } from "./posts.service";
 
@@ -55,7 +56,7 @@ router.get("/:id", async (req: Request<{ id: Post["_id"] }>, res: Response) => {
 // Create post
 router.post(
   "/",
-  upload.single("image"),
+  pictureService.upload.single("image"),
   injectUploadedUrl("imageUrl"),
   validateRequestBody(createPostSchema),
   validateExistingSender,
@@ -82,7 +83,7 @@ router.post(
 // Update post
 router.put(
   "/:id",
-  upload.single("image"),
+  pictureService.upload.single("image"),
   injectUploadedUrl("imageUrl"),
   validateRequestBody(updatePostSchema),
   async (req: Request<{ id: Post["_id"] }, {}, UpdatePost>, res: Response) => {
@@ -91,7 +92,7 @@ router.put(
 
     if (req.file) {
       const existingPost = await postService.getPostById(id);
-      await deleteFile(existingPost.imageUrl);
+      await pictureService.deleteFile(existingPost.imageUrl);
     }
 
     const { _id, updatedAt } = await postService.updatePost(id, postData);
@@ -128,8 +129,10 @@ router.delete(
     const id = req.params.id;
 
     const existingPost = await postService.getPostById(id);
-    await deleteFile(existingPost.imageUrl);
+    await pictureService.deleteFile(existingPost.imageUrl);
     await postService.deletePost(id);
+    await likesService.deleteLikesByPostId(id);
+    await commentsService.deleteCommentsByPostId(id);
 
     res.status(StatusCodes.OK).send({ message: "Post deleted" });
   },
