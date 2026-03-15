@@ -34,7 +34,6 @@ export const ProfileInfoCard: FC<ProfileInfoCardProps> = ({
   onEditClick,
 }) => {
   const bannerColor = resolveBannerColor(user.bannerColor);
-  const uniqueUsername = `@${user.username.toLowerCase().replace(/\s+/g, "")}`;
   const birthDateParsed = user.birthDate ? new Date(user.birthDate) : null;
   const birthDate =
     birthDateParsed && !isNaN(birthDateParsed.getTime())
@@ -70,7 +69,7 @@ export const ProfileInfoCard: FC<ProfileInfoCardProps> = ({
       <UserInfoBox>
         <DisplayName variant="h6">{user.username}</DisplayName>
         <HandleText variant="body2" color="text.secondary">
-          {uniqueUsername}
+          { `@${user.uniqueUsername}`}
         </HandleText>
         <BioText variant="body1">{user.bio ?? "No bio yet."}</BioText>
       </UserInfoBox>
