@@ -1,4 +1,4 @@
-import { nonoptional, z } from "zod";
+import { z } from "zod";
 import { baseModule } from "./base.dto";
 import { notEmptyStringSchema } from "./zodUtils";
 
@@ -12,7 +12,7 @@ export const userSchema = baseModule.extend({
   username: notEmptyStringSchema("Username"),
   uniqueUsername: z.string().optional(),
   email: z.email(),
-  birthDate: z.iso.date().optional(),
+  birthDate: z.coerce.date().optional(),
   bio: z.string().optional(),
   imageUrl: z.string().optional(),
   password: z.string(),
@@ -49,18 +49,14 @@ export type UserPreview = Omit<User, "password" | "googleId"> & {
  *         password:
  *           type: string
  */
-const optionalDateSchema = z.preprocess(
-  (val) => (val === "" || val === null ? undefined : val),
-  z.iso.date().optional()
-);
 
 export const createUserSchema = z.strictObject({
   _id: userSchema.shape._id.optional(),
   username: userSchema.shape.username,
   uniqueUsername: userSchema.shape.uniqueUsername,
   email: userSchema.shape.email,
-  birthDate: optionalDateSchema,
-  bio: z.string().optional(),
+  birthDate: userSchema.shape.birthDate,
+  bio: userSchema.shape.bio,
   password: z.string(),
 });
 const createGoogleUserSchema = createUserSchema

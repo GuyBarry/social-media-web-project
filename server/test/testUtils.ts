@@ -46,7 +46,7 @@ export const exampleUser: CreateUser = {
   _id: "Mayan",
   username: "mayanamsterdam",
   email: "mayan@example.com",
-  birthDate: "2002-10-13",
+  birthDate: new Date("2002-10-13"),
   bio: "I am the best user ever",
   password: hashSync("thebestpasswordever", PASSWORD_SALT_ROUNDS),
 };

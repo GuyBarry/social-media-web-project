@@ -5,41 +5,38 @@ import {
   type PropsWithChildren,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  AuthContext,
-  type AuthResultHandlers,
-} from "../context/authContext";
 import type { User } from "../../entities/User";
 import { authApi } from "../api/authApi";
 import { selfAuthApi } from "../api/selfAuthApi";
+import { AuthContext, type AuthResultHandlers } from "../context/authContext";
 import type { UserLogin } from "../types/userLogin";
 import type { UserRegistration } from "../types/userRegistration";
-
 export const AuthProvider = ({ children }: PropsWithChildren) => {
-  const [userId, setUserId] = useState<User['_id'] | null>(null);
+  const [userId, setUserId] = useState<User["_id"] | null>(null);
   const [isLoadingUserAuth, setIsLoadingUserAuth] = useState(true);
 
   const navigate = useNavigate();
 
-  const saveUserId = useCallback((id: User['_id'] | null) => {
+  const saveUserId = useCallback((id: User["_id"] | null) => {
     setUserId(id);
   }, []);
 
   const getUserMe = useCallback(async () => {
+    setIsLoadingUserAuth(true);
     try {
       const { data } = await selfAuthApi.post<{ user: User | null }>("/me");
       saveUserId(data.user?._id ?? null);
     } catch (error) {
       console.error("Get User Me went wrong", error);
+      saveUserId(null);
     } finally {
       setIsLoadingUserAuth(false);
     }
   }, [saveUserId]);
 
   useEffect(() => {
-    if (!isLoadingUserAuth) return;
     getUserMe();
-  }, []);
+  }, [getUserMe]);
 
   const logout = useCallback(async () => {
     try {
@@ -52,26 +49,25 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     }
   }, [navigate, saveUserId]);
 
-  const onAuthenticationSuccess = useCallback(
-    (id: User['_id']) => {
-      saveUserId(id);
-      navigate("/");
-    },
-    [navigate, saveUserId],
-  );
+  const onAuthenticationSuccess = useCallback(async () => {
+    await getUserMe();
+    navigate("/");
+  }, [navigate, getUserMe]);
 
   const login = useCallback(
     async (
       userLoginData: UserLogin,
       authResultHandlers?: AuthResultHandlers,
     ) => {
-      await authApi
-        .post<{ user: User }>("/login", userLoginData)
-        .then(({ data: { user } }) => {
-          authResultHandlers?.onSuccess?.(user);
-          onAuthenticationSuccess(user._id);
-        })
-        .catch((error) => authResultHandlers?.onError?.(error as Error));
+      try {
+        const {
+          data: { user },
+        } = await authApi.post<{ user: User }>("/login", userLoginData);
+        authResultHandlers?.onSuccess?.(user);
+        await onAuthenticationSuccess();
+      } catch (error) {
+        authResultHandlers?.onError?.(error as Error);
+      }
     },
     [onAuthenticationSuccess],
   );
@@ -81,13 +77,18 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       registrationDTO: UserRegistration,
       authResultHandlers?: AuthResultHandlers,
     ) => {
-      await authApi
-        .post<{ user: User }>("/registration", registrationDTO)
-        .then(({ data: { user } }) => {
-          authResultHandlers?.onSuccess?.(user);
-          onAuthenticationSuccess(user._id);
-        })
-        .catch((error) => authResultHandlers?.onError?.(error as Error));
+      try {
+        const {
+          data: { user },
+        } = await authApi.post<{ user: User }>(
+          "/registration",
+          registrationDTO,
+        );
+        authResultHandlers?.onSuccess?.(user);
+        await onAuthenticationSuccess();
+      } catch (error) {
+        authResultHandlers?.onError?.(error as Error);
+      }
     },
     [onAuthenticationSuccess],
   );
