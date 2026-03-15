@@ -1,4 +1,5 @@
 import { LikeMethod } from "../../entities/dto/like.dto";
+import { Post } from "../../entities/dto/post.dto";
 import { NotFoundException } from "../../exceptions/notFoundException";
 import { postRepository } from "../posts.repository";
 import { likesRepository } from "./likes.repository";
@@ -6,7 +7,7 @@ import { likesRepository } from "./likes.repository";
 export const handleLike = async (
   postId: string,
   userId: string,
-  method: LikeMethod
+  method: LikeMethod,
 ): Promise<void> => {
   const post = await postRepository.getPostById(postId);
   if (!post) {
@@ -23,6 +24,11 @@ export const handleLike = async (
   }
 };
 
+const deleteLikesByPostId = async (postId: Post["_id"]): Promise<void> => {
+  await likesRepository.deleteLikesByPostId(postId);
+};
+
 export const likesService = {
   handleLike,
+  deleteLikesByPostId,
 };
