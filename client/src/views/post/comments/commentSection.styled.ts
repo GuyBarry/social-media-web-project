@@ -11,7 +11,6 @@ export const CommentsSection = styled(Box)({
   padding: "16px",
   flex: 1,
   minHeight: 0,
-  maxHeight: "calc(100vh - 60px)",
   overflow: "hidden",
 });
 
