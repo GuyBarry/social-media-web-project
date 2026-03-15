@@ -18,6 +18,7 @@ import {
   CommentItem,
   CommentSenderRow,
   CommentsList,
+  CommentsScrollableList,
   CommentsSection,
   CommentsSectionHeader,
   CommentsSectionTitle,
@@ -117,53 +118,59 @@ export const PostCommentsSection: FC<CommentsSectionProps> = ({
       )}
 
       {isCommentsLoading ? (
-        <CircularProgress size={24} sx={{ margin: "16px auto" }} />
-      ) : comments.length === 0 ? (
-        <EmptyCommentsText>
-          No comments yet. Be the first to comment!
-        </EmptyCommentsText>
+        <CircularProgress size={24} />
       ) : (
-        <CommentsList>
-          {comments.map((comment) => (
-            <CommentItem key={comment._id}>
-              <ProfileAvatar
-                size={32}
-                src={comment.sender.imageUrl}
-                slotProps={avatarImageSlotProps}
-              />
-              <CommentContent>
-                <CommentSenderRow>
-                  <CommentUsername>{comment.sender.username}</CommentUsername>
-                  <CommentTimestamp>
-                    {formatTimestamp(comment.createdAt)}
-                  </CommentTimestamp>
-                  {currentUser?._id === comment.sender._id && (
-                    <CommentDeleteButton
-                      aria-label="Delete comment"
-                      onClick={() => deleteComment(comment._id)}
-                    >
-                      <DeleteOutlineIcon fontSize="small" />
-                    </CommentDeleteButton>
-                  )}
-                </CommentSenderRow>
-                <CommentText>{comment.message}</CommentText>
-              </CommentContent>
-            </CommentItem>
-          ))}
+        <CommentsScrollableList>
+          {comments.length === 0 ? (
+            <EmptyCommentsText>
+              No comments yet. Be the first to comment!
+            </EmptyCommentsText>
+          ) : (
+            <CommentsList>
+              {comments.map((comment) => (
+                <CommentItem key={comment._id}>
+                  <ProfileAvatar
+                    size={32}
+                    src={comment.sender.imageUrl}
+                    slotProps={avatarImageSlotProps}
+                  />
+                  <CommentContent>
+                    <CommentSenderRow>
+                      <CommentUsername>
+                        {comment.sender.username}
+                      </CommentUsername>
+                      <CommentTimestamp>
+                        {formatTimestamp(comment.createdAt)}
+                      </CommentTimestamp>
+                      {currentUser?._id === comment.sender._id && (
+                        <CommentDeleteButton
+                          aria-label="Delete comment"
+                          onClick={() => deleteComment(comment._id)}
+                        >
+                          <DeleteOutlineIcon fontSize="small" />
+                        </CommentDeleteButton>
+                      )}
+                    </CommentSenderRow>
+                    <CommentText>{comment.message}</CommentText>
+                  </CommentContent>
+                </CommentItem>
+              ))}
 
-          {hasNextPage && (
-            <LoadMoreButton
-              onClick={() => fetchNextPage()}
-              disabled={isFetchingNextPage}
-            >
-              {isFetchingNextPage ? (
-                <CircularProgress size={16} />
-              ) : (
-                "Load more comments"
+              {hasNextPage && (
+                <LoadMoreButton
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                >
+                  {isFetchingNextPage ? (
+                    <CircularProgress size={16} />
+                  ) : (
+                    "Load more comments"
+                  )}
+                </LoadMoreButton>
               )}
-            </LoadMoreButton>
+            </CommentsList>
           )}
-        </CommentsList>
+        </CommentsScrollableList>
       )}
     </CommentsSection>
   );

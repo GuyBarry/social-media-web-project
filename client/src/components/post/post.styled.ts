@@ -42,13 +42,45 @@ export const PostTimestamp = styled(Typography)(({ theme }) => ({
   lineHeight: 1.2,
 }));
 
-export const PostCaption = styled(Typography)({
+export const PostCaptionWrapper = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "truncated" && prop !== "$isRTL",
+})<{ truncated?: boolean; $isRTL?: boolean }>(({ truncated, $isRTL }) => ({
   padding: "4px 16px 10px",
-  fontSize: "0.9rem",
+  display: truncated ? "flex" : "block",
+  alignItems: "baseline",
+  gap: 4,
+  overflow: "hidden",
+  direction: $isRTL ? "rtl" : "ltr",
+}));
+
+export const PostCaption = styled(Typography)<{ truncated?: boolean }>(
+  ({ truncated }) => ({
+    fontSize: "0.9rem",
+    lineHeight: 1.5,
+    wordBreak: truncated ? undefined : "break-word",
+    whiteSpace: truncated ? "nowrap" : "pre-wrap",
+    overflow: truncated ? "hidden" : undefined,
+    textOverflow: truncated ? "ellipsis" : undefined,
+    flex: truncated ? "1 1 0" : undefined,
+    minWidth: 0,
+  }),
+);
+
+export const CaptionToggleButton = styled("button")(({ theme }) => ({
+  flexShrink: 0,
+  background: "none",
+  border: "none",
+  padding: 0,
+  cursor: "pointer",
+  color: theme.palette.text.secondary,
+  fontSize: "0.85rem",
+  fontWeight: 400,
+  outline: "none",
+  whiteSpace: "nowrap",
   lineHeight: 1.5,
-  whiteSpace: "pre-wrap",
-  wordBreak: "break-word",
-});
+  "&:hover": { color: theme.palette.text.primary },
+  "&:focus": { outline: "none" },
+}));
 
 export const PostImageContainer = styled(Box)({
   width: "100%",

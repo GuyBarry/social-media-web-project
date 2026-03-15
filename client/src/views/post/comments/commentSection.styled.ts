@@ -5,11 +5,19 @@ export const CommentsSection = styled(Box)({
   backgroundColor: "#fff",
   borderRadius: 12,
   boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-  overflow: "hidden",
   display: "flex",
   flexDirection: "column",
   gap: "16px",
   padding: "16px",
+  flex: 1,
+  minHeight: 0,
+  overflow: "hidden",
+});
+
+export const CommentsScrollableList = styled(Box)({
+  flex: 1,
+  overflowY: "auto",
+  minHeight: 0,
 });
 
 export const CommentsSectionHeader = styled(Box)({

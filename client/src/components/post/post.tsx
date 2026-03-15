@@ -3,7 +3,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import { useState, type FC } from "react";
+import { useLayoutEffect, useRef, useState, type FC } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Post } from "../../entities/Post";
 import { useDeletePost } from "../../react/hooks/usePosts";
@@ -14,6 +14,7 @@ import { EditPost } from "../createEditPost/editPost";
 import { ConfirmationDialog } from "../dialog/ConfirmationDialog";
 import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import {
+  CaptionToggleButton,
   CommentButton,
   EditPostDialog,
   EditPostDialogContent,
@@ -23,6 +24,7 @@ import {
   PostActionsGroup,
   PostCaption,
   PostCard,
+  PostCaptionWrapper,
   PostDeleteButton,
   PostEditButton,
   PostEngagementBar,
@@ -36,6 +38,7 @@ import {
 
 interface PostProps {
   post: Post;
+  truncateCaption?: boolean;
   onLike?: (id: string) => void;
   onDislike?: (id: string) => void;
   onComment?: (id: string) => void;
@@ -43,6 +46,7 @@ interface PostProps {
 
 export const PostComponent: FC<PostProps> = ({
   post,
+  truncateCaption,
   onLike,
   onDislike,
   onComment,
@@ -51,7 +55,18 @@ export const PostComponent: FC<PostProps> = ({
   const { mutate: deletePost } = useDeletePost();
   const navigate = useNavigate();
   const [isDeleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isTruncatable, setIsTruncatable] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+  const captionRef = useRef<HTMLElement>(null);
+
+  const isRTL = /[\u0590-\u05FF\u0600-\u06FF]/.test(post.message ?? "");
+
+  useLayoutEffect(() => {
+    if (!truncateCaption || !captionRef.current) return;
+    const captionElement = captionRef.current;
+    setIsTruncatable(captionElement.scrollWidth > captionElement.clientWidth);
+  }, [post.message, truncateCaption]);
 
   const isLiked = !!user && post.likes.includes(user._id);
   const isOwner = !!user && user._id === post.sender._id;
@@ -107,7 +122,21 @@ export const PostComponent: FC<PostProps> = ({
         )}
       </PostHeader>
 
-      {post.message && <PostCaption>{post.message}</PostCaption>}
+      {post.message && (
+        <PostCaptionWrapper truncated={truncateCaption && !isExpanded} $isRTL={isRTL}>
+          <PostCaption
+            ref={captionRef}
+            truncated={truncateCaption && !isExpanded}
+          >
+            {post.message}
+          </PostCaption>
+          {truncateCaption && isTruncatable && (
+            isExpanded
+              ? <CaptionToggleButton onClick={() => setIsExpanded(false)}>See less</CaptionToggleButton>
+              : <CaptionToggleButton onClick={() => setIsExpanded(true)}>See more</CaptionToggleButton>
+          )}
+        </PostCaptionWrapper>
+      )}
 
       <PostImageContainer>
         <PostImage src={post.imageUrl} alt="post" />
