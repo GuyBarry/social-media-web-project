@@ -118,7 +118,7 @@ export const PostCommentsSection: FC<CommentsSectionProps> = ({
       )}
 
       {isCommentsLoading ? (
-        <CircularProgress size={24} sx={{ margin: "16px auto", display: "block" }} />
+        <CircularProgress size={24} />
       ) : (
         <CommentsScrollableList>
           {comments.length === 0 ? (
@@ -127,45 +127,47 @@ export const PostCommentsSection: FC<CommentsSectionProps> = ({
             </EmptyCommentsText>
           ) : (
             <CommentsList>
-          {comments.map((comment) => (
-            <CommentItem key={comment._id}>
-              <ProfileAvatar
-                size={32}
-                src={comment.sender.imageUrl}
-                slotProps={avatarImageSlotProps}
-              />
-              <CommentContent>
-                <CommentSenderRow>
-                  <CommentUsername>{comment.sender.username}</CommentUsername>
-                  <CommentTimestamp>
-                    {formatTimestamp(comment.createdAt)}
-                  </CommentTimestamp>
-                  {currentUser?._id === comment.sender._id && (
-                    <CommentDeleteButton
-                      aria-label="Delete comment"
-                      onClick={() => deleteComment(comment._id)}
-                    >
-                      <DeleteOutlineIcon fontSize="small" />
-                    </CommentDeleteButton>
-                  )}
-                </CommentSenderRow>
-                <CommentText>{comment.message}</CommentText>
-              </CommentContent>
-            </CommentItem>
-          ))}
+              {comments.map((comment) => (
+                <CommentItem key={comment._id}>
+                  <ProfileAvatar
+                    size={32}
+                    src={comment.sender.imageUrl}
+                    slotProps={avatarImageSlotProps}
+                  />
+                  <CommentContent>
+                    <CommentSenderRow>
+                      <CommentUsername>
+                        {comment.sender.username}
+                      </CommentUsername>
+                      <CommentTimestamp>
+                        {formatTimestamp(comment.createdAt)}
+                      </CommentTimestamp>
+                      {currentUser?._id === comment.sender._id && (
+                        <CommentDeleteButton
+                          aria-label="Delete comment"
+                          onClick={() => deleteComment(comment._id)}
+                        >
+                          <DeleteOutlineIcon fontSize="small" />
+                        </CommentDeleteButton>
+                      )}
+                    </CommentSenderRow>
+                    <CommentText>{comment.message}</CommentText>
+                  </CommentContent>
+                </CommentItem>
+              ))}
 
-          {hasNextPage && (
-            <LoadMoreButton
-              onClick={() => fetchNextPage()}
-              disabled={isFetchingNextPage}
-            >
-              {isFetchingNextPage ? (
-                <CircularProgress size={16} />
-              ) : (
-                "Load more comments"
+              {hasNextPage && (
+                <LoadMoreButton
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                >
+                  {isFetchingNextPage ? (
+                    <CircularProgress size={16} />
+                  ) : (
+                    "Load more comments"
+                  )}
+                </LoadMoreButton>
               )}
-            </LoadMoreButton>
-          )}
             </CommentsList>
           )}
         </CommentsScrollableList>
