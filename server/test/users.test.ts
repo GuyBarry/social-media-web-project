@@ -56,6 +56,24 @@ describe("GET /", () => {
       expect.arrayContaining([exampleUser._id, loginUser._id])
     );
   });
+
+  test("Should not expose password or googleId fields", async () => {
+    const response = await request(app)
+      .get("/users")
+      .set("Cookie", authCookies);
+
+    expect(response.statusCode).toEqual(StatusCodes.OK);
+    response.body.forEach((user: Record<string, unknown>) => {
+      expect(user).not.toHaveProperty("password");
+      expect(user).not.toHaveProperty("googleId");
+    });
+  });
+
+  test("Should return 401 when not authenticated", async () => {
+    const response = await request(app).get("/users");
+
+    expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+  });
 });
 
 describe("GET /:id", () => {
@@ -102,6 +120,12 @@ describe("GET /:id", () => {
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("User does not exist");
   });
+
+  test("Should return 401 when not authenticated", async () => {
+    const response = await request(app).get(`/users/${exampleUser._id}`);
+
+    expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+  });
 });
 
 describe("POST /users", () => {
@@ -126,6 +150,7 @@ describe("POST /users", () => {
     expect(createdUser).not.toBeNull();
     expect(createdUser!.username).toBe("New User");
     expect(createdUser!.email).toBe("new@example.com");
+    expect(createdUser!.uniqueUsername).toMatch(/^newuser#\d{4}$/);
   });
 
   test("Should return 400 for missing username field", async () => {
@@ -221,6 +246,34 @@ describe("POST /users", () => {
     expect(response.body.details.field).toBe("_id");
     expect(response.body.details.value).toBe(exampleUser._id);
   });
+
+  test("Should return 409 if email is already taken by another user", async () => {
+    const response = await request(app)
+      .post("/users")
+      .set("Cookie", authCookies)
+      .send({
+        username: "Brand New User",
+        email: exampleUser.email,
+        birthDate: "1990-01-01",
+        password: "somepassword",
+      });
+
+    expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
+    expect(response.body.message).toBe("User already exists");
+    expect(response.body.details.field).toBe("email");
+    expect(response.body.details.value).toBe(exampleUser.email);
+  });
+
+  test("Should return 401 when not authenticated", async () => {
+    const response = await request(app).post("/users").send({
+      username: "Ghost User",
+      email: "ghost@example.com",
+      birthDate: "1990-01-01",
+      password: "ghostpassword",
+    });
+
+    expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
+  });
 });
 
 describe("PUT /users/:id", () => {
@@ -237,6 +290,7 @@ describe("PUT /users/:id", () => {
     expect(updatedUser).not.toBeNull();
     expect(updatedUser!.username).toBe("Updated User");
     expect(updatedUser!.bio).toBe("This is an updated bio");
+    expect(updatedUser!.uniqueUsername).toMatch(/^updateduser#\d{4}$/);
   });
 
   test("Should return 404 when updating a non-existent user", async () => {
@@ -266,6 +320,7 @@ describe("PUT /users/:id", () => {
     const anotherUser = await UserModel.create({
       _id: "2222",
       username: "anotheruser",
+      uniqueUsername: "anotheruser#0002",
       email: uniqueEmail,
       bio: "This is another user",
       birthDate: "1995-05-05",
@@ -283,26 +338,40 @@ describe("PUT /users/:id", () => {
     expect(response.body.details.value).toBe(uniqueEmail);
   });
 
-  test("Should return 409 when updating to an existing user's username", async () => {
-    const uniqueUsername = "uniqueusername";
-    const anotherUser = await UserModel.create({
-      _id: "3333",
-      username: uniqueUsername,
-      email: "unique@example.com",
-      bio: "This is another user",
-      birthDate: "1995-05-05",
-      password: "password",
-    });
+  test("Should not change uniqueUsername when username is not updated", async () => {
+    const originalUniqueUsername = exampleUser.uniqueUsername;
 
     const response = await request(app)
       .put(`/users/${exampleUser._id}`)
       .set("Cookie", authCookies)
-      .field("username", anotherUser.username);
+      .field("bio", "Updated bio without changing username");
 
-    expect(response.statusCode).toEqual(StatusCodes.CONFLICT);
-    expect(response.body.message).toBe("User already exists");
-    expect(response.body.details.field).toBe("username");
-    expect(response.body.details.value).toBe(uniqueUsername);
+    expect(response.statusCode).toEqual(StatusCodes.OK);
+
+    const updatedUser = await UserModel.findById(exampleUser._id);
+    expect(updatedUser!.uniqueUsername).toBe(originalUniqueUsername);
+  });
+
+  test("Should update the birthDate of an existing user", async () => {
+    const newBirthDate = "1985-06-15";
+    const response = await request(app)
+      .put(`/users/${exampleUser._id}`)
+      .set("Cookie", authCookies)
+      .field("birthDate", newBirthDate);
+
+    expect(response.statusCode).toEqual(StatusCodes.OK);
+
+    const updatedUser = await UserModel.findById(exampleUser._id);
+    expect(updatedUser).not.toBeNull();
+    expect(new Date(updatedUser!.birthDate!).toISOString().startsWith("1985-06-15")).toBe(true);
+  });
+
+  test("Should return 401 when not authenticated", async () => {
+    const response = await request(app)
+      .put(`/users/${exampleUser._id}`)
+      .field("bio", "Should not work");
+
+    expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
   });
 
   describe("banner color update", () => {
@@ -441,6 +510,21 @@ describe("PUT /users/:id", () => {
       expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
       expect(response.body.message).toBe("User does not exist");
     });
+
+    test("Should remove picture when imageUrl is set to empty string", async () => {
+      const response = await request(app)
+        .put(`/users/${exampleUser._id}`)
+        .set("Cookie", authCookies)
+        .field("imageUrl", "");
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+
+      // Old file should have been removed from disk
+      await expect(fs.access(oldPicturePath)).rejects.toThrow();
+
+      const updatedUser = await UserModel.findById(exampleUser._id);
+      expect(updatedUser?.imageUrl).toBe("");
+    });
   });
 });
 
@@ -466,5 +550,11 @@ describe("DELETE /:id", () => {
 
     expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
     expect(response.body.message).toBe("User does not exist");
+  });
+
+  test("Should return 401 when not authenticated", async () => {
+    const response = await request(app).delete(`/users/${exampleUser._id}`);
+
+    expect(response.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
   });
 });

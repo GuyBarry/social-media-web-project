@@ -62,6 +62,10 @@ const getUserByEmail = async (
   email: User["email"],
 ): Promise<User | null> => await UserModel.findOne({ email });
 
+const getUserByUniqueUsername = async (
+  uniqueUsername: User["uniqueUsername"],
+): Promise<User | null> => await UserModel.findOne({ uniqueUsername });
+
 const createUser = async (
   userData: CreateUser | CreateGoogleUser,
 ): Promise<UserPreview> => {
@@ -92,6 +96,7 @@ export const usersRepository = {
   getUserById,
   getUserByUsername,
   getUserByEmail,
+  getUserByUniqueUsername,
   createUser,
   updateUser,
   deleteUser,

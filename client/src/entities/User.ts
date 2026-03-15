@@ -3,6 +3,7 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
   username: string;
+  uniqueUsername: string;
   email: string;
   password: string;
   bio?: string;

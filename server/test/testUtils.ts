@@ -16,6 +16,7 @@ import { PASSWORD_SALT_ROUNDS } from "../users/users.service";
 export const loginUser = {
   _id: "loginUser",
   username: "loginuser",
+  uniqueUsername: "loginuser#0001",
   email: "loginuser@example.com",
   birthDate: "2002-10-13",
   bio: "I am the best loginuser ever",
@@ -45,8 +46,9 @@ export const exampleComment: CreateComment = {
 export const exampleUser: CreateUser = {
   _id: "Mayan",
   username: "mayanamsterdam",
+  uniqueUsername: "mayanamsterdam#0001",
   email: "mayan@example.com",
-  birthDate: "2002-10-13",
+  birthDate: new Date("2002-10-13"),
   bio: "I am the best user ever",
   password: hashSync("thebestpasswordever", PASSWORD_SALT_ROUNDS),
 };

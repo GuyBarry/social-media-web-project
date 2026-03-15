@@ -10,8 +10,9 @@ export const bannerColorSchema = z
 
 export const userSchema = baseModule.extend({
   username: notEmptyStringSchema("Username"),
-  email: z.string().email().min(1),
-  birthDate: z.string().date().optional(),
+  uniqueUsername: z.string().optional(),
+  email: z.email(),
+  birthDate: z.coerce.date().optional(),
   bio: z.string().optional(),
   imageUrl: z.string().optional(),
   password: z.string(),
@@ -33,7 +34,6 @@ export type UserPreview = Omit<User, "password" | "googleId"> & {
  *       required:
  *         - username
  *         - email
- *         - birthDate
  *         - password
  *       properties:
  *         _id:
@@ -49,9 +49,11 @@ export type UserPreview = Omit<User, "password" | "googleId"> & {
  *         password:
  *           type: string
  */
+
 export const createUserSchema = z.strictObject({
   _id: userSchema.shape._id.optional(),
   username: userSchema.shape.username,
+  uniqueUsername: userSchema.shape.uniqueUsername,
   email: userSchema.shape.email,
   birthDate: userSchema.shape.birthDate,
   bio: userSchema.shape.bio,
@@ -91,6 +93,7 @@ export type CreateGoogleUser = z.infer<typeof createGoogleUserSchema>;
 export const updateUserSchema = z
   .strictObject({
     username: userSchema.shape.username,
+    uniqueUsername: userSchema.shape.uniqueUsername,
     email: userSchema.shape.email,
     birthDate: userSchema.shape.birthDate,
     bio: userSchema.shape.bio,
