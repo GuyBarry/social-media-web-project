@@ -19,6 +19,7 @@ let loginTokens: LoginTokens;
 
 const testUser = {
   username: "AuthTestUser",
+  uniqueUsername: "authtestuser#0001",
   email: "authtest@example.com",
   password: "password123",
   birthDate: "1990-01-01",
