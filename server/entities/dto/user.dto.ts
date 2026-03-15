@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { nonoptional, z } from "zod";
 import { baseModule } from "./base.dto";
 import { notEmptyStringSchema } from "./zodUtils";
 
@@ -10,6 +10,7 @@ export const bannerColorSchema = z
 
 export const userSchema = baseModule.extend({
   username: notEmptyStringSchema("Username"),
+  uniqueUsername: z.string().optional(),
   email: z.string().email().min(1),
   birthDate: z.string().date().optional(),
   bio: z.string().optional(),
@@ -52,6 +53,7 @@ export type UserPreview = Omit<User, "password" | "googleId"> & {
 export const createUserSchema = z.strictObject({
   _id: userSchema.shape._id.optional(),
   username: userSchema.shape.username,
+  uniqueUsername: userSchema.shape.uniqueUsername,
   email: userSchema.shape.email,
   birthDate: userSchema.shape.birthDate,
   bio: userSchema.shape.bio,
@@ -91,6 +93,7 @@ export type CreateGoogleUser = z.infer<typeof createGoogleUserSchema>;
 export const updateUserSchema = z
   .strictObject({
     username: userSchema.shape.username,
+    uniqueUsername: userSchema.shape.uniqueUsername,
     email: userSchema.shape.email,
     birthDate: userSchema.shape.birthDate,
     bio: userSchema.shape.bio,

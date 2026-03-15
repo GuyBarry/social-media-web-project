@@ -34,12 +34,26 @@ export const getUserByEmail = async (
 export const createUser = async (
   userData: CreateUser | CreateGoogleUser
 ): Promise<UserPreview> => {
+  userData.uniqueUsername = await generateUniqueUsername(userData.username);
+
   if (isGoogleUserDTO(userData)) {
     return await usersRepository.createUser(userData);
   }
 
   userData.password = await hash(userData.password, PASSWORD_SALT_ROUNDS);
   return await usersRepository.createUser(userData);
+};
+
+export const generateUniqueUsername = async (username: string): Promise<string> => {
+  const base = username.replace(/\s+/g, "").toLowerCase();
+  let uniqueUsername: string;
+
+  do {
+    const suffix = Math.floor(1000 + Math.random() * 9000);
+    uniqueUsername = `${base}#${suffix}`;
+  } while (await usersRepository.getUserByUniqueUsername(uniqueUsername));
+
+  return uniqueUsername;
 };
 
 export const isGoogleUserDTO = (
@@ -77,6 +91,7 @@ export const usersService = {
   getUserByUsername,
   getUserByEmail,
   createUser,
+  generateUniqueUsername,
   updateUser,
   deleteUser,
   doesUserExist,

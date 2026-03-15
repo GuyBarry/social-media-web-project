@@ -33,6 +33,7 @@ export const RegisterScreen = () => {
     password: "",
     confirmPassword: "",
     username: "",
+    uniqueUsername: "",
     bio: "",
     birthdate: "",
   });
@@ -59,6 +60,7 @@ export const RegisterScreen = () => {
         email: formData.email,
         password: formData.password,
         username: formData.username,
+        uniqueUsername: formData.uniqueUsername,
         bio: formData.bio,
         birthDate: new Date(formData.birthdate),
       },
