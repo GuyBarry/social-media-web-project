@@ -3,7 +3,6 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import { Dialog, DialogContent } from "@mui/material";
 import { useState, type FC } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Post } from "../../entities/Post";
@@ -11,15 +10,15 @@ import { useDeletePost } from "../../react/hooks/usePosts";
 import { useGetUserById } from "../../react/hooks/useUsers";
 import { avatarImageSlotProps } from "../../utils/avatar.utils";
 import { formatTimestamp } from "../../utils/time.utils";
-import { ConfirmationDialog } from "../dialog/ConfirmationDialog";
 import { EditPost } from "../createEditPost/editPost";
+import { ConfirmationDialog } from "../dialog/ConfirmationDialog";
 import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import {
   CommentButton,
-  EngagementItem,
-  EngagementText,
   EditPostDialog,
   EditPostDialogContent,
+  EngagementItem,
+  EngagementText,
   LikeButton,
   PostActionsGroup,
   PostCaption,
