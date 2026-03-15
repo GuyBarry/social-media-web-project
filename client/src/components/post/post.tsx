@@ -18,6 +18,8 @@ import {
   CommentButton,
   EngagementItem,
   EngagementText,
+  EditPostDialog,
+  EditPostDialogContent,
   LikeButton,
   PostActionsGroup,
   PostCaption,
@@ -145,22 +147,21 @@ export const PostComponent: FC<PostProps> = ({
       />
 
       {user && (
-        <Dialog
+        <EditPostDialog
           open={isEditDialogOpen}
           onClose={() => setEditDialogOpen(false)}
           maxWidth="sm"
           fullWidth
           disableScrollLock
-          slotProps={{ paper: { sx: { borderRadius: 3, overflow: "hidden" } } }}
         >
-          <DialogContent sx={{ p: 0 }}>
+          <EditPostDialogContent>
             <EditPost
               user={user}
               initialPost={post}
               onSave={() => setEditDialogOpen(false)}
             />
-          </DialogContent>
-        </Dialog>
+          </EditPostDialogContent>
+        </EditPostDialog>
       )}
     </PostCard>
   );

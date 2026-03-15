@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Dialog, DialogContent, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 export const PostCard = styled(Box)({
@@ -162,4 +162,15 @@ export const CommentButton = styled("div")({
   "&:hover > *": {
     color: "#1976d2",
   },
+});
+
+export const EditPostDialog = styled(Dialog)({
+  "& .MuiDialog-paper": {
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+});
+
+export const EditPostDialogContent = styled(DialogContent)({
+  padding: 0,
 });
