@@ -1,16 +1,19 @@
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EditIcon from "@mui/icons-material/Edit";
 import EmailIcon from "@mui/icons-material/Email";
+import type { FC } from "react";
 import { CostumButton } from "../../../components/button/CostumButton.styled";
 import { ProfileAvatar } from "../../../components/profileAvatar/ProfileAvatar.styled";
 import { UserStats } from "../../../components/userStats/userStats";
 import type { User } from "../../../entities/User";
+import { avatarImageSlotProps } from "../../../utils/avatar.utils";
 import {
   AvatarRow,
   ProfileBanner,
   ProfileCard,
   ProfileDivider,
 } from "../profile.styled";
+import { resolveBannerColor } from "../profile.utils";
 import {
   BioText,
   DisplayName,
@@ -20,18 +23,16 @@ import {
   MetaText,
   UserInfoBox,
 } from "./profileInfoCard.styled";
-import { resolveBannerColor } from "../profile.utils";
-import { avatarImageSlotProps } from "../../../utils/avatar.utils";
 
 interface ProfileInfoCardProps {
   user: User;
   onEditClick: () => void;
 }
 
-export const ProfileInfoCard = ({
+export const ProfileInfoCard: FC<ProfileInfoCardProps> = ({
   user,
   onEditClick,
-}: ProfileInfoCardProps) => {
+}) => {
   const bannerColor = resolveBannerColor(user.bannerColor);
   const uniqueUsername = `@${user.username.toLowerCase().replace(/\s+/g, "")}`;
   const birthDateParsed = user.birthDate ? new Date(user.birthDate) : null;

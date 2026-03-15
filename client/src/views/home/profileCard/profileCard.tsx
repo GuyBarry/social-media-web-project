@@ -10,12 +10,13 @@ import {
   ProfileCardEmail,
   ProfileCardUsername,
 } from "./profileCard.styled";
+import type { FC } from "react";
 
 interface ProfileCardProps {
   user: User;
 }
 
-export const ProfileCard = ({ user }: ProfileCardProps) => {
+export const ProfileCard: FC<ProfileCardProps> = ({ user }) => {
   const navigate = useNavigate();
 
   return (

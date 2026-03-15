@@ -1,6 +1,6 @@
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { useRef, useState } from "react";
+import { useRef, useState, type FC } from "react";
 import { BannerColorPicker } from "../../../components/colorPicker/BannerColorPicker";
 import { CostumButton } from "../../../components/button/CostumButton.styled";
 import { FieldLabel } from "../../../components/fieldLabel/FieldLabel.styled";
@@ -35,11 +35,11 @@ interface EditProfileScreenProps {
   onSave: () => void;
 }
 
-export const EditProfileScreen = ({
+export const EditProfileScreen: FC<EditProfileScreenProps> = ({
   user,
   onCancel,
   onSave,
-}: EditProfileScreenProps) => {
+}) => {
   const { mutateAsync: updateUser } = useUpdateUser();
   const [editUsername, setEditUsername] = useState(user?.username ?? "");
   const [editBio, setEditBio] = useState(user?.bio ?? "");

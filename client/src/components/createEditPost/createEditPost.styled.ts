@@ -39,7 +39,7 @@ export const CreateEditPostInput = styled(InputBase)(
   }),
 );
 
-export const CreateEditPostActionsRow = styled(Box)({
+export const CreateEditPostButtonsRow = styled(Box)({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
@@ -99,3 +99,8 @@ export const ImagePreviewRemoveButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
+export const ActionButtonsContainer = styled("div")({
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+})

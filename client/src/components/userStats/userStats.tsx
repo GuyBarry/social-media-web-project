@@ -1,12 +1,16 @@
 import { Typography } from "@mui/material";
 import { StatItem, StatsContainer } from "./userStats.styled";
+import type { FC } from "react";
 
 interface UserStatsProps {
   postsCount?: number;
   likesCount?: number;
 }
 
-export const UserStats = ({ postsCount = 0, likesCount = 0 }: UserStatsProps) => {
+export const UserStats: FC<UserStatsProps> = ({
+  postsCount = 0,
+  likesCount = 0,
+}) => {
   const stats = [
     { label: "Posts", value: postsCount },
     { label: "Likes", value: likesCount },
