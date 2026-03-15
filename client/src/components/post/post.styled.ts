@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Dialog, DialogContent, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 export const PostCard = styled(Box)({
@@ -110,8 +110,14 @@ export const LikeButton = styled("div")<{ isLiked?: boolean }>(
   }),
 );
 
-export const PostDeleteButton = styled("button")(({ theme }) => ({
+export const PostActionsGroup = styled(Box)({
   marginLeft: "auto",
+  display: "flex",
+  alignItems: "center",
+  gap: "2px",
+});
+
+const ActionButton = styled("button")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -123,11 +129,17 @@ export const PostDeleteButton = styled("button")(({ theme }) => ({
   color: theme.palette.text.disabled,
   transition: "color 0.2s ease, background-color 0.2s ease",
   outline: "none",
+  "&:focus": { outline: "none" },
+}));
 
-  "&:focus": {
-    outline: "none",
+export const PostEditButton = styled(ActionButton)(({ theme }) => ({
+  "&:hover": {
+    color: theme.palette.primary.main,
+    backgroundColor: "rgba(25, 118, 210, 0.08)",
   },
+}));
 
+export const PostDeleteButton = styled(ActionButton)(({ theme }) => ({
   "&:hover": {
     color: theme.palette.error.main,
     backgroundColor: "rgba(211, 47, 47, 0.08)",
@@ -150,4 +162,15 @@ export const CommentButton = styled("div")({
   "&:hover > *": {
     color: "#1976d2",
   },
+});
+
+export const EditPostDialog = styled(Dialog)({
+  "& .MuiDialog-paper": {
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+});
+
+export const EditPostDialogContent = styled(DialogContent)({
+  padding: 0,
 });

@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { FeedComponent } from "../../components/feed/feed";
-import { CreatePost } from "../../components/createPost/createPost";
+import { CreatePost } from "../../components/createEditPost/createPost";
 import { ProfileCard } from "./profileCard/profileCard";
 import { useGetAllPostsInfinite } from "../../react/hooks/usePosts";
 import { useGetUserById } from "../../react/hooks/useUsers";

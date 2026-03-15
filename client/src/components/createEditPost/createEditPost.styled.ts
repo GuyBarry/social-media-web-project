@@ -1,6 +1,6 @@
 import { Box, IconButton, InputBase, styled } from "@mui/material";
 
-export const CreatePostContainer = styled(Box)(() => ({
+export const CreateEditPostContainer = styled(Box)(() => ({
   display: "flex",
   flexDirection: "column",
   gap: "12px",
@@ -12,41 +12,34 @@ export const CreatePostContainer = styled(Box)(() => ({
   boxSizing: "border-box",
 }));
 
-export const CreatePostInputRow = styled(Box)({
+export const CreateEditPostInputRow = styled(Box)({
   display: "flex",
   alignItems: "flex-start",
   gap: "12px",
   width: "100%",
 });
 
-export const CreatePostInput = styled(InputBase)<{ error?: boolean }>(
-  ({ theme, error }) => ({
+export const CreateEditPostInput = styled(InputBase)(
+  ({ theme }) => ({
     flex: 1,
     padding: "10px 16px",
     borderRadius: "16px",
-    backgroundColor:
-      theme.palette.mode === "dark"
-        ? "rgba(255,255,255,0.06)"
-        : "rgba(0,0,0,0.05)",
+    borderTopLeftRadius: 0,
+    backgroundColor: theme.palette.background.default,
     fontSize: "0.95rem",
     alignItems: "flex-start",
-    border: error
-      ? `1.5px solid ${theme.palette.error.main}`
-      : "1.5px solid transparent",
+    border: "1.5px solid transparent",
     "& textarea": {
       padding: 0,
       resize: "none",
     },
     "&:hover": {
-      backgroundColor:
-        theme.palette.mode === "dark"
-          ? "rgba(255,255,255,0.1)"
-          : "rgba(0,0,0,0.08)",
+      backgroundColor: "rgba(0,0,0,0.05)",
     },
   }),
 );
 
-export const CreatePostActionsRow = styled(Box)({
+export const CreateEditPostActionsRow = styled(Box)({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
@@ -71,7 +64,7 @@ export const PhotoButton = styled(Box)(({ theme }) => ({
       theme.palette.mode === "dark"
         ? "rgba(255,255,255,0.1)"
         : "rgba(0,0,0,0.06)",
-    color: theme.palette.success.main,
+    color: theme.palette.primary.main,
   },
 }));
 
@@ -106,23 +99,3 @@ export const ImagePreviewRemoveButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-export const ContentErrorText = styled("p")(({ theme }) => ({
-  margin: 0,
-  paddingLeft: "54px",
-  marginTop: "-8px",
-  fontSize: theme.typography.caption.fontSize,
-  color: theme.palette.error.main,
-}));
-
-export const PhotoButtonGroup = styled(Box)({
-  display: "flex",
-  flexDirection: "column",
-  gap: "2px",
-});
-
-export const PhotoErrorText = styled("p")(({ theme }) => ({
-  margin: 0,
-  paddingLeft: "14px",
-  fontSize: theme.typography.caption.fontSize,
-  color: theme.palette.error.main,
-}));

@@ -84,7 +84,9 @@ export function useCreatePost() {
     },
     onSuccess: (_data, postData) => {
       queryClient.invalidateQueries({ queryKey: postKeys.infinite() });
-      queryClient.invalidateQueries({ queryKey: userKeys.detail(postData.sender) });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.detail(postData.sender),
+      });
     },
   });
 }
@@ -97,11 +99,12 @@ export function useUpdatePost() {
       id,
       ...postData
     }: { id: Post["_id"] } & UpdatePost) => {
+      if (Object.keys(postData).length === 0) return;
+
       const formData = new FormData();
-      if (postData.message !== undefined)
-        formData.append("message", postData.message);
-      if (postData.image !== undefined)
-        formData.append("image", postData.image);
+      Object.entries(postData).forEach(([key, value]) => {
+        if (value !== undefined) formData.append(key, value);
+      });
 
       const { data } = await postsApi.put(`/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -150,7 +153,8 @@ export function useDeletePost() {
     onSuccess: (_data, id) => {
       queryClient.removeQueries({ queryKey: postKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: postKeys.all });
-      if (userId) queryClient.invalidateQueries({ queryKey: userKeys.detail(userId) });
+      if (userId)
+        queryClient.invalidateQueries({ queryKey: userKeys.detail(userId) });
     },
   });
 }

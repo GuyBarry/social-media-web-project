@@ -1,5 +1,6 @@
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useState, type FC } from "react";
@@ -9,16 +10,21 @@ import { useDeletePost } from "../../react/hooks/usePosts";
 import { useGetUserById } from "../../react/hooks/useUsers";
 import { avatarImageSlotProps } from "../../utils/avatar.utils";
 import { formatTimestamp } from "../../utils/time.utils";
+import { EditPost } from "../createEditPost/editPost";
 import { ConfirmationDialog } from "../dialog/ConfirmationDialog";
 import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import {
   CommentButton,
+  EditPostDialog,
+  EditPostDialogContent,
   EngagementItem,
   EngagementText,
   LikeButton,
+  PostActionsGroup,
   PostCaption,
   PostCard,
   PostDeleteButton,
+  PostEditButton,
   PostEngagementBar,
   PostHeader,
   PostImage,
@@ -45,6 +51,7 @@ export const PostComponent: FC<PostProps> = ({
   const { mutate: deletePost } = useDeletePost();
   const navigate = useNavigate();
   const [isDeleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  const [isEditDialogOpen, setEditDialogOpen] = useState(false);
 
   const isLiked = !!user && post.likes.includes(user._id);
   const isOwner = !!user && user._id === post.sender._id;
@@ -83,12 +90,20 @@ export const PostComponent: FC<PostProps> = ({
           <PostTimestamp>{formatTimestamp(post.createdAt)}</PostTimestamp>
         </PostUserInfo>
         {isOwner && (
-          <PostDeleteButton
-            aria-label="Delete post"
-            onClick={() => setDeleteConfirmationOpen(true)}
-          >
-            <DeleteOutlineIcon fontSize="small" />
-          </PostDeleteButton>
+          <PostActionsGroup>
+            <PostEditButton
+              aria-label="Edit post"
+              onClick={() => setEditDialogOpen(true)}
+            >
+              <EditOutlinedIcon fontSize="small" />
+            </PostEditButton>
+            <PostDeleteButton
+              aria-label="Delete post"
+              onClick={() => setDeleteConfirmationOpen(true)}
+            >
+              <DeleteOutlineIcon fontSize="small" />
+            </PostDeleteButton>
+          </PostActionsGroup>
         )}
       </PostHeader>
 
@@ -129,6 +144,24 @@ export const PostComponent: FC<PostProps> = ({
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeleteConfirmationOpen(false)}
       />
+
+      {user && (
+        <EditPostDialog
+          open={isEditDialogOpen}
+          onClose={() => setEditDialogOpen(false)}
+          maxWidth="sm"
+          fullWidth
+          disableScrollLock
+        >
+          <EditPostDialogContent>
+            <EditPost
+              user={user}
+              initialPost={post}
+              onSave={() => setEditDialogOpen(false)}
+            />
+          </EditPostDialogContent>
+        </EditPostDialog>
+      )}
     </PostCard>
   );
 };
