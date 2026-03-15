@@ -10,12 +10,12 @@ import {
 import { Post } from "../entities/dto/post.dto";
 import { NotFoundException } from "../exceptions/notFoundException";
 
-export const getAllComments = async (
+const getAllComments = async (
   pagination: PaginationParams,
 ): Promise<PaginateResult<Comment>> =>
   await commentsRepository.getAllComments(pagination);
 
-export const getAllCommentsByPostId = async (
+const getAllCommentsByPostId = async (
   postId: Post["_id"],
   pagination: PaginationParams,
 ): Promise<PaginateResult<Comment>> => {
@@ -25,7 +25,7 @@ export const getAllCommentsByPostId = async (
 
   return await commentsRepository.getAllCommentsByPostId(postId, pagination);
 };
-export const getCommentById = async (id: Comment["_id"]): Promise<Comment> => {
+const getCommentById = async (id: Comment["_id"]): Promise<Comment> => {
   const comment = await commentsRepository.getCommentById(id);
 
   if (!comment) {
@@ -34,7 +34,7 @@ export const getCommentById = async (id: Comment["_id"]): Promise<Comment> => {
   return comment;
 };
 
-export const updateComment = async (
+const updateComment = async (
   id: Comment["_id"],
   commentData: UpdateComment
 ): Promise<Comment> => {
@@ -45,7 +45,7 @@ export const updateComment = async (
   return comment;
 };
 
-export const createComment = async (
+const createComment = async (
   commentData: CreateComment
 ): Promise<Comment> => {
   if (!(await postService.getPostById(commentData.postId))) {
@@ -56,13 +56,17 @@ export const createComment = async (
   return await commentsRepository.createComment(commentData);
 };
 
-export const deleteComment = async (id: Comment["_id"]): Promise<void> => {
+const deleteComment = async (id: Comment["_id"]): Promise<void> => {
   const isDeleted = await commentsRepository.deleteComment(id);
   
   if (!isDeleted) {
     throw new NotFoundException("Comment", { commentId: id });
   }
 };
+
+const deleteCommentsByPostId = async (postId: Post["_id"]): Promise<void> => {
+  await commentsRepository.deleteCommentsByPostId(postId);
+}
 
 export const commentsService = {
   getAllComments,
@@ -71,4 +75,5 @@ export const commentsService = {
   getCommentById,
   updateComment,
   createComment,
+  deleteCommentsByPostId,
 };

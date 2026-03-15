@@ -11,10 +11,10 @@ import {
 } from "../entities/mongodb/user.module";
 import { handleDuplicateKeyException } from "../exceptions/mongoException";
 
-export const getAllUsers = async (): Promise<UserPreview[]> =>
+const getAllUsers = async (): Promise<UserPreview[]> =>
   await UserModel.find({}).select(USER_FIELDS_EXCEPT_AUTH);
 
-export const getUserById = async (
+const getUserById = async (
   id: User["_id"],
 ): Promise<UserPreview | null> => {
   const result = await UserModel.aggregate([
@@ -54,19 +54,19 @@ export const getUserById = async (
   return result[0] ?? null;
 };
 
-export const getUserByUsername = async (
+const getUserByUsername = async (
   username: User["username"],
 ): Promise<User | null> => await UserModel.findOne({ username });
 
-export const getUserByEmail = async (
+const getUserByEmail = async (
   email: User["email"],
 ): Promise<User | null> => await UserModel.findOne({ email });
 
-export const getUserByUniqueUsername = async (
+const getUserByUniqueUsername = async (
   uniqueUsername: User["uniqueUsername"],
 ): Promise<User | null> => await UserModel.findOne({ uniqueUsername });
 
-export const createUser = async (
+const createUser = async (
   userData: CreateUser | CreateGoogleUser,
 ): Promise<UserPreview> => {
   const user = new UserModel(userData);
@@ -77,7 +77,7 @@ export const createUser = async (
   return newUser;
 };
 
-export const updateUser = async (
+const updateUser = async (
   id: User["_id"],
   userData: UpdateUser,
 ): Promise<User | null> =>
@@ -85,10 +85,10 @@ export const updateUser = async (
     handleDuplicateKeyException(err),
   );
 
-export const deleteUser = async (id: User["_id"]): Promise<boolean> =>
+const deleteUser = async (id: User["_id"]): Promise<boolean> =>
   (await UserModel.deleteOne({ _id: id }).exec()).deletedCount > 0;
 
-export const doesUserExist = async (id: User["_id"]): Promise<boolean> =>
+const doesUserExist = async (id: User["_id"]): Promise<boolean> =>
   !!(await UserModel.exists({ _id: id }));
 
 export const usersRepository = {

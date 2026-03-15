@@ -100,7 +100,6 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
         ...(content !== initialPost.message && { message: content }),
         ...(selectedPhoto && { image: selectedPhoto }),
       });
-      onSave?.();
     } else {
       await createPost({
         sender: user._id,
@@ -110,12 +109,14 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
 
       setContent("");
       setSelectedPhoto(null);
+      setPreviewUrl(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      onSave?.();
     }
+
+    onSave?.();
   };
 
-  const handleCancel = () => {
+  const handleDiscard = () => {
     if (isEditMode) {
       setContent(initialPost.message);
       setSelectedPhoto(null);
@@ -184,7 +185,7 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
         />
 
         <ActionButtonsContainer>
-          <CostumButton variant="outlined" onClick={handleCancel}>
+          <CostumButton variant="outlined" onClick={handleDiscard}>
             {isEditMode ? "Discard Changes" : "Discard"}
           </CostumButton>
 
