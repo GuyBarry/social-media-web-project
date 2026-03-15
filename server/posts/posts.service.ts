@@ -4,10 +4,10 @@ import { PaginationParams } from "../config/pagination.config";
 import { postRepository } from "./posts.repository";
 import { PaginateResult } from "mongoose";
 
-export const getAllPosts = async (pagination: PaginationParams): Promise<PaginateResult<Post>> =>
+const getAllPosts = async (pagination: PaginationParams): Promise<PaginateResult<Post>> =>
   await postRepository.getAllPosts(pagination);
 
-export const getPostById = async (id: Post["_id"]): Promise<Post> => {
+const getPostById = async (id: Post["_id"]): Promise<Post> => {
   const post = await postRepository.getPostById(id);
 
   if (!post) {
@@ -16,15 +16,15 @@ export const getPostById = async (id: Post["_id"]): Promise<Post> => {
   return post;
 };
 
-export const getPostsBySender = async (
+const getPostsBySender = async (
   senderId: Post["sender"],
   pagination: PaginationParams,
 ): Promise<PaginateResult<Post>> => await postRepository.getPostsBySender(senderId, pagination);
 
-export const createPost = async (postData: CreatePost): Promise<Post> =>
+const createPost = async (postData: CreatePost): Promise<Post> =>
   await postRepository.createPost(postData);
 
-export const updatePost = async (
+const updatePost = async (
   id: Post["_id"],
   postData: UpdatePost
 ): Promise<Post> => {
@@ -36,7 +36,7 @@ export const updatePost = async (
   return post;
 };
 
-export const deletePost = async (id: Post["_id"]): Promise<void> => {
+const deletePost = async (id: Post["_id"]): Promise<void> => {
   const post = await postRepository.deletePost(id);
 
   if (!post) {

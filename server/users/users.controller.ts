@@ -10,7 +10,7 @@ import {
 } from "../entities/dto/user.dto";
 import { injectUploadedUrl } from "../middlewares/pictureMiddleware";
 import { validateRequestBody } from "../middlewares/requestBodyValidator";
-import { deleteFile, upload } from "../pictures/pictures.service";
+import { pictureService } from "../pictures/pictures.service";
 import { usersService } from "./users.service";
 
 const router = Router();
@@ -65,7 +65,7 @@ router.post(
 // Update user
 router.put(
   "/:id",
-  upload.single("image"),
+  pictureService.upload.single("image"),
   injectUploadedUrl("imageUrl"),
   validateRequestBody(updateUserSchema),
   async (req: Request<{ id: User["_id"] }, {}, UpdateUser>, res: Response) => {
@@ -74,12 +74,12 @@ router.put(
       if (req.file) {
         const existingUser = await usersService.getUserById(id);
         if (existingUser.imageUrl) {
-          await deleteFile(existingUser.imageUrl);
+          await pictureService.deleteFile(existingUser.imageUrl);
         }
       } else if (req.body.imageUrl === "") {
         const existingUser = await usersService.getUserById(id);
         if (existingUser.imageUrl) {
-          await deleteFile(existingUser.imageUrl);
+          await pictureService.deleteFile(existingUser.imageUrl);
         }
       }
 

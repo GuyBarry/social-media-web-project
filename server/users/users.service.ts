@@ -11,10 +11,10 @@ import { usersRepository } from "./users.repository";
 
 export const PASSWORD_SALT_ROUNDS = 10;
 
-export const getAllUsers = async (): Promise<UserPreview[]> =>
+const getAllUsers = async (): Promise<UserPreview[]> =>
   await usersRepository.getAllUsers();
 
-export const getUserById = async (id: User["_id"]): Promise<UserPreview> => {
+const getUserById = async (id: User["_id"]): Promise<UserPreview> => {
   const user = await usersRepository.getUserById(id);
 
   if (!user) {
@@ -23,15 +23,15 @@ export const getUserById = async (id: User["_id"]): Promise<UserPreview> => {
   return user;
 };
 
-export const getUserByUsername = async (
+const getUserByUsername = async (
   username: User["username"]
 ): Promise<User | null> => await usersRepository.getUserByUsername(username);
 
-export const getUserByEmail = async (
+const getUserByEmail = async (
   email: User["email"]
 ): Promise<User | null> => await usersRepository.getUserByEmail(email);
 
-export const createUser = async (
+const createUser = async (
   userData: CreateUser | CreateGoogleUser
 ): Promise<UserPreview> => {
   if (isGoogleUserDTO(userData)) {
@@ -42,13 +42,13 @@ export const createUser = async (
   return await usersRepository.createUser(userData);
 };
 
-export const isGoogleUserDTO = (
+const isGoogleUserDTO = (
   user: CreateUser | CreateGoogleUser
 ): user is CreateGoogleUser => {
   return user.hasOwnProperty("googleId");
 };
 
-export const updateUser = async (
+const updateUser = async (
   id: User["_id"],
   userData: UpdateUser
 ): Promise<User | null> => {
@@ -60,7 +60,7 @@ export const updateUser = async (
   return user;
 };
 
-export const deleteUser = async (id: User["_id"]): Promise<void> => {
+const deleteUser = async (id: User["_id"]): Promise<void> => {
   const isDeleted = await usersRepository.deleteUser(id);
 
   if (!isDeleted) {
@@ -68,7 +68,7 @@ export const deleteUser = async (id: User["_id"]): Promise<void> => {
   }
 };
 
-export const doesUserExist = async (id: User["_id"]): Promise<boolean> =>
+const doesUserExist = async (id: User["_id"]): Promise<boolean> =>
   await usersRepository.doesUserExist(id);
 
 export const usersService = {

@@ -170,11 +170,36 @@ describe("GET / ", () => {
       // Seed 5 total posts for pagination tests
       await PostModel.deleteMany();
       await PostModel.insertMany([
-        { _id: "p1", sender: loginUser._id, message: "Post 1", imageUrl: "http://localhost/public/1.png" },
-        { _id: "p2", sender: loginUser._id, message: "Post 2", imageUrl: "http://localhost/public/2.png" },
-        { _id: "p3", sender: loginUser._id, message: "Post 3", imageUrl: "http://localhost/public/3.png" },
-        { _id: "p4", sender: loginUser._id, message: "Post 4", imageUrl: "http://localhost/public/4.png" },
-        { _id: "p5", sender: loginUser._id, message: "Post 5", imageUrl: "http://localhost/public/5.png" },
+        {
+          _id: "p1",
+          sender: loginUser._id,
+          message: "Post 1",
+          imageUrl: "http://localhost/public/1.png",
+        },
+        {
+          _id: "p2",
+          sender: loginUser._id,
+          message: "Post 2",
+          imageUrl: "http://localhost/public/2.png",
+        },
+        {
+          _id: "p3",
+          sender: loginUser._id,
+          message: "Post 3",
+          imageUrl: "http://localhost/public/3.png",
+        },
+        {
+          _id: "p4",
+          sender: loginUser._id,
+          message: "Post 4",
+          imageUrl: "http://localhost/public/4.png",
+        },
+        {
+          _id: "p5",
+          sender: loginUser._id,
+          message: "Post 5",
+          imageUrl: "http://localhost/public/5.png",
+        },
       ]);
     });
 
@@ -756,6 +781,34 @@ describe("DELETE /:id", () => {
       .set("Cookie", authCookies);
 
     await expect(fs.access(picturePath)).rejects.toThrow();
+  });
+
+  test("Should delete associated likes", async () => {
+    await LikeModel.deleteMany();
+    await LikeModel.create(exampleLike);
+
+    await request(app)
+      .delete(`/posts/${examplePost._id}`)
+      .set("Cookie", authCookies);
+
+    const remainingLikes = await LikeModel.find({ postId: examplePost._id });
+
+    expect(remainingLikes.length).toBe(0);
+  });
+
+  test("Should delete associated comments", async () => {
+    await CommentModel.deleteMany();
+    await CommentModel.create(exampleComment);
+
+    await request(app)
+      .delete(`/posts/${examplePost._id}`)
+      .set("Cookie", authCookies);
+
+    const remainingComments = await CommentModel.find({
+      postId: examplePost._id,
+    });
+
+    expect(remainingComments.length).toBe(0);
   });
 
   test("Should return 404 when deleting a non-existent post", async () => {
