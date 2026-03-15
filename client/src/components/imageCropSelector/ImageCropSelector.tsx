@@ -1,6 +1,6 @@
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type FC } from "react";
 import { CostumButton } from "../button/CostumButton.styled";
 import {
   CropActionsRow,
@@ -28,7 +28,7 @@ type DragMode =
     }
   | { type: "resizing"; startX: number; startY: number; origRect: Rect };
 
-interface Props {
+interface ImageCropSelectorProps {
   previewUrl: string;
   originalFile: File;
   onConfirm: (croppedFile: File) => void;
@@ -37,12 +37,12 @@ interface Props {
 
 const MIN_SIZE = 40;
 
-export const ImageCropSelector = ({
+export const ImageCropSelector: FC<ImageCropSelectorProps> = ({
   previewUrl,
   originalFile,
   onConfirm,
   onCancel,
-}: Props) => {
+}) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const [rect, setRect] = useState<Rect | null>(null);

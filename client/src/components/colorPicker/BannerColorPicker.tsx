@@ -1,3 +1,4 @@
+import type { FC } from "react";
 import { theme } from "../../themes";
 import { FieldLabel } from "../fieldLabel/FieldLabel.styled";
 import { BannerColorSwitch } from "./BannerColorSwitch";
@@ -24,10 +25,10 @@ interface BannerColorPickerProps {
   onChange: (color: string) => void;
 }
 
-export const BannerColorPicker = ({
+export const BannerColorPicker: FC<BannerColorPickerProps> = ({
   color,
   onChange,
-}: BannerColorPickerProps) => {
+}) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <FieldLabel sx={{ mb: 1 }}>Banner Color</FieldLabel>

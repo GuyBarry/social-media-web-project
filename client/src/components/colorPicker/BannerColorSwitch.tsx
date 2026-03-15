@@ -1,13 +1,20 @@
-import { useRef } from "react";
+import { useRef, type FC } from "react";
 import PaletteIcon from "@mui/icons-material/Palette";
-import { BannerColorHexInput, BannerColorPreview, BannerColorSwitchBox } from "./colorPicker.styled";
+import {
+  BannerColorHexInput,
+  BannerColorPreview,
+  BannerColorSwitchBox,
+} from "./colorPicker.styled";
 
 interface BannerColorSwitchProps {
   color: string;
   onChange: (color: string) => void;
 }
 
-export const BannerColorSwitch = ({ color, onChange }: BannerColorSwitchProps) => {
+export const BannerColorSwitch: FC<BannerColorSwitchProps> = ({
+  color,
+  onChange,
+}) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleHexChange = (raw: string) => {
@@ -37,7 +44,9 @@ export const BannerColorSwitch = ({ color, onChange }: BannerColorSwitchProps) =
         <input
           ref={inputRef}
           type="color"
-          value={color.length === 7 && color.startsWith("#") ? color : "#000000"}
+          value={
+            color.length === 7 && color.startsWith("#") ? color : "#000000"
+          }
           onChange={(e) => onChange(e.target.value)}
         />
       </BannerColorPreview>
