@@ -66,6 +66,10 @@ export const updateUser = async (
   id: User["_id"],
   userData: UpdateUser
 ): Promise<User | null> => {
+  if (userData.username) {
+    userData.uniqueUsername = await generateUniqueUsername(userData.username);
+  }
+  
   const user = await usersRepository.updateUser(id, userData);
 
   if (!user) {
