@@ -15,6 +15,7 @@ import { errorHandler } from "./middlewares/errorHandler";
 import { noRouteHandler } from "./middlewares/noRouteHandler";
 import { postsController } from "./posts/posts.controller";
 import { registerSwagger } from "./swagger/setupSwagger";
+import { trendingController } from "./trending/trending.controller";
 import { usersController } from "./users/users.controller";
 
 export const initApp = async (): Promise<Express> => {
@@ -40,6 +41,7 @@ export const initApp = async (): Promise<Express> => {
   app.use("/users", validateAccessToken, usersController);
   app.use("/auth", authController);
   app.use("/ai", validateAccessToken, aiController);
+  app.use("/trending", validateAccessToken, trendingController);
 
   registerSwagger(app);
   app.use(noRouteHandler);

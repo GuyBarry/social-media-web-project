@@ -74,6 +74,9 @@ export const updatePost = async (
 export const deletePost = async (id: Post["_id"]): Promise<Post | null> =>
   await PostModel.findByIdAndDelete(id).exec();
 
+export const getPostsFromDate = async (since: Date): Promise<Pick<Post, "message">[]> =>
+  await PostModel.find({ createdAt: { $gte: since } }, { message: 1, _id: 0 }).lean().exec();
+
 export const postRepository = {
   getAllPosts,
   getPostById,
@@ -81,4 +84,5 @@ export const postRepository = {
   createPost,
   updatePost,
   deletePost,
+  getPostsFromDate,
 };

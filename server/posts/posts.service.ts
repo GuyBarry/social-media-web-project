@@ -44,6 +44,11 @@ const deletePost = async (id: Post["_id"]): Promise<void> => {
   }
 };
 
+const getPostMessagesSinceDate = async (since: Date): Promise<string[]> => {
+  const posts = await postRepository.getPostsFromDate(since);
+  return posts.map((p) => p.message);
+};
+
 export const postService = {
   getAllPosts,
   getPostById,
@@ -51,4 +56,5 @@ export const postService = {
   createPost,
   updatePost,
   deletePost,
+  getPostMessagesSinceDate,
 };
