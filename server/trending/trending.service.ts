@@ -84,6 +84,11 @@ const getTrending = async (timeRange: TrendingTimeRange): Promise<TrendingResult
   }
 
   const fresh = await generateFreshResult(timeRange);
+
+  if (fresh.topics.length === 0) {
+    return fresh;
+  }
+
   return saveTrendingResult(fresh);
 };
 

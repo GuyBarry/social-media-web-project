@@ -1,5 +1,10 @@
 {
   "preset": "ts-jest",
   "testTimeout": 5000,
-  "testMatch": ["**/*.test.ts"]
+  "testMatch": ["**/*.test.ts"],
+  "setupFiles": ["./jest.setup.ts"],
+  "moduleNameMapper": {
+    "../ai/ai.service": "<rootDir>/ai/__mocks__/ai.service.ts",
+    "./ai/ai.service": "<rootDir>/ai/__mocks__/ai.service.ts"
+  }
 }
