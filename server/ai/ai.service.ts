@@ -8,6 +8,10 @@ export async function generateAIContent(content: string): Promise<string> {
   const response = await ai.models.generateContent({
     model: model,
     contents: content,
+    config: {
+      responseMimeType: "application/json",
+      temperature: 0.2,
+    },
   });
 
   return response.text ?? "";

@@ -30,19 +30,45 @@ export const TrendingButtonGroup = styled(Box)({
   flexWrap: "wrap",
 });
 
-export const TrendingResultBox = styled(Box)(({ theme }) => ({
-  padding: "12px",
+export const TrendingTopicList = styled(Box)({
+  display: "flex",
+  flexDirection: "column",
+  gap: "8px",
+  marginTop: "4px",
+});
+
+export const TrendingTopicCard = styled(Box)(({ theme }) => ({
+  padding: "10px 12px",
   backgroundColor: `${theme.palette.primary.main}0f`,
   borderRadius: "8px",
   borderLeft: `3px solid ${theme.palette.primary.main}`,
+}));
+
+export const TrendingTopicName = styled(Typography)(({ theme }) => ({
+  fontWeight: 700,
+  fontSize: "0.85rem",
+  color: theme.palette.primary.main,
+}));
+
+export const TrendingTopicSummary = styled(Typography)(({ theme }) => ({
+  fontSize: "0.8rem",
+  color: theme.palette.text.secondary,
+  lineHeight: 1.5,
+  marginTop: "2px",
+}));
+
+export const TrendingGeneratedAt = styled(Typography)(({ theme }) => ({
+  fontSize: "0.72rem",
+  color: theme.palette.text.secondary,
+  textAlign: "right",
   marginTop: "4px",
 }));
 
-export const TrendingResultText = styled(Typography)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  fontSize: "0.875rem",
-  lineHeight: 1.6,
-  whiteSpace: "pre-wrap",
+export const TrendingEmptyText = styled(Typography)(({ theme }) => ({
+  fontSize: "0.85rem",
+  color: theme.palette.text.secondary,
+  textAlign: "center",
+  padding: "8px 0",
 }));
 
 export const TrendingLoadingBox = styled(Box)({

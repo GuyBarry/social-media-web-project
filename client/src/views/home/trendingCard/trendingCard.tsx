@@ -6,13 +6,25 @@ import {
   TrendingButtonGroup,
   TrendingCardContainer,
   TrendingDivider,
+  TrendingEmptyText,
   TrendingLoadingBox,
-  TrendingResultBox,
-  TrendingResultText,
   TrendingTitle,
+  TrendingTopicCard,
+  TrendingTopicList,
+  TrendingTopicName,
+  TrendingTopicSummary,
 } from "./trendingCard.styled";
 
 type TimeRange = "1day" | "3days" | "1week";
+
+interface TrendingTopic {
+  topicName: string;
+  shortSummary: string;
+}
+
+interface TrendingResult {
+  topics: TrendingTopic[];
+}
 
 const TIME_RANGE_BUTTONS: { label: string; value: TimeRange }[] = [
   { label: "1 day", value: "1day" },
@@ -23,7 +35,7 @@ const TIME_RANGE_BUTTONS: { label: string; value: TimeRange }[] = [
 export const TrendingCard = () => {
   const theme = useTheme();
   const [selected, setSelected] = useState<TimeRange | null>(null);
-  const [result, setResult] = useState<string | null>(null);
+  const [result, setResult] = useState<TrendingResult | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSelectRange = async (range: TimeRange) => {
@@ -33,12 +45,12 @@ export const TrendingCard = () => {
     setLoading(true);
 
     try {
-      const response = await trendingApi.post<{ content: string }>("/", {
+      const response = await trendingApi.post<TrendingResult>("/", {
         timeRange: range,
       });
-      setResult(response.data.content);
+      setResult(response.data);
     } catch {
-      setResult("Failed to fetch trending topics. Please try again.");
+      setResult({ topics: [] });
     } finally {
       setLoading(false);
     }
@@ -70,9 +82,20 @@ export const TrendingCard = () => {
       )}
 
       {!loading && result && (
-        <TrendingResultBox>
-          <TrendingResultText>{result}</TrendingResultText>
-        </TrendingResultBox>
+        <>
+          {result.topics.length === 0 ? (
+            <TrendingEmptyText>No posts found for this period yet!</TrendingEmptyText>
+          ) : (
+            <TrendingTopicList>
+              {result.topics.map((topic) => (
+                <TrendingTopicCard key={topic.topicName}>
+                  <TrendingTopicName>{topic.topicName}</TrendingTopicName>
+                  <TrendingTopicSummary>{topic.shortSummary}</TrendingTopicSummary>
+                </TrendingTopicCard>
+              ))}
+            </TrendingTopicList>
+          )}
+        </>
       )}
     </TrendingCardContainer>
   );

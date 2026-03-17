@@ -1,26 +1,30 @@
 import { Request, Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
-import { validateExistingSender } from "../middlewares/validateExistingUser";
-import { trendingService, TrendingTimeRange, VALID_TIME_RANGES } from "./trending.service";
+import { trendingService } from "./trending.service";
+import { TrendingTimeRange, VALID_TIME_RANGES } from "./trending.constants";
+import type { TrendingResult } from "../entities/dto/trending.dto";
 
 const router = Router();
 
-// Get trending topics based on real posts within a time range
 router.post(
   "/",
-  validateExistingSender,
-  async (req: Request<{}, {}, { sender: string; timeRange: TrendingTimeRange }>, res: Response) => {
+  async (
+    req: Request<{}, TrendingResult, { timeRange: TrendingTimeRange }>,
+    res: Response,
+  ) => {
     const { timeRange } = req.body || {};
 
     if (!VALID_TIME_RANGES.includes(timeRange)) {
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .send({ error: `Field 'timeRange' must be one of: ${VALID_TIME_RANGES.join(", ")}.` });
+        .send({
+          error: `Field 'timeRange' must be one of: ${VALID_TIME_RANGES.join(", ")}.`,
+        });
     }
 
-    const content = await trendingService.getTrending(timeRange);
+    const result = await trendingService.getTrending(timeRange);
 
-    res.status(StatusCodes.OK).send({ content });
+    res.status(StatusCodes.OK).send(result);
   },
 );
 
