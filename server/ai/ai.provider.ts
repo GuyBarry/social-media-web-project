@@ -6,20 +6,23 @@ export enum AICreativity {
   NORMAL = 1,
 }
 
+export interface AIConfig {
+  responseMimeType?: string;
+  temperature?: AICreativity;
+  systemInstruction?: string;
+}
+
 const ai = new GoogleGenAI({ apiKey: geminiConfig.apiKey });
 const model = "gemini-3-flash-preview";
 
 export async function generateAIContent(
   content: string,
-  temperature: AICreativity
+  config: AIConfig,
 ): Promise<string> {
   const response = await ai.models.generateContent({
     model: model,
     contents: content,
-    config: {
-      responseMimeType: "application/json",
-      temperature,
-    },
+    config: config,
   });
 
   return response.text ?? "";

@@ -16,7 +16,7 @@ import { UserModel } from "../entities/mongodb/user.module";
 import { TrendingTimeRange } from "../trending/trending.constants";
 import { TrendingResult } from "../entities/dto/trending.dto";
 import { getAuthCookies, loginUser, truncateDatabase } from "./testUtils";
-import { generateAIContent } from "../ai/ai.service";
+import { generateAIContent } from "../ai/ai.provider";
 
 const mockGenerateAIContent = generateAIContent as jest.MockedFunction<
   typeof generateAIContent

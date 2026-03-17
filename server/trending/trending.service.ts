@@ -1,4 +1,4 @@
-import { AICreativity, generateAIContent } from "../ai/ai.service";
+import { AICreativity, generateAIContent } from "../ai/ai.provider";
 import { postService } from "../posts/posts.service";
 import {
   trendingTopicSchema,
@@ -10,34 +10,13 @@ import {
   VALID_TIME_RANGES,
   TIME_RANGE_MS,
 } from "./trending.constants";
+import { analyzeTrendingTopics } from "../ai/prompt.manager";
 
 const getPostsInRange = async (
   timeRange: TrendingTimeRange,
 ): Promise<string[]> => {
   const since = new Date(Date.now() - TIME_RANGE_MS[timeRange]);
   return postService.getPostMessagesSinceDate(since);
-};
-
-const buildPrompt = (posts: string[]): string => {
-  const postsBlock = posts.map((msg, i) => `${i + 1}. ${msg}.`).join("\n");
-  return `
-        You are a trend-analysis engine for a social media platform.
-        Analyze the following list of posts and identify the top 3 trending topics.
-        
-        Posts to analyze:
-        - ${postsBlock}
-        
-        Rules:
-        1. Return ONLY a valid JSON array of objects.
-        2. Each object must have a "topicName" (string) and a "shortSummary" (string).
-        3. Do not include markdown formatting like \`\`\`json.
-    `;
-};
-
-const callAI = async (prompt: string): Promise<TrendingResult["topics"]> => {
-  const raw = await generateAIContent(prompt, AICreativity.LOW);
-  const parsed = JSON.parse(raw.trim());
-  return trendingTopicSchema.array().parse(parsed);
 };
 
 const buildEmptyResult = (timeRange: TrendingTimeRange): TrendingResult => ({
@@ -61,8 +40,8 @@ const generateFreshResult = async (
     return buildEmptyResult(timeRange);
   }
 
-  const prompt = buildPrompt(posts);
-  const topics = await callAI(prompt);
+  const postsBlock = posts.map((msg, i) => `${i + 1}. ${msg}.`).join("\n");
+  const topics = await analyzeTrendingTopics(postsBlock);
 
   return {
     topics,
