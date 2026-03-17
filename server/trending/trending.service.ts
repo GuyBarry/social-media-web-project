@@ -1,4 +1,4 @@
-import { generateAIContent } from "../ai/ai.service";
+import { AICreativity, generateAIContent } from "../ai/ai.service";
 import { postService } from "../posts/posts.service";
 import {
   trendingTopicSchema,
@@ -35,7 +35,7 @@ const buildPrompt = (posts: string[]): string => {
 };
 
 const callAI = async (prompt: string): Promise<TrendingResult["topics"]> => {
-  const raw = await generateAIContent(prompt);
+  const raw = await generateAIContent(prompt, AICreativity.LOW);
   const parsed = JSON.parse(raw.trim());
   return trendingTopicSchema.array().parse(parsed);
 };
