@@ -1,7 +1,8 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { FeedComponent } from "../../components/feed/feed";
 import { CreatePost } from "../../components/createEditPost/createPost";
 import { ProfileCard } from "./profileCard/profileCard";
+import { TrendingCard } from "./trendingCard/trendingCard";
 import { useGetAllPostsInfinite } from "../../react/hooks/usePosts";
 import { useGetUserById } from "../../react/hooks/useUsers";
 import { HomeContainer, HomeSidebar } from "./home.styled";
@@ -24,9 +25,7 @@ export const HomeScreen = () => {
         </Box>
       </main>
       <HomeSidebar>
-        <Typography variant="h5" fontWeight={600}>
-          AI
-        </Typography>
+        <TrendingCard />
       </HomeSidebar>
     </HomeContainer>
   );
