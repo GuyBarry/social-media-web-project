@@ -1,5 +1,5 @@
 import { CircularProgress, useTheme } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CostumButton } from "../../../components/button/CostumButton.styled";
 import { trendingApi } from "../../../api/trendingApi";
 import {
@@ -37,6 +37,10 @@ export const TrendingCard = () => {
   const [selected, setSelected] = useState<TimeRange | null>(null);
   const [result, setResult] = useState<TrendingResult | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    handleSelectRange("1day");
+  }, []);
 
   const handleSelectRange = async (range: TimeRange) => {
     if (loading) return;
