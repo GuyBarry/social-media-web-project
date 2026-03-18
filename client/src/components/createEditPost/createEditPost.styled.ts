@@ -107,7 +107,7 @@ export const ActionButtonsContainer = styled("div")({
 
 export const MoodButtonsRow = styled(Box)({
   display: "flex",
-  alignItems: "center",
+  alignItems: "stretch",
   gap: "8px",
   flexWrap: "nowrap",
   paddingTop: "0px",
@@ -119,8 +119,11 @@ export const MoodButtonWrapper = styled("div")<{ selected?: boolean }>(
     position: "relative",
     flex: 1,
     minWidth: "0",
+    display: "flex",
+    flexDirection: "column",
     "& button": {
       width: "100%",
+      height: "100%",
       ...(selected && {
         backgroundColor: theme.palette.primary.main,
         color: "#fff",

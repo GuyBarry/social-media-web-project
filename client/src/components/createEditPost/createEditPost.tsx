@@ -6,8 +6,8 @@ import { useEffect, useRef, useState, type FC } from "react";
 import type { Post } from "../../entities/Post";
 import type { User } from "../../entities/User";
 import { useCreatePost, useUpdatePost } from "../../react/hooks/usePosts";
+import { useRewriteWithMood } from "../../react/hooks/useAi";
 import { avatarImageSlotProps } from "../../utils/avatar.utils";
-import { rewriteWithMood } from "../../api/aiApi";
 import { MOODS, type Mood } from "../../constants/moods";
 import { CostumButton } from "../button/CostumButton.styled";
 import { ImageCropSelector } from "../imageCropSelector/ImageCropSelector";
@@ -45,6 +45,8 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
   const isEditMode = !!initialPost;
   const { mutateAsync: createPost } = useCreatePost();
   const { mutateAsync: updatePost } = useUpdatePost();
+  const { mutateAsync: rewriteWithMood, isPending: moodMutationPending } =
+    useRewriteWithMood();
   const [content, setContent] = useState(initialPost?.message ?? "");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
@@ -53,7 +55,7 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
   );
   const [pendingCropFile, setPendingCropFile] = useState<File | null>(null);
   const [pendingCropUrl, setPendingCropUrl] = useState<string | null>(null);
-  const [moodLoading, setMoodLoading] = useState<Mood | null>(null);
+  const [activeMood, setActiveMood] = useState<Mood | null>(null);
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
   const [moodSuggestion, setMoodSuggestion] = useState<string | null>(null);
 
@@ -143,17 +145,16 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
   };
 
   const handleMoodClick = async (mood: Mood) => {
-    if (!content.trim() || moodLoading) return;
-    // Don't send request if this mood is already selected
+    if (!content.trim() || moodMutationPending) return;
     if (selectedMood === mood) return;
-    setMoodLoading(mood);
+    setActiveMood(mood);
     setMoodSuggestion(null);
     try {
-      const result = await rewriteWithMood(content, mood);
+      const result = await rewriteWithMood({ postContent: content, mood });
       setMoodSuggestion(result);
       setSelectedMood(mood);
     } finally {
-      setMoodLoading(null);
+      setActiveMood(null);
     }
   };
 
@@ -198,16 +199,16 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
               size="small"
               variant="outlined"
               disabled={
-                !!moodLoading || !content.trim() || selectedMood === mood
+                moodMutationPending || !content.trim() || selectedMood === mood
               }
               onClick={() => handleMoodClick(mood)}
             >
-              {moodLoading === mood ? (
+              {activeMood === mood ? (
                 <MoodLoadingSpinner>
                   <CircularProgress size={14} color="inherit" />
                 </MoodLoadingSpinner>
               ) : null}
-              <MoodButtonText loading={moodLoading === mood}>
+              <MoodButtonText loading={activeMood === mood}>
                 {mood}
               </MoodButtonText>
             </CostumButton>
