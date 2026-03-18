@@ -1,4 +1,4 @@
-import { Box, IconButton, InputBase, styled } from "@mui/material";
+import { Box, IconButton, InputBase, Typography, styled } from "@mui/material";
 
 export const CreateEditPostContainer = styled(Box)(() => ({
   display: "flex",
@@ -104,3 +104,62 @@ export const ActionButtonsContainer = styled("div")({
   alignItems: "center",
   gap: "8px",
 })
+
+export const MoodButtonsRow = styled(Box)({
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+  flexWrap: "nowrap",
+  paddingTop: "0px",
+  width: "100%",
+});
+
+export const MoodButtonWrapper = styled("div")<{ selected?: boolean }>(
+  ({ theme, selected }) => ({
+    position: "relative",
+    flex: 1,
+    minWidth: "0",
+    "& button": {
+      width: "100%",
+      ...(selected && {
+        backgroundColor: theme.palette.primary.main,
+        color: "#fff",
+        borderColor: theme.palette.primary.main,
+      }),
+    },
+  }),
+);
+
+export const MoodButtonText = styled("span")<{ loading?: boolean }>(
+  ({ loading }) => ({
+    marginLeft: loading ? "20px" : "0",
+  }),
+);
+
+export const MoodLoadingSpinner = styled("div")({
+  position: "absolute",
+  left: "8px",
+});
+
+export const MoodSuggestionBox = styled(Box)(({ theme }) => ({
+  borderRadius: "12px",
+  border: `1.5px solid ${theme.palette.primary.main}`,
+  padding: "12px 14px",
+  backgroundColor:
+    theme.palette.mode === "dark"
+      ? "rgba(255,255,255,0.04)"
+      : "rgba(0,0,0,0.02)",
+  display: "flex",
+  flexDirection: "column",
+  gap: "10px",
+}));
+
+export const MoodSuggestionText = styled(Typography)({
+  whiteSpace: "pre-wrap",
+});
+
+export const MoodSuggestionActions = styled(Box)({
+  display: "flex",
+  gap: "8px",
+  justifyContent: "flex-end",
+});
