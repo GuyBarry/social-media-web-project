@@ -17,12 +17,12 @@ const findRecentByTimeRange = async (
     .lean<TrendingResult>();
 };
 
-const create = async (result: TrendingResult): Promise<TrendingResult> => {
+const saveTrendingResult = async (result: TrendingResult): Promise<TrendingResult> => {
   const created = await TrendingResultModel.create(result);
   return created.toObject() as TrendingResult;
 };
 
 export const trendingRepository = {
   findRecentByTimeRange,
-  create,
+  saveTrendingResult,
 };
