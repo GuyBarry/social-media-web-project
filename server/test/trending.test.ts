@@ -3,7 +3,6 @@ import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import request from "supertest";
 
-// ── Mock ai.service BEFORE any module that imports app/ai.service is loaded ──
 jest.mock("../ai/ai.service", () => ({
   generateAIContent: jest.fn(),
 }));
@@ -22,7 +21,6 @@ const mockGenerateAIContent = generateAIContent as jest.MockedFunction<
   typeof generateAIContent
 >;
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 const MOCK_TOPICS: TrendingResult["topics"] = [
   { topicName: "Artificial Intelligence", shortSummary: "AI is everywhere" },
@@ -61,7 +59,6 @@ const seedCachedResult = (
 const postTrending = (app: Express, body: object, cookies: string[]) =>
   request(app).post("/trending").set("Cookie", cookies).send(body);
 
-// ── Test setup ────────────────────────────────────────────────────────────────
 
 let app: Express;
 let authCookies: string[];
@@ -87,8 +84,6 @@ beforeEach(async () => {
 afterAll(async () => {
   await mongoose.connection.close();
 });
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe("POST /trending - validation", () => {
   test("Should return 401 when not authenticated", async () => {
@@ -200,17 +195,14 @@ describe("POST /trending - fresh result generation", () => {
   test("Should only consider posts within the time range", async () => {
     mockAIWithTopics();
 
-    const oldDate = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000); // 2 days ago
-    await seedPost("old post outside 1day range", oldDate);
+    const oldDate = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
-    // 1day range should see no posts → empty result, AI not called
     const response = await postTrending(app, { timeRange: "1day" }, authCookies);
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(response.body.topics).toEqual([]);
     expect(mockGenerateAIContent).not.toHaveBeenCalled();
 
-    // 3days range should pick up the same post → AI is called
     const response3days = await postTrending(
       app,
       { timeRange: "3days" },
@@ -249,7 +241,7 @@ describe("POST /trending - cache behaviour", () => {
   test("Should not use cache of a different timeRange", async () => {
     mockAIWithTopics();
     await seedPost("some post");
-    await seedCachedResult("3days"); // cache for 3days, request is 1day
+    await seedCachedResult("3days"); 
 
     const response = await postTrending(app, { timeRange: "1day" }, authCookies);
 
@@ -266,7 +258,6 @@ describe("POST /trending - cache behaviour", () => {
 
     await postTrending(app, { timeRange: "1day" }, authCookies);
 
-    // Should now have two documents: the old one + the new one
     const count = await TrendingResultModel.countDocuments({ timeRange: "1day" });
     expect(count).toBe(2);
   });
