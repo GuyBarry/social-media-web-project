@@ -9,6 +9,7 @@ export const PostCard = styled(Box)({
   display: "flex",
   flexDirection: "column",
   width: "100%",
+  maxHeight: "80vh",
 
   transition: "box-shadow 0.2s ease-in-out",
   "&:hover": {
@@ -88,6 +89,8 @@ export const PostImageContainer = styled(Box, {
   width: "100%",
   aspectRatio: $aspectRatio,
   overflow: "hidden",
+  minHeight: 0,
+  flexShrink: 1,
 }));
 
 export const PostImage = styled("img")({
