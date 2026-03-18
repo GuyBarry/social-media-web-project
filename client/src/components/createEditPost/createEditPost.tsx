@@ -1,11 +1,14 @@
 import CloseIcon from "@mui/icons-material/Close";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
-import { Typography } from "@mui/material";
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import { CircularProgress, Typography } from "@mui/material";
 import { useEffect, useRef, useState, type FC } from "react";
 import type { Post } from "../../entities/Post";
 import type { User } from "../../entities/User";
 import { useCreatePost, useUpdatePost } from "../../react/hooks/usePosts";
+import { useRewriteWithMood } from "../../react/hooks/useAi";
 import { avatarImageSlotProps } from "../../utils/avatar.utils";
+import { MOODS, type Mood } from "../../constants/moods";
 import { CostumButton } from "../button/CostumButton.styled";
 import { ImageCropSelector } from "../imageCropSelector/ImageCropSelector";
 import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
@@ -18,6 +21,13 @@ import {
   ImagePreview,
   ImagePreviewRemoveButton,
   ImagePreviewWrapper,
+  MoodButtonText,
+  MoodButtonWrapper,
+  MoodButtonsRow,
+  MoodLoadingSpinner,
+  MoodSuggestionActions,
+  MoodSuggestionBox,
+  MoodSuggestionText,
   PhotoButton,
 } from "./createEditPost.styled";
 
@@ -35,6 +45,8 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
   const isEditMode = !!initialPost;
   const { mutateAsync: createPost } = useCreatePost();
   const { mutateAsync: updatePost } = useUpdatePost();
+  const { mutateAsync: rewriteWithMood, isPending: moodMutationPending } =
+    useRewriteWithMood();
   const [content, setContent] = useState(initialPost?.message ?? "");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
@@ -43,6 +55,9 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
   );
   const [pendingCropFile, setPendingCropFile] = useState<File | null>(null);
   const [pendingCropUrl, setPendingCropUrl] = useState<string | null>(null);
+  const [activeMood, setActiveMood] = useState<Mood | null>(null);
+  const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
+  const [moodSuggestion, setMoodSuggestion] = useState<string | null>(null);
 
   useEffect(() => {
     if (!selectedPhoto) return;
@@ -129,6 +144,32 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
     }
   };
 
+  const handleMoodClick = async (mood: Mood) => {
+    if (!content.trim() || moodMutationPending) return;
+    if (selectedMood === mood) return;
+    setActiveMood(mood);
+    setMoodSuggestion(null);
+    try {
+      const result = await rewriteWithMood({ postContent: content, mood });
+      setMoodSuggestion(result);
+      setSelectedMood(mood);
+    } finally {
+      setActiveMood(null);
+    }
+  };
+
+  const handleAcceptSuggestion = () => {
+    if (moodSuggestion) {
+      setContent(moodSuggestion);
+    }
+    setMoodSuggestion(null);
+  };
+
+  const handleDiscardSuggestion = () => {
+    setMoodSuggestion(null);
+    setSelectedMood(null);
+  };
+
   return (
     <CreateEditPostContainer>
       <CreateEditPostInputRow>
@@ -149,6 +190,55 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
           }}
         />
       </CreateEditPostInputRow>
+
+      <MoodButtonsRow>
+        <AutoFixHighIcon fontSize="small" color="primary" />
+        {MOODS.map((mood) => (
+          <MoodButtonWrapper key={mood} selected={selectedMood === mood}>
+            <CostumButton
+              size="small"
+              variant="outlined"
+              disabled={
+                moodMutationPending || !content.trim() || selectedMood === mood
+              }
+              onClick={() => handleMoodClick(mood)}
+            >
+              {activeMood === mood ? (
+                <MoodLoadingSpinner>
+                  <CircularProgress size={14} color="inherit" />
+                </MoodLoadingSpinner>
+              ) : null}
+              <MoodButtonText loading={activeMood === mood}>
+                {mood}
+              </MoodButtonText>
+            </CostumButton>
+          </MoodButtonWrapper>
+        ))}
+      </MoodButtonsRow>
+
+      {moodSuggestion && (
+        <MoodSuggestionBox>
+          <MoodSuggestionText variant="body2">
+            {moodSuggestion}
+          </MoodSuggestionText>
+          <MoodSuggestionActions>
+            <CostumButton
+              size="small"
+              variant="outlined"
+              onClick={handleDiscardSuggestion}
+            >
+              Discard
+            </CostumButton>
+            <CostumButton
+              size="small"
+              variant="contained"
+              onClick={handleAcceptSuggestion}
+            >
+              Use this
+            </CostumButton>
+          </MoodSuggestionActions>
+        </MoodSuggestionBox>
+      )}
 
       {pendingCropUrl && pendingCropFile ? (
         <ImageCropSelector

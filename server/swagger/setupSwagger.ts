@@ -20,7 +20,7 @@ const apiSpec = swaggerJSDoc({
       },
     },
   },
-  tags: [{ name: "Posts" }, { name: "Comments" }],
+  tags: [{ name: "Posts" }, { name: "Comments" }, { name: "Trending" }],
   apis: ["**/*.docs.ts", "**/*.dto.ts"],
 });
 

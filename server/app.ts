@@ -5,7 +5,6 @@ import express, { Express } from "express";
 import mongoose from "mongoose";
 import passport from "passport";
 import path from "path";
-import { aiController } from "./ai/ai.controller";
 import { authController } from "./auth/auth.contoller";
 import { commentsController } from "./comments/comments.controller";
 import { dbConfig } from "./config/db.config";
@@ -15,6 +14,8 @@ import { errorHandler } from "./middlewares/errorHandler";
 import { noRouteHandler } from "./middlewares/noRouteHandler";
 import { postsController } from "./posts/posts.controller";
 import { registerSwagger } from "./swagger/setupSwagger";
+import { aiController } from "./ai/ai.controller";
+import { trendingController } from "./trending/trending.controller";
 import { usersController } from "./users/users.controller";
 
 export const initApp = async (): Promise<Express> => {
@@ -39,6 +40,7 @@ export const initApp = async (): Promise<Express> => {
   app.use("/comments", validateAccessToken, commentsController);
   app.use("/users", validateAccessToken, usersController);
   app.use("/auth", authController);
+  app.use("/trending", validateAccessToken, trendingController);
   app.use("/ai", validateAccessToken, aiController);
 
   registerSwagger(app);
