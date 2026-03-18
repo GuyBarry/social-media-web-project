@@ -43,7 +43,7 @@ export const ProfileScreen = () => {
         </Typography>
       </Stack>
 
-      <FeedComponent queryResult={queryResult} columns={3} />
+      <FeedComponent queryResult={queryResult} columns={3} forceAspectRatio="1 / 1" />
     </ProfilePage>
   );
 };

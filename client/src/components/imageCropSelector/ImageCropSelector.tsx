@@ -244,7 +244,6 @@ export const ImageCropSelector: FC<ImageCropSelectorProps> = ({
     );
   }, [rect, previewUrl, originalFile, onConfirm]);
 
-  /** Re-center the crop selection whenever the aspect ratio changes. */
   const initRect = useCallback(() => {
     const el = imgRef.current;
     if (!el) return;

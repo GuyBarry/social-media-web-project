@@ -12,9 +12,10 @@ import { FeedCenter, FeedContainer, FeedGrid } from "./feed.styled";
 interface FeedProps {
   queryResult: UseInfiniteQueryResult<InfiniteData<PaginatedPosts>>;
   columns?: number;
+  forceAspectRatio?: string;
 }
 
-export const FeedComponent: FC<FeedProps> = ({ queryResult, columns = 1 }) => {
+export const FeedComponent: FC<FeedProps> = ({ queryResult, columns = 1, forceAspectRatio }) => {
   const {
     data,
     isLoading,
@@ -70,6 +71,7 @@ export const FeedComponent: FC<FeedProps> = ({ queryResult, columns = 1 }) => {
             key={post._id}
             post={post}
             truncateCaption
+            forceAspectRatio={forceAspectRatio}
             onLike={(id) => likePost({ id, senderId: post.sender._id, method: "like" })}
             onDislike={(id) => likePost({ id, senderId: post.sender._id, method: "dislike" })}
           />

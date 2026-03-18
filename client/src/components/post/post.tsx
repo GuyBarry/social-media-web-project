@@ -40,6 +40,7 @@ import {
 interface PostProps {
   post: Post;
   truncateCaption?: boolean;
+  forceAspectRatio?: string;
   onLike?: (id: string) => void;
   onDislike?: (id: string) => void;
   onComment?: (id: string) => void;
@@ -48,6 +49,7 @@ interface PostProps {
 export const PostComponent: FC<PostProps> = ({
   post,
   truncateCaption,
+  forceAspectRatio,
   onLike,
   onDislike,
   onComment,
@@ -62,7 +64,8 @@ export const PostComponent: FC<PostProps> = ({
   const captionRef = useRef<HTMLElement>(null);
 
   const isRTL = /[\u0590-\u05FF\u0600-\u06FF]/.test(post.message ?? "");
-  const imageAspectRatio = useImageAspectRatio(post.imageUrl);
+  const detectedAspectRatio = useImageAspectRatio(post.imageUrl);
+  const imageAspectRatio = forceAspectRatio ?? detectedAspectRatio;
 
   useLayoutEffect(() => {
     if (!truncateCaption || !captionRef.current) return;
@@ -140,7 +143,7 @@ export const PostComponent: FC<PostProps> = ({
         </PostCaptionWrapper>
       )}
 
-      <PostImageContainer sx={{ aspectRatio: imageAspectRatio }}>
+      <PostImageContainer $aspectRatio={imageAspectRatio}>
         <PostImage src={post.imageUrl} alt="post" />
       </PostImageContainer>
 
