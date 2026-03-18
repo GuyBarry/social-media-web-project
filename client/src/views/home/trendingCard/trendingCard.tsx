@@ -1,4 +1,3 @@
-import { CircularProgress, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { CostumButton } from "../../../components/button/CostumButton.styled";
 import { trendingApi } from "../../../api/trendingApi";
@@ -8,6 +7,7 @@ import {
   TrendingDivider,
   TrendingEmptyText,
   TrendingLoadingBox,
+  TrendingLoadingSpinner,
   TrendingTitle,
   TrendingTopicCard,
   TrendingTopicList,
@@ -33,7 +33,6 @@ const TIME_RANGE_BUTTONS: { label: string; value: TimeRange }[] = [
 ];
 
 export const TrendingCard = () => {
-  const theme = useTheme();
   const [selected, setSelected] = useState<TimeRange | null>(null);
   const [result, setResult] = useState<TrendingResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -81,20 +80,24 @@ export const TrendingCard = () => {
 
       {loading && (
         <TrendingLoadingBox>
-          <CircularProgress size={28} sx={{ color: theme.palette.primary.main }} />
+          <TrendingLoadingSpinner size={28} />
         </TrendingLoadingBox>
       )}
 
       {!loading && result && (
         <>
           {result.topics.length === 0 ? (
-            <TrendingEmptyText>No posts found for this period yet!</TrendingEmptyText>
+            <TrendingEmptyText>
+              No posts found for this period yet!
+            </TrendingEmptyText>
           ) : (
             <TrendingTopicList>
               {result.topics.map((topic) => (
                 <TrendingTopicCard key={topic.topicName}>
                   <TrendingTopicName>{topic.topicName}</TrendingTopicName>
-                  <TrendingTopicSummary>{topic.shortSummary}</TrendingTopicSummary>
+                  <TrendingTopicSummary>
+                    {topic.shortSummary}
+                  </TrendingTopicSummary>
                 </TrendingTopicCard>
               ))}
             </TrendingTopicList>

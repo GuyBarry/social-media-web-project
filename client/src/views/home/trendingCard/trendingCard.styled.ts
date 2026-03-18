@@ -1,4 +1,10 @@
-import { Box, Divider, Typography, styled } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Divider,
+  Typography,
+  styled,
+} from "@mui/material";
 
 export const TrendingCardContainer = styled(Box)({
   display: "flex",
@@ -77,3 +83,7 @@ export const TrendingLoadingBox = styled(Box)({
   alignItems: "center",
   padding: "16px 0",
 });
+
+export const TrendingLoadingSpinner = styled(CircularProgress)(({ theme }) => ({
+  color: theme.palette.primary.main,
+}));
