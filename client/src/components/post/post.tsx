@@ -10,6 +10,7 @@ import { useDeletePost } from "../../react/hooks/usePosts";
 import { useGetUserById } from "../../react/hooks/useUsers";
 import { avatarImageSlotProps } from "../../utils/avatar.utils";
 import { formatTimestamp } from "../../utils/time.utils";
+import { useImageAspectRatio } from "../../react/hooks/useImageAspectRatio";
 import { EditPost } from "../createEditPost/editPost";
 import { ConfirmationDialog } from "../dialog/ConfirmationDialog";
 import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
@@ -61,6 +62,7 @@ export const PostComponent: FC<PostProps> = ({
   const captionRef = useRef<HTMLElement>(null);
 
   const isRTL = /[\u0590-\u05FF\u0600-\u06FF]/.test(post.message ?? "");
+  const imageAspectRatio = useImageAspectRatio(post.imageUrl);
 
   useLayoutEffect(() => {
     if (!truncateCaption || !captionRef.current) return;
@@ -138,7 +140,7 @@ export const PostComponent: FC<PostProps> = ({
         </PostCaptionWrapper>
       )}
 
-      <PostImageContainer>
+      <PostImageContainer sx={{ aspectRatio: imageAspectRatio }}>
         <PostImage src={post.imageUrl} alt="post" />
       </PostImageContainer>
 

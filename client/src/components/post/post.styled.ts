@@ -84,7 +84,6 @@ export const CaptionToggleButton = styled("button")(({ theme }) => ({
 
 export const PostImageContainer = styled(Box)({
   width: "100%",
-  aspectRatio: "1 / 1",
   overflow: "hidden",
 });
 

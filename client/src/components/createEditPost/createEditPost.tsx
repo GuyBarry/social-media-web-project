@@ -10,7 +10,7 @@ import { avatarImageSlotProps } from "../../utils/avatar.utils";
 import { rewriteWithMood } from "../../api/aiApi";
 import { MOODS, type Mood } from "../../constants/moods";
 import { CostumButton } from "../button/CostumButton.styled";
-import { ImageCropSelector } from "../imageCropSelector/ImageCropSelector";
+import { ImageCropSelector, type AspectRatio } from "../imageCropSelector/ImageCropSelector";
 import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import {
   ActionButtonsContainer,
@@ -56,6 +56,7 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
   const [moodLoading, setMoodLoading] = useState<Mood | null>(null);
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
   const [moodSuggestion, setMoodSuggestion] = useState<string | null>(null);
+  const [cropAspectRatio, setCropAspectRatio] = useState<AspectRatio>("1:1");
 
   useEffect(() => {
     if (!selectedPhoto) return;
@@ -144,7 +145,6 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
 
   const handleMoodClick = async (mood: Mood) => {
     if (!content.trim() || moodLoading) return;
-    // Don't send request if this mood is already selected
     if (selectedMood === mood) return;
     setMoodLoading(mood);
     setMoodSuggestion(null);
@@ -245,6 +245,8 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
           originalFile={pendingCropFile}
           onConfirm={handleCropConfirm}
           onCancel={handleCropCancel}
+          aspectRatio={cropAspectRatio}
+          onAspectRatioChange={setCropAspectRatio}
         />
       ) : (
         previewUrl && (
