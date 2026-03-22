@@ -11,7 +11,7 @@ export const useImageAspectRatio = (src: string | undefined) => {
 
     const handle = () => {
       const ratio = img.naturalWidth / img.naturalHeight;
-      setRatio(r >= 1.2 ? "4 / 3" : "1 / 1");
+      setRatio(ratio >= 1.2 ? "4 / 3" : "1 / 1");
     };
 
     if (img.complete) {

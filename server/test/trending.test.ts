@@ -3,10 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import request from "supertest";
 
-jest.mock("../ai/ai.provider", () => ({
-  generateAIContent: jest.fn(),
-  AICreativity: { LOW: 0.3, NORMAL: 1 },
-}));
+jest.mock("../ai/ai.provider");
 
 import { initApp } from "../app";
 import { authService } from "../auth/auth.service";
