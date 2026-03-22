@@ -53,7 +53,6 @@ export function useCreateComment() {
       queryClient.invalidateQueries({
         queryKey: commentKeys.byPost(commentData.postId),
       });
-      // Invalidate the post so numComments updates
       queryClient.invalidateQueries({
         queryKey: postKeys.detail(commentData.postId),
       });
