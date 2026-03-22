@@ -111,6 +111,9 @@ export const MoodButtonsRow = styled(Box)({
   flexWrap: "nowrap",
   paddingTop: "0px",
   width: "100%",
+  "& svg": {
+    alignSelf: "center",
+  },
 });
 
 export const MoodButtonWrapper = styled("div")<{ selected?: boolean }>(

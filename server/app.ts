@@ -17,6 +17,8 @@ import { registerSwagger } from "./swagger/setupSwagger";
 import { aiController } from "./ai/ai.controller";
 import { trendingController } from "./trending/trending.controller";
 import { usersController } from "./users/users.controller";
+import { ExpirationInSec } from "./entities/dto/auth.dto";
+import { setUpRateLimit } from "./middlewares/rateLimiter";
 
 export const initApp = async (): Promise<Express> => {
   const port = serverConfig.port;
@@ -25,7 +27,7 @@ export const initApp = async (): Promise<Express> => {
     cors({
       origin: serverConfig.clientUrl,
       credentials: true,
-    })
+    }),
   );
 
   app.use(bodyParser.urlencoded({ extended: true, limit: "1mb" }));
@@ -41,7 +43,12 @@ export const initApp = async (): Promise<Express> => {
   app.use("/users", validateAccessToken, usersController);
   app.use("/auth", authController);
   app.use("/trending", validateAccessToken, trendingController);
-  app.use("/ai", validateAccessToken, aiController);
+  app.use(
+    "/ai",
+    setUpRateLimit({ limit: 10, windowMs: ExpirationInSec.ONE_MINUTE * 1000 }),
+    validateAccessToken,
+    aiController,
+  );
 
   registerSwagger(app);
   app.use(noRouteHandler);

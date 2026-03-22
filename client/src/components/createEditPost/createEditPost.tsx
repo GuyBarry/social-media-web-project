@@ -1,14 +1,16 @@
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import CloseIcon from "@mui/icons-material/Close";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
-import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
-import { CircularProgress, Typography } from "@mui/material";
+import { Alert, CircularProgress, Snackbar, Typography } from "@mui/material";
+import type { AxiosError } from "axios";
+import { StatusCodes } from "http-status-codes";
 import { useEffect, useRef, useState, type FC } from "react";
+import { MOODS, type Mood } from "../../constants/moods";
 import type { Post } from "../../entities/Post";
 import type { User } from "../../entities/User";
-import { useCreatePost, useUpdatePost } from "../../react/hooks/usePosts";
 import { useRewriteWithMood } from "../../react/hooks/useAi";
+import { useCreatePost, useUpdatePost } from "../../react/hooks/usePosts";
 import { avatarImageSlotProps } from "../../utils/avatar.utils";
-import { MOODS, type Mood } from "../../constants/moods";
 import { CostumButton } from "../button/CostumButton.styled";
 import { ImageCropSelector, type AspectRatio } from "../imageCropSelector/ImageCropSelector";
 import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
@@ -59,6 +61,7 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
   const [moodSuggestion, setMoodSuggestion] = useState<string | null>(null);
   const [cropAspectRatio, setCropAspectRatio] = useState<AspectRatio>("1:1");
+  const [rateLimitError, setRateLimitError] = useState(false);
 
   useEffect(() => {
     if (!selectedPhoto) return;
@@ -154,6 +157,11 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
       const result = await rewriteWithMood({ postContent: content, mood });
       setMoodSuggestion(result);
       setSelectedMood(mood);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === StatusCodes.TOO_MANY_REQUESTS) {
+        setRateLimitError(true);
+      }
     } finally {
       setActiveMood(null);
     }
@@ -291,6 +299,20 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
           </CostumButton>
         </ActionButtonsContainer>
       </CreateEditPostButtonsRow>
+
+      <Snackbar
+        open={rateLimitError}
+        autoHideDuration={3000}
+        onClose={() => setRateLimitError(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setRateLimitError(false)}
+          severity="warning"
+        >
+          ✨ Woah there! Try again in a minute ✨
+        </Alert>
+      </Snackbar>
     </CreateEditPostContainer>
   );
 };

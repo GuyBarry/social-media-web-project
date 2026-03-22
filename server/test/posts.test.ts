@@ -167,7 +167,6 @@ describe("GET / ", () => {
 
   describe("GET /?page=&limit=", () => {
     beforeEach(async () => {
-      // Seed 5 total posts for pagination tests
       await PostModel.deleteMany();
       await PostModel.insertMany([
         {
