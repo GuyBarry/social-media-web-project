@@ -9,7 +9,6 @@ export const PostCard = styled(Box)({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  maxHeight: "80vh",
 
   transition: "box-shadow 0.2s ease-in-out",
   "&:hover": {
