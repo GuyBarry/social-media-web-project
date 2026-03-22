@@ -1,5 +1,7 @@
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
+import CropSquareIcon from "@mui/icons-material/CropSquare";
+import CropLandscapeIcon from "@mui/icons-material/CropLandscape";
 import { useCallback, useEffect, useRef, useState, type FC } from "react";
 import { CostumButton } from "../button/CostumButton.styled";
 import {
@@ -8,13 +10,20 @@ import {
   CropImage,
   CropSelection,
   CropWrapper,
+  RatioToggleRow,
 } from "./ImageCropSelector.styled";
+
+export type AspectRatio = "1:1" | "4:3";
 
 interface Rect {
   x: number;
   y: number;
-  size: number;
+  width: number;
+  height: number;
 }
+
+const ratioMultipliers = (ratio: AspectRatio) =>
+  ratio === "4:3" ? { rw: 4, rh: 3 } : { rw: 1, rh: 1 };
 
 type DragMode =
   | { type: "idle" }
@@ -33,6 +42,8 @@ interface ImageCropSelectorProps {
   originalFile: File;
   onConfirm: (croppedFile: File) => void;
   onCancel: () => void;
+  aspectRatio?: AspectRatio;
+  onAspectRatioChange?: (ratio: AspectRatio) => void;
 }
 
 const MIN_SIZE = 40;
@@ -42,11 +53,15 @@ export const ImageCropSelector: FC<ImageCropSelectorProps> = ({
   originalFile,
   onConfirm,
   onCancel,
+  aspectRatio = "1:1",
+  onAspectRatioChange,
 }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const [rect, setRect] = useState<Rect | null>(null);
   const dragRef = useRef<DragMode>({ type: "idle" });
+
+  const { rw, rh } = ratioMultipliers(aspectRatio);
 
   const toImgCoords = useCallback((clientX: number, clientY: number) => {
     const el = imgRef.current;
@@ -68,12 +83,22 @@ export const ImageCropSelector: FC<ImageCropSelectorProps> = ({
     return { w: bounds.width, h: bounds.height };
   }, []);
 
+  const sizeFromWidth = useCallback(
+    (w: number) => ({ width: w, height: (w * rh) / rw }),
+    [rw, rh],
+  );
+
+  const maxBaseWidth = useCallback(() => {
+    const { w, h } = imgSize();
+    return Math.min(w, (h * rw) / rh);
+  }, [imgSize, rw, rh]);
+
   const onWrapperPointerDown = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest("[data-crop-selection]")) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     const { x, y } = toImgCoords(e.clientX, e.clientY);
     dragRef.current = { type: "drawing", startX: x, startY: y };
-    setRect({ x, y, size: 0 });
+    setRect({ x, y, width: 0, height: 0 });
   };
 
   const onWrapperPointerMove = (e: React.PointerEvent) => {
@@ -81,17 +106,16 @@ export const ImageCropSelector: FC<ImageCropSelectorProps> = ({
     if (mode.type !== "drawing") return;
     const { x, y } = toImgCoords(e.clientX, e.clientY);
     const { w, h } = imgSize();
-    const rawSize = Math.max(
-      Math.abs(x - mode.startX),
-      Math.abs(y - mode.startY),
-    );
-    const size = clamp(rawSize, 0, Math.min(w, h));
-    const rx = x < mode.startX ? mode.startX - size : mode.startX;
-    const ry = y < mode.startY ? mode.startY - size : mode.startY;
+    const rawW = Math.abs(x - mode.startX);
+    const baseWidth = clamp(rawW, 0, maxBaseWidth());
+    const { width, height } = sizeFromWidth(baseWidth);
+    const rx = x < mode.startX ? mode.startX - width : mode.startX;
+    const ry = y < mode.startY ? mode.startY - height : mode.startY;
     setRect({
-      x: clamp(rx, 0, w - size),
-      y: clamp(ry, 0, h - size),
-      size,
+      x: clamp(rx, 0, w - width),
+      y: clamp(ry, 0, h - height),
+      width,
+      height,
     });
   };
 
@@ -122,8 +146,8 @@ export const ImageCropSelector: FC<ImageCropSelectorProps> = ({
     const dy = e.clientY - mode.startY;
     setRect({
       ...rect,
-      x: clamp(mode.origX + dx, 0, w - rect.size),
-      y: clamp(mode.origY + dy, 0, h - rect.size),
+      x: clamp(mode.origX + dx, 0, w - rect.width),
+      y: clamp(mode.origY + dy, 0, h - rect.height),
     });
   };
 
@@ -149,13 +173,14 @@ export const ImageCropSelector: FC<ImageCropSelectorProps> = ({
     const mode = dragRef.current;
     if (mode.type !== "resizing" || !rect) return;
     const { w, h } = imgSize();
-    const delta = Math.max(e.clientX - mode.startX, e.clientY - mode.startY);
-    const newSize = clamp(
-      mode.origRect.size + delta,
+    const delta = e.clientX - mode.startX;
+    const newBaseWidth = clamp(
+      mode.origRect.width + delta,
       MIN_SIZE,
-      Math.min(w - mode.origRect.x, h - mode.origRect.y),
+      Math.min(w - mode.origRect.x, ((h - mode.origRect.y) * rw) / rh),
     );
-    setRect({ ...rect, size: newSize });
+    const { width, height } = sizeFromWidth(newBaseWidth);
+    setRect({ ...rect, width, height });
   };
 
   const onHandlePointerUp = () => {
@@ -165,7 +190,7 @@ export const ImageCropSelector: FC<ImageCropSelectorProps> = ({
   };
 
   const handleConfirm = useCallback(async () => {
-    if (!rect || rect.size < MIN_SIZE) return;
+    if (!rect || rect.width < MIN_SIZE) return;
     const el = imgRef.current;
     if (!el) return;
 
@@ -183,20 +208,21 @@ export const ImageCropSelector: FC<ImageCropSelectorProps> = ({
     const scaleY = img.naturalHeight / el.getBoundingClientRect().height;
 
     const canvas = document.createElement("canvas");
-    const size = Math.round(rect.size * Math.min(scaleX, scaleY));
-    canvas.width = size;
-    canvas.height = size;
+    const cropW = Math.round(rect.width * scaleX);
+    const cropH = Math.round(rect.height * scaleY);
+    canvas.width = cropW;
+    canvas.height = cropH;
     const ctx = canvas.getContext("2d")!;
     ctx.drawImage(
       img,
       Math.round(rect.x * scaleX),
       Math.round(rect.y * scaleY),
-      size,
-      size,
+      cropW,
+      cropH,
       0,
       0,
-      size,
-      size,
+      cropW,
+      cropH,
     );
 
     canvas.toBlob(
@@ -215,25 +241,49 @@ export const ImageCropSelector: FC<ImageCropSelectorProps> = ({
     );
   }, [rect, previewUrl, originalFile, onConfirm]);
 
+  const initRect = useCallback(() => {
+    const el = imgRef.current;
+    if (!el) return;
+    const { width: iw, height: ih } = el.getBoundingClientRect();
+    if (!iw || !ih) return;
+    const baseWidth = Math.min(iw, (ih * rw) / rh) * 0.7;
+    const { width, height } = sizeFromWidth(baseWidth);
+    setRect({
+      x: (iw - width) / 2,
+      y: (ih - height) / 2,
+      width,
+      height,
+    });
+  }, [rw, rh, sizeFromWidth]);
+
   useEffect(() => {
     const el = imgRef.current;
     if (!el || !previewUrl) return;
-    const init = () => {
-      const { width, height } = el.getBoundingClientRect();
-      if (!width || !height) return;
-      const size = Math.min(width, height) * 0.7;
-      setRect({
-        x: (width - size) / 2,
-        y: (height - size) / 2,
-        size,
-      });
-    };
-    if (el.complete) init();
-    else el.onload = init;
-  }, [previewUrl]);
+    if (el.complete) initRect();
+    else el.onload = initRect;
+  }, [previewUrl, initRect]);
 
   return (
     <div>
+      <RatioToggleRow>
+        <CostumButton
+          size="small"
+          variant={aspectRatio === "1:1" ? "contained" : "outlined"}
+          startIcon={<CropSquareIcon fontSize="small" />}
+          onClick={() => onAspectRatioChange?.("1:1")}
+        >
+          Square
+        </CostumButton>
+        <CostumButton
+          size="small"
+          variant={aspectRatio === "4:3" ? "contained" : "outlined"}
+          startIcon={<CropLandscapeIcon fontSize="small" />}
+          onClick={() => onAspectRatioChange?.("4:3")}
+        >
+          Wide
+        </CostumButton>
+      </RatioToggleRow>
+
       <CropWrapper
         ref={wrapperRef}
         onPointerDown={onWrapperPointerDown}
@@ -242,14 +292,14 @@ export const ImageCropSelector: FC<ImageCropSelectorProps> = ({
       >
         <CropImage ref={imgRef} src={previewUrl} alt="Crop preview" />
 
-        {rect && rect.size >= MIN_SIZE && (
+        {rect && rect.width >= MIN_SIZE && (
           <CropSelection
             data-crop-selection
             style={{
               left: rect.x,
               top: rect.y,
-              width: rect.size,
-              height: rect.size,
+              width: rect.width,
+              height: rect.height,
             }}
             onPointerDown={onSelectionPointerDown}
             onPointerMove={onSelectionPointerMove}
@@ -281,7 +331,7 @@ export const ImageCropSelector: FC<ImageCropSelectorProps> = ({
           variant="contained"
           color="success"
           startIcon={<CheckIcon fontSize="small" />}
-          disabled={!rect || rect.size < MIN_SIZE}
+          disabled={!rect || rect.width < MIN_SIZE}
           onClick={handleConfirm}
         >
           Apply crop
