@@ -29,11 +29,9 @@ const MOCK_TOPICS: TrendingResult["topics"] = [
   { topicName: "Cloud Computing", shortSummary: "Serverless on the rise" },
 ];
 
-/** Make generateAIContent return a valid JSON string of MOCK_TOPICS */
 const mockAIWithTopics = () =>
   mockGenerateAIContent.mockResolvedValue(JSON.stringify(MOCK_TOPICS));
 
-/** Make generateAIContent reject to simulate AI failure */
 const mockAIFailure = () =>
   mockGenerateAIContent.mockRejectedValue(new Error("AI service error"));
 
