@@ -3,8 +3,9 @@ import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import request from "supertest";
 
-jest.mock("../ai/ai.service", () => ({
+jest.mock("../ai/ai.provider", () => ({
   generateAIContent: jest.fn(),
+  AICreativity: { LOW: 0.3, NORMAL: 1 },
 }));
 
 import { initApp } from "../app";
@@ -196,6 +197,7 @@ describe("POST /trending - fresh result generation", () => {
     mockAIWithTopics();
 
     const oldDate = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+    await seedPost("old post", oldDate);
 
     const response = await postTrending(app, { timeRange: "1day" }, authCookies);
 
