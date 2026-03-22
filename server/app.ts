@@ -2,23 +2,26 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Express } from "express";
+import fs from "fs";
+import http from "http";
+import https from "https";
 import mongoose from "mongoose";
 import passport from "passport";
 import path from "path";
+import { aiController } from "./ai/ai.controller";
 import { authController } from "./auth/auth.contoller";
 import { commentsController } from "./comments/comments.controller";
 import { dbConfig } from "./config/db.config";
 import { serverConfig } from "./config/server.config";
+import { ExpirationInSec } from "./entities/dto/auth.dto";
 import { validateAccessToken } from "./middlewares/authMiddleware";
 import { errorHandler } from "./middlewares/errorHandler";
 import { noRouteHandler } from "./middlewares/noRouteHandler";
+import { setUpRateLimit } from "./middlewares/rateLimiter";
 import { postsController } from "./posts/posts.controller";
 import { registerSwagger } from "./swagger/setupSwagger";
-import { aiController } from "./ai/ai.controller";
 import { trendingController } from "./trending/trending.controller";
 import { usersController } from "./users/users.controller";
-import { ExpirationInSec } from "./entities/dto/auth.dto";
-import { setUpRateLimit } from "./middlewares/rateLimiter";
 
 export const initApp = async (): Promise<Express> => {
   const port = serverConfig.port;
@@ -59,9 +62,25 @@ export const initApp = async (): Promise<Express> => {
     mongoose.connection.on("error", (error) => console.error(error));
     await mongoose.connect(dbConfig.connectionUrl);
 
-    app.listen(port, () => {
-      console.log(`Listening on port ${port}`);
-    });
+    if (serverConfig.env === "production") {
+      const privateKey = fs.readFileSync(
+        path.resolve(__dirname, "certs/key.pem"),
+        "utf8",
+      );
+      const certificate = fs.readFileSync(
+        path.resolve(__dirname, "certs/cert.pem"),
+        "utf8",
+      );
+      const credentials = { key: privateKey, cert: certificate };
+
+      https.createServer(credentials, app).listen(port, () => {
+        console.log(`Listening on port ${port}`);
+      });
+    } else {
+      http.createServer(app).listen(port, () => {
+        console.log(`Listening on port ${port}`);
+      });
+    }
   } catch (err) {
     const error = err as Error;
     const errorLog = {
