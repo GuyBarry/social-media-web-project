@@ -22,7 +22,6 @@ interface Rect {
   height: number;
 }
 
-/** Returns { w, h } multipliers for a given ratio label. */
 const ratioMultipliers = (ratio: AspectRatio) =>
   ratio === "4:3" ? { rw: 4, rh: 3 } : { rw: 1, rh: 1 };
 
@@ -84,13 +83,11 @@ export const ImageCropSelector: FC<ImageCropSelectorProps> = ({
     return { w: bounds.width, h: bounds.height };
   }, []);
 
-  /** Given a "base width", returns the corresponding { width, height } for the current ratio. */
   const sizeFromWidth = useCallback(
     (w: number) => ({ width: w, height: (w * rh) / rw }),
     [rw, rh],
   );
 
-  /** Max base-width that fits the image at the current ratio. */
   const maxBaseWidth = useCallback(() => {
     const { w, h } = imgSize();
     return Math.min(w, (h * rw) / rh);
