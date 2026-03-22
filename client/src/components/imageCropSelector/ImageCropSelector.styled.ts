@@ -52,3 +52,9 @@ export const CropActionsRow = styled(Box)({
   justifyContent: "flex-end",
   paddingTop: "10px",
 });
+
+export const RatioToggleRow = styled(Box)({
+  display: "flex",
+  gap: "8px",
+  paddingBottom: "10px",
+});

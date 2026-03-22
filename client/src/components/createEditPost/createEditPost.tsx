@@ -12,7 +12,7 @@ import { useRewriteWithMood } from "../../react/hooks/useAi";
 import { useCreatePost, useUpdatePost } from "../../react/hooks/usePosts";
 import { avatarImageSlotProps } from "../../utils/avatar.utils";
 import { CostumButton } from "../button/CostumButton.styled";
-import { ImageCropSelector } from "../imageCropSelector/ImageCropSelector";
+import { ImageCropSelector, type AspectRatio } from "../imageCropSelector/ImageCropSelector";
 import { ProfileAvatar } from "../profileAvatar/ProfileAvatar.styled";
 import {
   ActionButtonsContainer,
@@ -60,6 +60,7 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
   const [activeMood, setActiveMood] = useState<Mood | null>(null);
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
   const [moodSuggestion, setMoodSuggestion] = useState<string | null>(null);
+  const [cropAspectRatio, setCropAspectRatio] = useState<AspectRatio>("1:1");
   const [rateLimitError, setRateLimitError] = useState(false);
 
   useEffect(() => {
@@ -254,6 +255,8 @@ export const CreateEditPost: FC<CreateEditPostProps> = ({
           originalFile={pendingCropFile}
           onConfirm={handleCropConfirm}
           onCancel={handleCropCancel}
+          aspectRatio={cropAspectRatio}
+          onAspectRatioChange={setCropAspectRatio}
         />
       ) : (
         previewUrl && (

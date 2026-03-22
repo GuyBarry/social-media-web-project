@@ -3,9 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import request from "supertest";
 
-jest.mock("../ai/ai.service", () => ({
-  generateAIContent: jest.fn(),
-}));
+jest.mock("../ai/ai.provider");
 
 import { initApp } from "../app";
 import { authService } from "../auth/auth.service";
@@ -28,11 +26,9 @@ const MOCK_TOPICS: TrendingResult["topics"] = [
   { topicName: "Cloud Computing", shortSummary: "Serverless on the rise" },
 ];
 
-/** Make generateAIContent return a valid JSON string of MOCK_TOPICS */
 const mockAIWithTopics = () =>
   mockGenerateAIContent.mockResolvedValue(JSON.stringify(MOCK_TOPICS));
 
-/** Make generateAIContent reject to simulate AI failure */
 const mockAIFailure = () =>
   mockGenerateAIContent.mockRejectedValue(new Error("AI service error"));
 
@@ -196,6 +192,7 @@ describe("POST /trending - fresh result generation", () => {
     mockAIWithTopics();
 
     const oldDate = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+    await seedPost("old post", oldDate);
 
     const response = await postTrending(app, { timeRange: "1day" }, authCookies);
 

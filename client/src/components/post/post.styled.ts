@@ -82,11 +82,15 @@ export const CaptionToggleButton = styled("button")(({ theme }) => ({
   "&:focus": { outline: "none" },
 }));
 
-export const PostImageContainer = styled(Box)({
+export const PostImageContainer = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "$aspectRatio",
+})<{ $aspectRatio?: string }>(({ $aspectRatio }) => ({
   width: "100%",
-  aspectRatio: "1 / 1",
+  aspectRatio: $aspectRatio,
   overflow: "hidden",
-});
+  minHeight: 0,
+  flexShrink: 1,
+}));
 
 export const PostImage = styled("img")({
   width: "100%",
