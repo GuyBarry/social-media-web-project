@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { CostumButton } from "../../../components/button/CostumButton.styled";
-import { trendingApi } from "../../../api/trendingApi";
+import { useGetTrending } from "../../../react/hooks/useTrending";
+import {
+  TIME_RANGE_BUTTONS,
+  type TimeRange,
+} from "../../../constants/timeRanges";
 import {
   TrendingButtonGroup,
   TrendingCardContainer,
@@ -15,48 +19,22 @@ import {
   TrendingTopicSummary,
 } from "./trendingCard.styled";
 
-type TimeRange = "1day" | "3days" | "1week";
-
-interface TrendingTopic {
-  topicName: string;
-  shortSummary: string;
-}
-
-interface TrendingResult {
-  topics: TrendingTopic[];
-}
-
-const TIME_RANGE_BUTTONS: { label: string; value: TimeRange }[] = [
-  { label: "1 day", value: "1day" },
-  { label: "3 days", value: "3days" },
-  { label: "1 week", value: "1week" },
-];
-
 export const TrendingCard = () => {
   const [selected, setSelected] = useState<TimeRange | null>(null);
-  const [result, setResult] = useState<TrendingResult | null>(null);
-  const [loading, setLoading] = useState(false);
+  const {
+    mutate: getTrending,
+    data: result,
+    isPending: loading,
+  } = useGetTrending();
 
   useEffect(() => {
     handleSelectRange("1day");
   }, []);
 
-  const handleSelectRange = async (range: TimeRange) => {
+  const handleSelectRange = (range: TimeRange) => {
     if (loading) return;
     setSelected(range);
-    setResult(null);
-    setLoading(true);
-
-    try {
-      const response = await trendingApi.post<TrendingResult>("/", {
-        timeRange: range,
-      });
-      setResult(response.data);
-    } catch {
-      setResult({ topics: [] });
-    } finally {
-      setLoading(false);
-    }
+    getTrending(range);
   };
 
   return (

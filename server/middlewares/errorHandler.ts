@@ -22,10 +22,10 @@ export const errorHandler: ErrorRequestHandler = (
       details,
     });
   } else {
-    // console.error({
-    //   message: error?.message,
-    //   stack: error?.stack,
-    // });
+  // console.error({
+  //   message: error?.message,
+  //   stack: error?.stack,
+  // });
 
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       message: "Oops, something went wrong!",
