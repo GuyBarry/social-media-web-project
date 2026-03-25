@@ -4,7 +4,7 @@ set -e
 
 . ./vm.config
 host="node63.cs.colman.ac.il"
-app_dir="~/social-media"
+app_dir="/home/node63/social-media"
 
 echo "🚀 Deploying to $username@$host..."
 
