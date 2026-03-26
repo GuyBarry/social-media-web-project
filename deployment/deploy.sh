@@ -14,23 +14,25 @@ sshpass -p $password ssh $username@$host "rm -rf $app_dir/server $app_dir/client
 sshpass -p $password ssh $username@$host "mkdir -p $app_dir" \
 && sshpass -p $password scp -r ../server $username@$host:$app_dir \
 && sshpass -p $password scp -r ../client $username@$host:$app_dir \
+&& sshpass -p $password scp ../server/nginx.conf $username@$host:/etc/nginx/conf.d/
+&& sshpass -p $password ssh $username@$host "sudo systemctl reload nginx" \
 \
-&& echo "=== [1/6] Installing server dependencies ===" \
+&& echo "=== [1/7] Installing server dependencies ===" \
 && sshpass -p $password ssh $username@$host "cd $app_dir/server && npm install" \
 \
-&& echo "=== [2/6] Installing client dependencies ===" \
+&& echo "=== [2/7] Installing client dependencies ===" \
 && sshpass -p $password ssh $username@$host "cd $app_dir/client && npm install" \
 \
-&& echo "=== [3/6] Building client ===" \
+&& echo "=== [3/7] Building client ===" \
 && sshpass -p $password ssh $username@$host "cd $app_dir/client && npm run build" \
 \
-&& echo "=== [4/6] Copying client build into server/client ===" \
+&& echo "=== [4/7] Copying client build into server/client ===" \
 && sshpass -p $password ssh $username@$host "mkdir -p $app_dir/server/client && cp -r $app_dir/client/dist/. $app_dir/server/client/" \
 \
-&& echo "=== [5/6] Removing client folder ===" \
+&& echo "=== [5/7] Removing client folder ===" \
 && sshpass -p $password ssh $username@$host "rm -rf $app_dir/client" \
 \
-&& echo "=== [6/6] Compiling server & pruning dev dependencies ===" \
+&& echo "=== [6/7] Compiling server & pruning dev dependencies ===" \
 && sshpass -p $password ssh $username@$host "cd $app_dir/server && npm run build:prod" \
 \
 && echo "=== [7/7] Starting server with PM2 ===" \
