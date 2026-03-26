@@ -34,6 +34,6 @@ sshpass -p $password ssh $username@$host "mkdir -p $app_dir" \
 && sshpass -p $password ssh $username@$host "cd $app_dir/server && npm run build:prod" \
 \
 && echo "=== [7/7] Starting server with PM2 ===" \
-&& sshpass -p $password ssh $username@$host "cd $app_dir/server && npm run start:prod" \
+&& sshpass -p $password ssh $username@$host "cd $app_dir/server && pm2 startOrRestart ecosystem.config.js" \
 \
 && echo "✅ Deployment complete!"
