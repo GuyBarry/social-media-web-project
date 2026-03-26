@@ -40,7 +40,6 @@ export const initApp = async (): Promise<Express> => {
   require("./auth/auth.google");
 
   app.use("/public", express.static(path.resolve(__dirname, "public")));
-  app.use("/", express.static(path.resolve(__dirname, "client")));
   
   app.use("/posts", validateAccessToken, postsController);
   app.use("/comments", validateAccessToken, commentsController);
@@ -55,6 +54,9 @@ export const initApp = async (): Promise<Express> => {
   );
 
   registerSwagger(app);
+  
+  app.use("/", express.static(path.resolve(__dirname, "client")));
+
   app.use(noRouteHandler);
   app.use(errorHandler);
 
