@@ -24,8 +24,8 @@ sshpass -p $password ssh $username@$host "mkdir -p $app_dir" \
 && echo "=== [3/6] Building client ===" \
 && sshpass -p $password ssh $username@$host "cd $app_dir/client && npm run build" \
 \
-&& echo "=== [4/6] Copying client build into server/public ===" \
-&& sshpass -p $password ssh $username@$host "cp -r $app_dir/client/dist/. $app_dir/server/public/" \
+&& echo "=== [4/6] Copying client build into server/client ===" \
+&& sshpass -p $password ssh $username@$host "mkdir -p $app_dir/server/client && cp -r $app_dir/client/dist/. $app_dir/server/client/" \
 \
 && echo "=== [5/6] Removing client folder ===" \
 && sshpass -p $password ssh $username@$host "rm -rf $app_dir/client" \
