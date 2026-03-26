@@ -33,14 +33,15 @@ export const initApp = async (): Promise<Express> => {
     }),
   );
 
+  app.use(express.static("client"));
+  app.use("/public", express.static(path.resolve(__dirname, "public")));
+
   app.use(bodyParser.urlencoded({ extended: true, limit: "1mb" }));
   app.use(bodyParser.json());
   app.use(cookieParser());
   app.use(passport.initialize());
   require("./auth/auth.google");
 
-  app.use("/public", express.static(path.resolve(__dirname, "public")));
-  
   app.use("/posts", validateAccessToken, postsController);
   app.use("/comments", validateAccessToken, commentsController);
   app.use("/users", validateAccessToken, usersController);
@@ -54,8 +55,6 @@ export const initApp = async (): Promise<Express> => {
   );
 
   registerSwagger(app);
-  
-  app.use("/", express.static(path.resolve(__dirname, "client")));
 
   app.use(noRouteHandler);
   app.use(errorHandler);
