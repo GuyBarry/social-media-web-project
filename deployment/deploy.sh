@@ -14,8 +14,8 @@ sshpass -p $password ssh $username@$host "rm -rf $app_dir/server $app_dir/client
 sshpass -p $password ssh $username@$host "mkdir -p $app_dir" \
 && sshpass -p $password scp -r ../server $username@$host:$app_dir \
 && sshpass -p $password scp -r ../client $username@$host:$app_dir \
-&& sshpass -p $password scp ../server/nginx.conf $username@$host:/etc/nginx/conf.d/
-&& sshpass -p $password ssh $username@$host "sudo systemctl reload nginx" \
+# && sshpass -p $password scp ../server/nginx.conf $username@$host:/etc/nginx/conf.d/
+# && sshpass -p $password ssh $username@$host "sudo systemctl reload nginx" \
 \
 && echo "=== [1/7] Installing server dependencies ===" \
 && sshpass -p $password ssh $username@$host "cd $app_dir/server && npm install" \
