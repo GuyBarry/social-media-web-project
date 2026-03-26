@@ -64,11 +64,11 @@ export const initApp = async (): Promise<Express> => {
 
     if (serverConfig.env === "production") {
       const privateKey = fs.readFileSync(
-        path.resolve(__dirname, "certs/key.pem"),
+        path.resolve(__dirname, "../certs/key.pem"),
         "utf8",
       );
       const certificate = fs.readFileSync(
-        path.resolve(__dirname, "certs/cert.pem"),
+        path.resolve(__dirname, "../certs/cert.pem"),
         "utf8",
       );
       const credentials = { key: privateKey, cert: certificate };
