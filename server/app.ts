@@ -58,7 +58,13 @@ export const initApp = async (): Promise<Express> => {
 
   // Serve index.html for all non-API routes (SPA routing)
   app.use((_req, res) => {
-    res.sendFile(path.resolve(__dirname, "client/index.html"));
+    const indexPath = path.resolve(__dirname, "client/index.html");
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error("Error sending index.html:", err);
+        res.status(404).json({ message: "Route does not exist" });
+      }
+    });
   });
 
   app.use(errorHandler);
