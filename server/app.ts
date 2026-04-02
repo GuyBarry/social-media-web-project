@@ -33,7 +33,7 @@ export const initApp = async (): Promise<Express> => {
     }),
   );
 
-  app.use(express.static("client"));
+  app.use(express.static(path.resolve(__dirname, "client")));
   app.use("/public", express.static(path.resolve(__dirname, "public")));
 
   app.use(bodyParser.urlencoded({ extended: true, limit: "1mb" }));
@@ -55,6 +55,11 @@ export const initApp = async (): Promise<Express> => {
   );
 
   registerSwagger(app);
+
+  // Serve index.html for all non-API routes (SPA routing)
+  app.get("*", (_req, res) => {
+    res.sendFile(path.resolve(__dirname, "client/index.html"));
+  });
 
   app.use(noRouteHandler);
   app.use(errorHandler);
