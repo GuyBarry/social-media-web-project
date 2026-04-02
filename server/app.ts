@@ -56,7 +56,7 @@ export const initApp = async (): Promise<Express> => {
 
   registerSwagger(app);
 
-  app.get("/(.*)", (_req, res) => {
+  app.get("/:path(.*)", (_req, res) => {
     res.sendFile(path.resolve(__dirname, "client", "index.html"));
   });
 
