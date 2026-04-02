@@ -57,11 +57,10 @@ export const initApp = async (): Promise<Express> => {
   registerSwagger(app);
 
   // Serve index.html for all non-API routes (SPA routing)
-  app.get("*", (_req, res) => {
+  app.use((_req, res) => {
     res.sendFile(path.resolve(__dirname, "client/index.html"));
   });
 
-  app.use(noRouteHandler);
   app.use(errorHandler);
 
   try {
