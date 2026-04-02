@@ -33,7 +33,7 @@ export const initApp = async (): Promise<Express> => {
     }),
   );
 
-  app.use(express.static(path.resolve(__dirname, "client")));
+  app.use(express.static("client"));
   app.use("/public", express.static(path.resolve(__dirname, "public")));
 
   app.use(bodyParser.urlencoded({ extended: true, limit: "1mb" }));
@@ -56,17 +56,7 @@ export const initApp = async (): Promise<Express> => {
 
   registerSwagger(app);
 
-  // Serve index.html for all non-API routes (SPA routing)
-  app.use((_req, res) => {
-    const indexPath = path.resolve(__dirname, "client/index.html");
-    res.sendFile(indexPath, (err) => {
-      if (err) {
-        console.error("Error sending index.html:", err);
-        res.status(404).json({ message: "Route does not exist" });
-      }
-    });
-  });
-
+  app.use(noRouteHandler);
   app.use(errorHandler);
 
   try {
