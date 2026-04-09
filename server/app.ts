@@ -56,16 +56,16 @@ export const initApp = async (): Promise<Express> => {
 
   registerSwagger(app);
 
-  // const clientRoutes = [
-  //   "/",
-  //   "/profile",
-  //   "/post/:postId",
-  //   "/register",
-  //   "/login",
-  // ];
-  // app.get(clientRoutes, (_req, res) => {
-  //   res.sendFile(path.resolve(__dirname, "../client/index.html"));
-  // });
+  const clientRoutes = [
+    "/",
+    "/profile",
+    "/post/:postId",
+    "/register",
+    "/login",
+  ];
+  app.get(clientRoutes, (_req, res) => {
+    res.sendFile(path.resolve(__dirname, "../client/index.html"));
+  });
 
   app.use(noRouteHandler);
   app.use(errorHandler);
