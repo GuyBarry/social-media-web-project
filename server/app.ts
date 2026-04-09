@@ -63,8 +63,8 @@ export const initApp = async (): Promise<Express> => {
     "/register",
     "/login",
   ];
-  app.use(clientRoutes, (_req, res) => {
-    res.sendFile("client/index.html");
+  app.get(clientRoutes, (_req, res) => {
+    res.sendFile(path.resolve(__dirname, "client/index.html"));
   });
 
   app.use(noRouteHandler);
