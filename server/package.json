@@ -1,5 +1,5 @@
 {
-  "name": "server", 
+  "name": "server",
   "version": "1.0.0",
   "description": "",
   "license": "ISC",
@@ -9,8 +9,7 @@
     "test": "tsc && node --env-file=.env.test --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:file": "tsc && node --env-file=.env.test --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "start": "tsc && node --env-file=.env dist/app.js",
-    "build:prod": "tsc -p tsconfig.prod.json  && npm prune --omit=dev",
-    "start:prod": "node --env-file=.env.production dist/app.js"
+    "build:prod": "tsc -p tsconfig.prod.json  && npm prune --omit=dev"
   },
   "dependencies": {
     "@google/genai": "^1.43.0",
