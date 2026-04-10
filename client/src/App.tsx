@@ -1,7 +1,7 @@
 import { Stack } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth/provider/authProvider";
 import { AppLayout } from "./components/layout/layout";
 import { ProtectedRoute } from "./components/protectedRoute/protectedRoute";
@@ -55,6 +55,7 @@ function App() {
                 element={<RegisterScreen></RegisterScreen>}
               />
               <Route path="/login" element={<LoginScreen></LoginScreen>} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </AuthProvider>
         </BrowserRouter>
