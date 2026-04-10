@@ -55,7 +55,6 @@ function App() {
                 element={<RegisterScreen></RegisterScreen>}
               />
               <Route path="/login" element={<LoginScreen></LoginScreen>} />
-              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </AuthProvider>
         </BrowserRouter>
