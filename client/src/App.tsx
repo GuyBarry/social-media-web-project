@@ -1,16 +1,16 @@
 import { Stack } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth/provider/authProvider";
 import { AppLayout } from "./components/layout/layout";
 import { ProtectedRoute } from "./components/protectedRoute/protectedRoute";
 import { ScrollToTop } from "./components/scrollToTop/ScrollToTop";
 import { HomeScreen } from "./views/home/home";
 import { LoginScreen } from "./views/login/login";
-import { RegisterScreen } from "./views/registeration/register";
-import { ProfileScreen } from "./views/profile/profile";
 import { PostDetailScreen } from "./views/post/postDetail";
+import { ProfileScreen } from "./views/profile/profile";
+import { RegisterScreen } from "./views/registeration/register";
 
 function App() {
   return (
