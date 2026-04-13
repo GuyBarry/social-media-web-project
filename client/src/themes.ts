@@ -3,15 +3,28 @@ import { createTheme } from "@mui/material/styles";
 declare module "@mui/material/styles" {
   interface ThemeOptions {
     banner?: {
-      1?: string;
-      2?: string;
-      3?: string;
-      4?: string;
-      5?: string;
-      6?: string;
-      7?: string;
-      8?: string;
-      9?: string;
+      1: string;
+      2: string;
+      3: string;
+      4: string;
+      5: string;
+      6: string;
+      7: string;
+      8: string;
+      9: string;
+    };
+  }
+  interface Theme {
+    banner: {
+      1: string;
+      2: string;
+      3: string;
+      4: string;
+      5: string;
+      6: string;
+      7: string;
+      8: string;
+      9: string;
     };
   }
 }

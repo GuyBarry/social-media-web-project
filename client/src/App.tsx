@@ -8,9 +8,9 @@ import { ProtectedRoute } from "./components/protectedRoute/protectedRoute";
 import { ScrollToTop } from "./components/scrollToTop/ScrollToTop";
 import { HomeScreen } from "./views/home/home";
 import { LoginScreen } from "./views/login/login";
-import { RegisterScreen } from "./views/registeration/register";
-import { ProfileScreen } from "./views/profile/profile";
 import { PostDetailScreen } from "./views/post/postDetail";
+import { ProfileScreen } from "./views/profile/profile";
+import { RegisterScreen } from "./views/registeration/register";
 
 function App() {
   return (
