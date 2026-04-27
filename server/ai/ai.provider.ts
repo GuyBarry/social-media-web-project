@@ -13,14 +13,13 @@ export interface AIConfig {
 }
 
 const ai = new GoogleGenAI({ apiKey: geminiConfig.apiKey });
-const model = "gemini-3.1-flash-lite-preview";
 
 export async function generateAIContent(
   content: string,
   config: AIConfig,
 ): Promise<string> {
   const response = await ai.models.generateContent({
-    model: model,
+    model: "gemini-3-flash-preview",
     contents: content,
     config: config,
   });
